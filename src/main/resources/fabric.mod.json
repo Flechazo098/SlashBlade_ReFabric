@@ -1,0 +1,51 @@
+{
+	"schemaVersion": 1,
+	"id": "slashbladerefabriced",
+	"version": "${version}",
+	"name": "SlashBlade:Refabriced",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/slashbladerefabriced/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+          "mods.flammpfeil.slashblade.SlashBladeRefabriced"
+		],
+		"fabric-datagen": [
+          "mods.flammpfeil.slashblade.SlashBladeRefabricedDataGenerator"
+		],
+		"cardinal-components-entity": [
+			"com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponentRegistry",
+			"com.flechazo.slashblade.capability.inputstate.InputStateComponentRegistry",
+			"com.flechazo.slashblade.capability.mobeffect.MobEffectComponentRegistry",
+			"com.flechazo.slashblade.capability.slashblade.BladeStateComponentRegistry"
+		]
+	},
+	"custom": {
+		"cardinal-components": [
+			"slashblade:concentration_rank",
+			"slashblade:input_state",
+			"slashblade:mob_effect",
+			"slashblade:blade_state"
+		]
+	},
+	"mixins": [
+		"slashbladerefabriced.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.16.13",
+		"minecraft": "~1.20.1",
+		"java": ">=17",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}
