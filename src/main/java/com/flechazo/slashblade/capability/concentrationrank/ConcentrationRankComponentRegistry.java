@@ -16,7 +16,6 @@ public class ConcentrationRankComponentRegistry implements EntityComponentInitia
 
     @Override
     public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
-        // 只给玩家添加集中度等级组件
         registry.registerForPlayers(CONCENTRATION_RANK, player -> new ConcentrationRankComponentImpl(),
                 RespawnCopyStrategy.ALWAYS_COPY);
     }

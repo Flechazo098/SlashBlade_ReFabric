@@ -5,8 +5,10 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 
@@ -77,4 +79,61 @@ public class NetworkManager {
             }
         }
     }
+    /**
+     * 向指定世界中以 (x,y,z) 为中心，半径 radius 范围内所有玩家发送包
+     */
+    public static void sendToNear(ServerLevel world, int x, int y, int z, double radius, ResourceLocation channelId, FriendlyByteBuf buf) {
+        // 将浮点坐标转为整数方块位置
+        BlockPos center = new BlockPos(x, y, z);
+        // PlayerLookup.around 返回所有在 view-distance 内、并且距离 center <= radius 的 ServerPlayer
+        for (ServerPlayer player : PlayerLookup.around(world, center, radius)) {
+            ServerPlayNetworking.send(player, channelId, buf);  // 向单个玩家发送包
+        }
+    }
+    /**
+     * 通用的send方法，用于兼容Forge风格的PacketDistributor调用
+     * 这个方法处理PacketDistributor.PLAYER.with(() -> player)的调用模式
+     */
+    public static void send(PacketDistributor distributor, Object message) {
+        if (distributor.getType() == PacketDistributor.Type.PLAYER) {
+            ServerPlayer player = distributor.getPlayerSupplier().get();
+
+            if (message instanceof RankSyncMessage msg) {
+                FriendlyByteBuf buf = PacketByteBufs.create();
+                buf.writeLong(msg.rawPoint);
+                ServerPlayNetworking.send(player, RANK_SYNC_ID, buf);
+            }
+        }
+    }
+    /**
+     * PacketDistributor类，用于模拟Forge的网络分发机制
+     */
+    public static class PacketDistributor {
+        private final Type type;
+        private java.util.function.Supplier<ServerPlayer> playerSupplier;
+
+        private PacketDistributor(Type type) {
+            this.type = type;
+        }
+
+        public Type getType() {
+            return type;
+        }
+
+        public java.util.function.Supplier<ServerPlayer> getPlayerSupplier() {
+            return playerSupplier;
+        }
+
+        public PacketDistributor with(java.util.function.Supplier<ServerPlayer> supplier) {
+            this.playerSupplier = supplier;
+            return this;
+        }
+
+        public static final PacketDistributor PLAYER = new PacketDistributor(Type.PLAYER);
+
+        public enum Type {
+            PLAYER
+        }
+    }
+
 }

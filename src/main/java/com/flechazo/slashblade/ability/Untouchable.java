@@ -1,13 +1,17 @@
 package com.flechazo.slashblade.ability;
 
-import com.flechazo.slashblade.capability.mobeffect.MobEffectComponentRegistry;
-import com.flechazo.slashblade.item.ItemSlashBlade;
+import com.flechazo.slashblade.capability.mobeffect.MobEffectComponent;
+import com.flechazo.slashblade.capability.mobeffect.MobEffectHelper;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
+import io.github.fabricators_of_create.porting_lib.entity.events.LivingAttackEvent;
+import io.github.fabricators_of_create.porting_lib.entity.events.LivingEntityEvents;
+import io.github.fabricators_of_create.porting_lib.entity.events.living.LivingDamageEvent;
+import io.github.fabricators_of_create.porting_lib.entity.events.living.LivingHurtEvent;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.*;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,11 +29,16 @@ public class Untouchable {
     }
 
     public void register() {
-        MinecraftForge.EVENT_BUS.register(this);
+        LivingHurtEvent.HURT.register(this::onLivingHurt);
+        LivingDamageEvent.DAMAGE.register(this::onLivingDamage);
+        LivingAttackEvent.ATTACK.register(this::onLivingAttack);
+        ServerLivingEntityEvents.ALLOW_DEATH.register(this::onAllowDeath);
+        LivingEntityEvents.LivingTickEvent.TICK.register(this::onLivingTicks);
+        LivingEntityEvents.LivingJumpEvent.JUMP.register(this::onPlayerJump);
     }
 
     public static void setUntouchable(LivingEntity entity, int ticks) {
-        entity.getCapability(MobEffectComponentRegistry.MOB_EFFECT).ifPresent(ef -> {
+        MobEffectHelper.getMobEffect(entity).ifPresent(ef -> {
             ef.setManagedUntouchable(entity.level().getGameTime(), ticks);
             ef.storeEffects(entity.getActiveEffectsMap().keySet());
             ef.storeHealth(entity.getHealth());
@@ -37,10 +46,10 @@ public class Untouchable {
     }
 
     private boolean checkUntouchable(LivingEntity entity) {
-        Optional<Boolean> isUntouchable = entity.getCapability(MobEffectComponentRegistry.MOB_EFFECT)
+        Optional<Boolean> isUntouchable = MobEffectHelper.getMobEffect(entity)
                 .map(ef -> ef.isUntouchable(entity.getCommandSenderWorld().getGameTime()));
 
-        return isUntouchable.orElseGet(() -> false);
+        return isUntouchable.orElse(false);
     }
 
     private void doWitchTime(Entity entity) {
@@ -53,7 +62,6 @@ public class Untouchable {
         StunManager.setStun((LivingEntity) entity);
     }
 
-    @SubscribeEvent
     public void onLivingHurt(LivingHurtEvent event) {
         if (checkUntouchable(event.getEntity())) {
             event.setCanceled(true);
@@ -61,7 +69,6 @@ public class Untouchable {
         }
     }
 
-    @SubscribeEvent
     public void onLivingDamage(LivingDamageEvent event) {
         if (checkUntouchable(event.getEntity())) {
             event.setCanceled(true);
@@ -69,7 +76,6 @@ public class Untouchable {
         }
     }
 
-    @SubscribeEvent
     public void onLivingAttack(LivingAttackEvent event) {
         if (checkUntouchable(event.getEntity())) {
             event.setCanceled(true);
@@ -77,43 +83,39 @@ public class Untouchable {
         }
     }
 
-    @SubscribeEvent
-    public void onLivingDeath(LivingDeathEvent event) {
-        if (checkUntouchable(event.getEntity())) {
-            event.setCanceled(true);
-            doWitchTime(event.getSource().getEntity());
+    private boolean onAllowDeath(LivingEntity entity, DamageSource source, float damageAmount) {
+        if (checkUntouchable(entity)) {
 
-            LivingEntity entity = event.getEntity();
+            MobEffectComponent eff = MobEffectHelper.getMobEffect(entity).orElse(null);
+            if (eff != null && eff.hasUntouchableWorked()) {
+                List<MobEffect> toRemove = entity.getActiveEffectsMap().keySet().stream()
+                        .filter(m -> !(eff.getEffectSet().contains(m) || m.isBeneficial()))
+                        .toList();
+                toRemove.forEach(entity::removeEffect);
 
-            entity.getCapability(MobEffectComponentRegistry.MOB_EFFECT).ifPresent(ef -> {
-                if (ef.hasUntouchableWorked()) {
-                    List<MobEffect> filterd = entity.getActiveEffectsMap().keySet().stream()
-                            .filter(p -> !(ef.getEffectSet().contains(p) || p.isBeneficial())).toList();
-
-                    filterd.forEach(p -> entity.removeEffect(p));
-
-                    float storedHealth = ef.getStoredHealth();
-                    if (ef.getStoredHealth() < storedHealth)
-                        entity.setHealth(ef.getStoredHealth());
+                float stored = eff.getStoredHealth();
+                if (entity.getHealth() < stored) {
+                    entity.setHealth(stored);
                 }
-            });
+            }
+            return false;
         }
+        return true;
     }
 
-    @SubscribeEvent
-    public void onLivingTicks(LivingEvent.LivingTickEvent event) {
+    public void onLivingTicks(LivingEntityEvents.LivingTickEvent event) {
         LivingEntity entity = event.getEntity();
 
         if (entity.level().isClientSide())
             return;
 
-        entity.getCapability(MobEffectComponentRegistry.MOB_EFFECT).ifPresent(ef -> {
+        MobEffectHelper.getMobEffect(entity).ifPresent(ef -> {
             if (ef.hasUntouchableWorked()) {
                 ef.setUntouchableWorked(false);
                 List<MobEffect> filterd = entity.getActiveEffectsMap().keySet().stream()
                         .filter(p -> !(ef.getEffectSet().contains(p) || p.isBeneficial())).toList();
 
-                filterd.forEach(p -> entity.removeEffect(p));
+                filterd.forEach(entity::removeEffect);
 
                 float storedHealth = ef.getStoredHealth();
                 if (ef.getStoredHealth() < storedHealth)
@@ -124,9 +126,8 @@ public class Untouchable {
 
     final static int JUMP_TICKS = 10;
 
-    @SubscribeEvent
-    public void onPlayerJump(LivingEvent.LivingJumpEvent event) {
-        if (!event.getEntity().getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).isPresent())
+    public void onPlayerJump(LivingEntityEvents.LivingJumpEvent event) {
+        if (BladeStateHelper.getBladeState(event.getEntity().getMainHandItem()).isEmpty())
             return;
 
         Untouchable.setUntouchable(event.getEntity(), JUMP_TICKS);

@@ -1,16 +1,14 @@
 package com.flechazo.slashblade.compat.playerAnim;
 
+import com.flechazo.slashblade.event.BladeMotionEvent;
 import com.google.common.collect.Maps;
 import dev.kosmx.playerAnim.api.layered.AnimationStack;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
 import com.flechazo.slashblade.SlashBladeRefabriced;
-import com.flechazo.slashblade.event.BladeMotionEvent;
 import com.flechazo.slashblade.init.DefaultResources;
 import com.flechazo.slashblade.registry.ComboStateRegistry;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.Map;
 
@@ -29,18 +27,7 @@ public class PlayerAnimationOverrider {
     }
 
     public void register() {
-        MinecraftForge.EVENT_BUS.register(this);
-    }
-
-    private static final ResourceLocation MotionLocation = new ResourceLocation(SlashBladeRefabriced.MODID,
-            "model/pa/player_motion.vmd");
-
-    public Map<ResourceLocation, VmdAnimation> getAnimation() {
-		return animation;
-	}
-    
-    @SubscribeEvent
-    public void onBladeAnimationStart(BladeMotionEvent event) {
+        BladeMotionEvent.BLADE_MOTION.register(event -> {
         if (!(event.getEntity() instanceof AbstractClientPlayer))
             return;
         AbstractClientPlayer player = (AbstractClientPlayer) event.getEntity();
@@ -53,9 +40,17 @@ public class PlayerAnimationOverrider {
             animationStack.removeLayer(0);
             animation.play();
             animationStack.addAnimLayer(0, animation.getClone());
-        }
-
+            }
+        });
     }
+
+    private static final ResourceLocation MotionLocation = new ResourceLocation(SlashBladeRefabriced.MODID,
+            "model/pa/player_motion.vmd");
+
+    public Map<ResourceLocation, VmdAnimation> getAnimation() {
+		return animation;
+	}
+
 
     private Map<ResourceLocation, VmdAnimation> initAnimations() {
         Map<ResourceLocation, VmdAnimation> map = Maps.newHashMap();

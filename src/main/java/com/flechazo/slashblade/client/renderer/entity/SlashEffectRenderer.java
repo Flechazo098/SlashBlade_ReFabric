@@ -1,14 +1,16 @@
 package com.flechazo.slashblade.client.renderer.entity;
 
+import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponent;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.flechazo.slashblade.SlashBladeRefabriced;
-import com.flechazo.slashblade.capability.concentrationrank.IConcentrationRank.ConcentrationRanks;
 import com.flechazo.slashblade.client.renderer.model.BladeModelManager;
 import com.flechazo.slashblade.client.renderer.model.obj.Face;
 import com.flechazo.slashblade.client.renderer.model.obj.WavefrontObject;
 import com.flechazo.slashblade.client.renderer.util.BladeRenderState;
 import com.flechazo.slashblade.client.renderer.util.MSAutoCloser;
 import com.flechazo.slashblade.entity.EntitySlashEffect;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -16,12 +18,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import com.mojang.math.Axis;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class SlashEffectRenderer<T extends EntitySlashEffect> extends EntityRenderer<T> {
 
     static private final ResourceLocation modelLocation = new ResourceLocation(SlashBladeRefabriced.MODID,
@@ -79,10 +79,10 @@ public class SlashEffectRenderer<T extends EntitySlashEffect> extends EntityRend
 
             int color = entity.getColor() & 0xFFFFFF;
 
-            ConcentrationRanks rank = entity.getRankCode();
+            ConcentrationRankComponent.ConcentrationRanks rank = entity.getRankCode();
 
             // rank color overwrite
-            if (rank.level < ConcentrationRanks.C.level) {
+            if (rank.level < ConcentrationRankComponent.ConcentrationRanks.C.level) {
                 color = 0x555555;
             }
 
@@ -92,7 +92,7 @@ public class SlashEffectRenderer<T extends EntitySlashEffect> extends EntityRend
             int alpha = ((0xFF & (int) (0xFF * baseAlpha)) << 24);
 
             // black alpha insidee
-            if (ConcentrationRanks.S.level <= rank.level)
+            if (ConcentrationRankComponent.ConcentrationRanks.S.level <= rank.level)
                 try (MSAutoCloser msacb = MSAutoCloser.pushMatrix(matrixStackIn)) {
                     float windscale = entity.getBaseSize() * Mth.lerp(progress, 0.035f, 0.03f);
                     matrixStackIn.scale(windscale, yscale, windscale);
@@ -104,7 +104,7 @@ public class SlashEffectRenderer<T extends EntitySlashEffect> extends EntityRend
                 }
 
             // color alpha base
-            if (ConcentrationRanks.D.level <= rank.level)
+            if (ConcentrationRankComponent.ConcentrationRanks.D.level <= rank.level)
                 try (MSAutoCloser msacb = MSAutoCloser.pushMatrix(matrixStackIn)) {
                     matrixStackIn.scale(scale, yscale, scale);
                     Face.setAlphaOverride(Face.alphaOverrideYZZ);
@@ -115,7 +115,7 @@ public class SlashEffectRenderer<T extends EntitySlashEffect> extends EntityRend
                 }
 
             // white add outside
-            if (ConcentrationRanks.B.level <= rank.level)
+            if (ConcentrationRankComponent.ConcentrationRanks.B.level <= rank.level)
                 try (MSAutoCloser msacb = MSAutoCloser.pushMatrix(matrixStackIn)) {
                     float windscale = entity.getBaseSize() * Mth.lerp(progress, 0.03f, 0.0375f);
                     matrixStackIn.scale(windscale, yscale, windscale);

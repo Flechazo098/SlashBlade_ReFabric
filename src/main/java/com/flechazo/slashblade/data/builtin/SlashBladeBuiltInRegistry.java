@@ -2,6 +2,7 @@ package com.flechazo.slashblade.data.builtin;
 
 import java.util.List;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import org.apache.commons.compress.utils.Lists;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
@@ -18,7 +19,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class SlashBladeBuiltInRegistry {
     public static final ResourceKey<SlashBladeDefinition> YAMATO = register("yamato");
@@ -319,12 +319,11 @@ public class SlashBladeBuiltInRegistry {
     }
 
     private static ResourceLocation getEnchantmentID(Enchantment enchantment) {
-        return ForgeRegistries.ENCHANTMENTS.getKey(enchantment);
+        return BuiltInRegistries.ENCHANTMENT.getKey(enchantment);
     }
 
     private static ResourceKey<SlashBladeDefinition> register(String id) {
-        ResourceKey<SlashBladeDefinition> loc = ResourceKey.create(SlashBladeDefinition.REGISTRY_KEY,
+        return ResourceKey.create(SlashBladeDefinition.REGISTRY_KEY,
                 SlashBladeRefabriced.prefix(id));
-        return loc;
     }
 }

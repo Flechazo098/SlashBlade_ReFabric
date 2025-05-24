@@ -57,6 +57,10 @@ repositories {
 	}
 	maven { url "https://maven.shedaniel.me/" }
 	maven { url "https://maven.terraformersmc.com/releases/" }
+	maven {
+		name = "FLMaven"
+		url = "https://raw.githubusercontent.com/Flechazo098/FLMaven/main/repository"
+	}
 }
 
 fabricApi {
@@ -122,6 +126,11 @@ dependencies {
 	modApi("me.shedaniel.cloth:cloth-config-fabric:11.1.136") {
 		exclude(group: "net.fabricmc.fabric-api")
 	}
+	modImplementation ("com.flechazo:jzxlib:0.0.1")
+}
+
+loom {
+	accessWidenerPath = file("src/main/resources/slashbladere.accesswidener")
 }
 
 processResources {

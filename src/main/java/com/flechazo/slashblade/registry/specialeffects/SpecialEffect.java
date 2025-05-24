@@ -49,15 +49,15 @@ public class SpecialEffect {
 	}
 	
 	public static boolean isEffective(ResourceLocation id, int level){
-		return SpecialEffectsRegistry.REGISTRY.get().getValue(id).getRequestLevel() <= level;
+		return SpecialEffectsRegistry.REGISTRY.get(id).getRequestLevel() <= level;
 	}
 	
 	public static Component getDescription(ResourceLocation id){
-		return SpecialEffectsRegistry.REGISTRY.get().getValue(id).getDescription();
+		return SpecialEffectsRegistry.REGISTRY.get(id).getDescription();
 	}
 	
 	public static int getRequestLevel(ResourceLocation id){
-		return SpecialEffectsRegistry.REGISTRY.get().getValue(id).getRequestLevel();
+		return SpecialEffectsRegistry.REGISTRY.get(id).getRequestLevel();
 	}
 	
 	public Component getDescription() {
@@ -65,14 +65,14 @@ public class SpecialEffect {
     }
 
     public String toString() {
-        return SpecialEffectsRegistry.REGISTRY.get().getKey(this).toString();
+        return SpecialEffectsRegistry.REGISTRY.getKey(this).toString();
     }
 
     private String descriptionId;
 
     protected String getOrCreateDescriptionId() {
         if (this.descriptionId == null) {
-            this.descriptionId = Util.makeDescriptionId("se", SpecialEffectsRegistry.REGISTRY.get().getKey(this));
+            this.descriptionId = Util.makeDescriptionId("se", SpecialEffectsRegistry.REGISTRY.getKey(this));
         }
         return this.descriptionId;
     }

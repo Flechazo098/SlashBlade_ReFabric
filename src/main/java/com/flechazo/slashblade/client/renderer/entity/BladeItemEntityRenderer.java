@@ -1,5 +1,7 @@
 package com.flechazo.slashblade.client.renderer.entity;
 
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
+import com.flechazo.slashblade.util.accessor.PersistentDataAccessor;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.flechazo.slashblade.client.renderer.model.BladeModelManager;
 import com.flechazo.slashblade.client.renderer.model.obj.WavefrontObject;
@@ -24,16 +26,6 @@ public class BladeItemEntityRenderer extends ItemEntityRenderer {
     }
 
     @Override
-    public boolean shouldSpreadItems() {
-        return false;
-    }
-
-    @Override
-    public boolean shouldBob() {
-        return false;
-    }
-
-    @Override
     public void render(ItemEntity itemIn, float entityYaw, float partialTicks, PoseStack matrixStackIn,
             MultiBufferSource bufferIn, int packedLightIn) {
         this.shadowRadius = 0;
@@ -55,10 +47,10 @@ public class BladeItemEntityRenderer extends ItemEntityRenderer {
                 ItemStack current = itemIn.getItem();
 
                 EnumSet<SwordType> types = SwordType.from(current);
-                itemIn.getPersistentData();
-                ResourceLocation modelLocation = current.getCapability(ItemSlashBlade.BLADESTATE)
+                ((PersistentDataAccessor) itemIn).slashbladerefabriced$getPersistentData();
+                ResourceLocation modelLocation = BladeStateHelper.getBladeState(current)
                         .map((state) -> state.getModel().orElseGet(bladeItem::getModel)).orElseGet(bladeItem::getModel);
-                ResourceLocation textureLocation = current.getCapability(ItemSlashBlade.BLADESTATE)
+                ResourceLocation textureLocation = BladeStateHelper.getBladeState(current)
                         .map((state) -> state.getTexture().orElseGet(bladeItem::getTexture))
                         .orElseGet(bladeItem::getTexture);
 

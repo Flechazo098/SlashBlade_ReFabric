@@ -4,6 +4,7 @@ import com.flechazo.slashblade.ability.*;
 import com.flechazo.slashblade.client.renderer.entity.*;
 import com.flechazo.slashblade.entity.*;
 import com.flechazo.slashblade.event.*;
+import com.flechazo.slashblade.event.drop.EntityDropEvent;
 import com.google.common.base.CaseFormat;
 import mods.flammpfeil.slashblade.ability.*;
 import com.flechazo.slashblade.capability.concentrationrank.CapabilityConcentrationRank;
@@ -28,10 +29,13 @@ import com.flechazo.slashblade.registry.combo.ComboCommands;
 import com.flechazo.slashblade.registry.slashblade.SlashBladeDefinition;
 import com.flechazo.slashblade.registry.specialeffects.SpecialEffect;
 import com.flechazo.slashblade.util.TargetSelector;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.entity.Entity;
@@ -69,7 +73,7 @@ import java.util.List;
 import static com.flechazo.slashblade.SlashBladeConfig.TRAPEZOHEDRON_MAX_REFINE;
 
 @Mod(SlashBladeRefabriced.MODID)
-public class SlashBladeRefabriced {
+public class SlashBladeRefabriced implements ModInitializer {
     public static final String MODID = "slashblade";
 
     public static ResourceLocation prefix(String path) {
@@ -78,6 +82,17 @@ public class SlashBladeRefabriced {
 
     // Directly reference a log4j logger.
     public static final Logger LOGGER = LogManager.getLogger();
+
+
+    @Override
+    public void onInitialize () {
+        // 在服务端实体死亡后触发
+        ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
+            // 只对存活实体（非玩家等）进行处理
+            if (!(entity.level() instanceof ServerLevel world)) return;
+            EntityDropEvent.handleBladeDrop(world, entity, source);
+        });
+    }
 
     public SlashBladeRefabriced () {
         // Register the setup method for modloading
@@ -102,20 +117,15 @@ public class SlashBladeRefabriced {
 
     private void setup(final FMLCommonSetupEvent event) {
 
-        MinecraftForge.EVENT_BUS.addListener(KnockBackHandler::onLivingKnockBack);
-
         FallHandler.getInstance().register();
         LockOnManager.getInstance().register();
         Guard.getInstance().register();
 
-        MinecraftForge.EVENT_BUS.register(new CapabilityAttachHandler());
         MinecraftForge.EVENT_BUS.register(new StunManager());
 
-        RefineHandler.getInstance().register();
         KillCounter.getInstance().register();
         RankPointHandler.getInstance().register();
         AllowFlightOverrwrite.getInstance().register();
-        BlockPickCanceller.getInstance().register();
         BladeMotionEventBroadcaster.getInstance().register();
 
         MinecraftForge.EVENT_BUS.addListener(TargetSelector::onInputChange);

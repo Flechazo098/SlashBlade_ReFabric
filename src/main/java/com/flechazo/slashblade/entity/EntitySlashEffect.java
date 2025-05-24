@@ -1,14 +1,18 @@
 package com.flechazo.slashblade.entity;
 
+import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponent;
+import com.flechazo.slashblade.util.accessor.PersistentDataAccessor;
 import com.google.common.collect.Lists;
 import com.mojang.math.Axis;
 import com.flechazo.slashblade.SlashBladeRefabriced;
-import com.flechazo.slashblade.capability.concentrationrank.IConcentrationRank;
 import com.flechazo.slashblade.event.FallHandler;
 import com.flechazo.slashblade.util.AttackManager;
 import com.flechazo.slashblade.util.EnumSetConverter;
 import com.flechazo.slashblade.util.KnockBacks;
 import com.flechazo.slashblade.util.NBTHelper;
+import io.github.fabricators_of_create.porting_lib.entity.PortingLibEntity;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -28,10 +32,6 @@ import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.*;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.network.PlayMessages;
-import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 import java.util.EnumSet;
@@ -96,7 +96,7 @@ public class EntitySlashEffect extends Projectile implements IShootable {
         // this.setGlowing(true);
     }
 
-    public static EntitySlashEffect createInstance(PlayMessages.SpawnEntity packet, Level worldIn) {
+    public static EntitySlashEffect createInstance(Level worldIn) {
         return new EntitySlashEffect(SlashBladeRefabriced.RegistryEvents.SlashEffect, worldIn);
     }
 
@@ -137,7 +137,7 @@ public class EntitySlashEffect extends Projectile implements IShootable {
 
     @Override
     public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+        return PortingLibEntity.getEntitySpawningPacket(this);
     }
 
     public boolean isWave() {
@@ -151,7 +151,7 @@ public class EntitySlashEffect extends Projectile implements IShootable {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public boolean shouldRenderAtSqrDistance(double distance) {
         double d0 = this.getBoundingBox().getSize() * 10.0D;
         if (Double.isNaN(d0)) {
@@ -163,7 +163,7 @@ public class EntitySlashEffect extends Projectile implements IShootable {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void lerpTo(double x, double y, double z, float yaw, float pitch, int posRotationIncrements,
             boolean teleport) {
         this.setPos(x, y, z);
@@ -171,7 +171,7 @@ public class EntitySlashEffect extends Projectile implements IShootable {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void lerpMotion(double x, double y, double z) {
         this.setDeltaMovement(0, 0, 0);
     }
@@ -309,7 +309,7 @@ public class EntitySlashEffect extends Projectile implements IShootable {
                 FallHandler.spawnLandingParticle(this, rayResult.getLocation(), normal3d, 3);
             }
 
-            if (IConcentrationRank.ConcentrationRanks.S.level < getRankCode().level) {
+            if (ConcentrationRankComponent.ConcentrationRanks.S.level < getRankCode().level) {
                 Vec3 vec3 = start.add(normal3d.scale(this.getBaseSize() * 2.5));
                 this.level().addParticle(ParticleTypes.CRIT, vec3.x(), vec3.y(), vec3.z(), dir.x() + normal.x(),
                         dir.y() + normal.y(), dir.z() + normal.z());
@@ -375,8 +375,8 @@ public class EntitySlashEffect extends Projectile implements IShootable {
         this.getEntityData().set(RANK, value);
     }
 
-    public IConcentrationRank.ConcentrationRanks getRankCode() {
-        return IConcentrationRank.ConcentrationRanks.getRankFromLevel(getRank());
+    public ConcentrationRankComponent.ConcentrationRanks getRankCode() {
+        return ConcentrationRankComponent.ConcentrationRanks.getRankFromLevel(getRank());
     }
 
     public int getLifetime() {
@@ -423,7 +423,7 @@ public class EntitySlashEffect extends Projectile implements IShootable {
     }
 
     public List<MobEffectInstance> getPotionEffects() {
-        List<MobEffectInstance> effects = PotionUtils.getAllEffects(this.getPersistentData());
+        List<MobEffectInstance> effects = PotionUtils.getAllEffects(((PersistentDataAccessor)this).slashbladerefabriced$getPersistentData());
 
         if (effects.isEmpty())
             effects.add(new MobEffectInstance(MobEffects.POISON, 1, 1));

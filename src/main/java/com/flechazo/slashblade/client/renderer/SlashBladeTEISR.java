@@ -1,5 +1,6 @@
 package com.flechazo.slashblade.client.renderer;
 
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import com.flechazo.slashblade.client.renderer.model.BladeFirstPersonRender;
@@ -15,6 +16,7 @@ import com.flechazo.slashblade.init.DefaultResources;
 import com.flechazo.slashblade.init.SBItems;
 import com.flechazo.slashblade.item.SwordType;
 import com.flechazo.slashblade.registry.slashblade.SlashBladeDefinition;
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.*;
@@ -35,7 +37,7 @@ import java.util.EnumSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class SlashBladeTEISR extends BlockEntityWithoutLevelRenderer {
+public class SlashBladeTEISR extends BlockEntityWithoutLevelRenderer implements BuiltinItemRendererRegistry.DynamicItemRenderer {
 
     public SlashBladeTEISR(BlockEntityRenderDispatcher p_172550_, EntityModelSet p_172551_) {
         super(p_172550_, p_172551_);
@@ -48,8 +50,8 @@ public class SlashBladeTEISR extends BlockEntityWithoutLevelRenderer {
         // IRenderTypeBuffer bufferIn, int combinedLightIn, int combinedOverlayIn) {
         if (!(itemStackIn.getItem() instanceof ItemSlashBlade))
             return;
-        
-        renderBlade(itemStackIn, type, matrixStack, bufferIn, combinedLightIn, combinedOverlayIn);
+
+        render(itemStackIn, type, matrixStack, bufferIn, combinedLightIn, combinedOverlayIn);
     }
 
     boolean checkRenderNaked() {
@@ -141,11 +143,11 @@ public class SlashBladeTEISR extends BlockEntityWithoutLevelRenderer {
 
         EnumSet<SwordType> types = SwordType.from(stack);
 
-        ResourceLocation modelLocation = stack.getCapability(ItemSlashBlade.BLADESTATE)
+        ResourceLocation modelLocation = BladeStateHelper.getBladeState(stack)
                 .filter(s -> s.getModel().isPresent()).map(s -> s.getModel().get())
                 .orElseGet(() -> stackDefaultModel(stack));
         WavefrontObject model = BladeModelManager.getInstance().getModel(modelLocation);
-        ResourceLocation textureLocation = stack.getCapability(ItemSlashBlade.BLADESTATE)
+        ResourceLocation textureLocation = BladeStateHelper.getBladeState(stack)
                 .filter(s -> s.getTexture().isPresent()).map(s -> s.getTexture().get())
                 .orElseGet(() -> stackDefaultTexture(stack));
 
@@ -235,11 +237,11 @@ public class SlashBladeTEISR extends BlockEntityWithoutLevelRenderer {
         EnumSet<SwordType> types = SwordType.from(stack);
         // BladeModel.itemBlade.getModelLocation(itemStackIn)
 
-        ResourceLocation modelLocation = stack.getCapability(ItemSlashBlade.BLADESTATE)
+        ResourceLocation modelLocation = BladeStateHelper.getBladeState(stack)
                 .filter(s -> s.getModel().isPresent()).map(s -> s.getModel().get())
                 .orElseGet(() -> stackDefaultModel(stack));
         WavefrontObject model = BladeModelManager.getInstance().getModel(modelLocation);
-        ResourceLocation textureLocation = stack.getCapability(ItemSlashBlade.BLADESTATE)
+        ResourceLocation textureLocation = BladeStateHelper.getBladeState(stack)
                 .filter(s -> s.getTexture().isPresent()).map(s -> s.getTexture().get())
                 .orElseGet(() -> stackDefaultTexture(stack));
 
@@ -389,6 +391,11 @@ public class SlashBladeTEISR extends BlockEntityWithoutLevelRenderer {
             }
         }
 
+    }
+
+    @Override
+    public void render (ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+        renderBlade(stack, mode, matrices, vertexConsumers, light, overlay);
     }
 
     /*

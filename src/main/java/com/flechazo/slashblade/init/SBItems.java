@@ -2,7 +2,6 @@ package com.flechazo.slashblade.init;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.registries.ObjectHolder;
 
 public class SBItems {
 

@@ -1,31 +1,28 @@
 package com.flechazo.slashblade.event;
 
-import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.event.drop.EntityDropEntry;
 import com.flechazo.slashblade.recipe.SlashBladeIngredient;
 import com.flechazo.slashblade.registry.slashblade.SlashBladeDefinition;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.registries.DataPackRegistryEvent;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegisterEvent;
+import io.github.fabricators_of_create.porting_lib.registries.RegistryEvents;
+import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
+import net.minecraft.resources.RegistryDataLoader;
 
-@Mod.EventBusSubscriber(bus = Bus.MOD)
 public class RegistryHandler {
 
-    @SubscribeEvent
-    public static void onDatapackRegister(DataPackRegistryEvent.NewRegistry event) {
-        event.dataPackRegistry(SlashBladeDefinition.REGISTRY_KEY, SlashBladeDefinition.CODEC,
-                SlashBladeDefinition.CODEC);
+    private static void registerDataPackRegistries(RegistryEvents.NewDatapackRegistry registry) {
+        // 注册 SlashBladeDefinition 数据包注册表
+        registry.register(
+                new RegistryDataLoader.RegistryData<>(SlashBladeDefinition.REGISTRY_KEY, SlashBladeDefinition.CODEC),
+                SlashBladeDefinition.CODEC
+        );
 
-        event.dataPackRegistry(EntityDropEntry.REGISTRY_KEY, EntityDropEntry.CODEC, EntityDropEntry.CODEC);
+        // 注册 EntityDropEntry 数据包注册表
+        registry.register(
+                new RegistryDataLoader.RegistryData<>(EntityDropEntry.REGISTRY_KEY, EntityDropEntry.CODEC),
+                EntityDropEntry.CODEC
+        );
     }
-
-    @SubscribeEvent
-    public static void registerSerializers(RegisterEvent event) {
-        event.register(ForgeRegistries.Keys.RECIPE_SERIALIZERS, helper -> CraftingHelper
-                .register(SlashBladeRefabriced.prefix("blade"), SlashBladeIngredient.Serializer.INSTANCE));
+    public static void registerIngredientSerializer () {
+        CustomIngredientSerializer.register(SlashBladeIngredient.Serializer.INSTANCE);
     }
 }

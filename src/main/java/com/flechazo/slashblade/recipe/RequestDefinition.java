@@ -3,6 +3,7 @@ package com.flechazo.slashblade.recipe;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -16,6 +17,7 @@ import com.flechazo.slashblade.item.ItemSlashBlade;
 import com.flechazo.slashblade.item.SwordType;
 import com.flechazo.slashblade.registry.slashblade.EnchantmentDefinition;
 import net.minecraft.Util;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -116,7 +118,7 @@ public class RequestDefinition {
     }
 
     public void initItemStack(ItemStack blade) {
-        var state = blade.getCapability(ItemSlashBlade.BLADESTATE).orElse(new BladeStateComponentImpl(blade));
+        var state = BladeStateHelper.getBladeState(blade).orElse(new BladeStateComponentImpl(blade));
         state.setNonEmpty();
         if (!this.name.equals(SlashBladeRefabriced.prefix("none")))
             state.setTranslationKey(getTranslationKey());
@@ -126,7 +128,7 @@ public class RequestDefinition {
         
         this.getEnchantments()
                 .forEach(enchantment -> blade.enchant(
-                        ForgeRegistries.ENCHANTMENTS.getValue(enchantment.getEnchantmentID()),
+                        BuiltInRegistries.ENCHANTMENT.get(enchantment.getEnchantmentID()),
                         enchantment.getEnchantmentLevel()));
         this.defaultType.forEach(type -> {
             switch (type) {
@@ -140,7 +142,7 @@ public class RequestDefinition {
             }
         });
         
-        blade.getOrCreateTag().put("bladeState", state.serializeNBT());
+        blade.getOrCreateTag().put("bladeState", state.getActiveState());
     }
     
     

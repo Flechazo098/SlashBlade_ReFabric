@@ -2,10 +2,9 @@ package com.flechazo.slashblade.event;
 
 import com.flechazo.slashblade.network.MotionBroadcastMessage;
 import com.flechazo.slashblade.network.NetworkManager;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.PacketDistributor;
 
 public class BladeMotionEventBroadcaster {
 
@@ -21,25 +20,29 @@ public class BladeMotionEventBroadcaster {
     }
 
     public void register() {
-        MinecraftForge.EVENT_BUS.register(this);
-    }
+        BladeMotionEvent.BLADE_MOTION.register(event -> {
+            if (!(event.getEntity() instanceof ServerPlayer))
+                return;
 
-    @SubscribeEvent
-    public void onBladeMotion(BladeMotionEvent event) {
-        if (!(event.getEntity() instanceof ServerPlayer))
-            return;
+            ServerPlayer sp = (ServerPlayer) event.getEntity();
 
-        ServerPlayer sp = (ServerPlayer) event.getEntity();
+            MotionBroadcastMessage msg = new MotionBroadcastMessage();
+            msg.playerId = sp.getUUID();
+            msg.combo = event.getCombo().toString();
 
-        MotionBroadcastMessage msg = new MotionBroadcastMessage();
-        msg.playerId = sp.getUUID();
-        msg.combo = event.getCombo().toString();
+            FriendlyByteBuf buf = PacketByteBufs.create();
+            buf.writeUUID(msg.playerId);
+            buf.writeUtf(msg.combo);
 
-        // if(msg.combo == Extra.EX_JUDGEMENT_CUT.getName())
-        {
-            NetworkManager.INSTANCE.send(PacketDistributor.NEAR.with(() -> new PacketDistributor.TargetPoint(sp.getX(),
-                    sp.getY(), sp.getZ(), 20, sp.serverLevel().dimension())), msg);
-        }
-
-    }
+            NetworkManager.sendToNear(
+                    sp.serverLevel(),
+                    (int)sp.getX(),
+                    (int)sp.getY(),
+                    (int)sp.getZ(),
+                    20.0,
+                    NetworkManager.MOTION_BROADCAST_ID,
+                    buf
+            );
+        });
+     }
 }

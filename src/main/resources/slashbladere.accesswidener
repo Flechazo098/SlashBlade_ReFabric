@@ -1,0 +1,16 @@
+accessWidener v2 named
+
+accessible field net/minecraft/client/gui/screens/advancements/AdvancementsScreen selectedTab Lnet/minecraft/client/gui/screens/advancements/AdvancementTab;
+accessible field net/minecraft/client/gui/screens/advancements/AdvancementTab scrollX D
+accessible field net/minecraft/client/gui/screens/advancements/AdvancementTab scrollY D
+accessible field net/minecraft/client/gui/screens/advancements/AdvancementTab widgets Ljava/util/Map;
+accessible field net/minecraft/client/gui/screens/advancements/AdvancementWidget display Lnet/minecraft/advancements/DisplayInfo;
+accessible field net/minecraft/world/inventory/AnvilMenu cost Lnet/minecraft/world/inventory/DataSlot;
+accessible field net/minecraft/world/inventory/AnvilMenu repairItemCountCost I
+
+accessible method net/minecraft/world/entity/ai/targeting/TargetingConditions <init> (Z)V
+accessible method net/minecraft/world/entity/projectile/Projectile <init> (Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/level/Level;)V
+
+accessible field net/minecraft/server/level/ServerPlayer isChangingDimension Z
+accessible field net/minecraft/world/entity/Mob goalSelector Lnet/minecraft/world/entity/ai/goal/GoalSelector;
+accessible field net/minecraft/client/renderer/entity/EntityRenderer entityRenderDispatcher Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;

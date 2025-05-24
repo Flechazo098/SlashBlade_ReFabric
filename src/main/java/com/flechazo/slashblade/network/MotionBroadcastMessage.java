@@ -22,6 +22,10 @@ public class MotionBroadcastMessage {
         this.combo = combo;
     }
 
+    public MotionBroadcastMessage () {
+
+    }
+
     // 发送到所有客户端
     public static void broadcastToAll(UUID playerId, String combo) {
         FriendlyByteBuf buf = PacketByteBufs.create();
@@ -31,8 +35,7 @@ public class MotionBroadcastMessage {
     }
 
     // 客户端处理
-    public static void handleClient(Minecraft client, ClientPacketListener handler,
-                                    FriendlyByteBuf buf, PacketSender responseSender) {
+    public static void handleClient(Minecraft client, ClientPacketListener handler, FriendlyByteBuf buf, PacketSender responseSender) {
         UUID playerId = buf.readUUID();
         String combo = buf.readUtf();
 
@@ -48,7 +51,7 @@ public class MotionBroadcastMessage {
             if (state == null || !ComboStateRegistry.REGISTRY.get().containsKey(state))
                 return;
 
-            BladeMotionEvent.EVENT.invoker().onBladeMotion(target, state);
+            BladeMotionEvent.BLADE_MOTION.post(new BladeMotionEvent(target, state));
         });
     }
 }

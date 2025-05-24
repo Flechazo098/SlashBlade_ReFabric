@@ -1,13 +1,16 @@
 package com.flechazo.slashblade.client;
 
 import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
+import com.flechazo.slashblade.client.renderer.SlashBladeTEISR;
 import com.flechazo.slashblade.event.bladestand.BlandStandEventHandler;
 import com.flechazo.slashblade.event.client.AdvancementsRecipeRenderer;
 import com.flechazo.slashblade.event.client.RenderOverrideEvent;
-import com.flechazo.slashblade.event.client.SneakingMotionCanceller;
 import com.flechazo.slashblade.event.client.UserPoseOverrider;
+import com.flechazo.slashblade.item.ItemSlashBlade;
 import com.flechazo.slashblade.network.NetworkManager;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
+import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 
 public class ClientHandler implements ClientModInitializer {
@@ -40,8 +43,6 @@ public class ClientHandler implements ClientModInitializer {
             // 返回可能修改过的结果
             return new RenderOverrideEvent.RenderOverrideResult(model, target, customTexture, false);
         });
-
-        SneakingMotionCanceller.getInstance().register();
-        UserPoseOverrider.getInstance().register();
     }
+
 }

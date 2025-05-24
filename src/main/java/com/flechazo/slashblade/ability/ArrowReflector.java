@@ -1,5 +1,6 @@
 package com.flechazo.slashblade.ability;
 
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.item.ItemSlashBlade;
 import com.flechazo.slashblade.registry.ComboStateRegistry;
 import com.flechazo.slashblade.registry.combo.ComboState;
@@ -45,7 +46,7 @@ public class ArrowReflector {
                 if (!(stack.getItem() instanceof ItemSlashBlade))
                     break;
 
-                Entity target = stack.getCapability(ItemSlashBlade.BLADESTATE)
+                Entity target = BladeStateHelper.getBladeState(stack)
                         .map(s -> s.getTargetEntity(attacker.level())).orElse(null);
                 if (target != null) {
                     dir = arrow.position().subtract(target.getEyePosition(1.0f)).normalize();
@@ -73,7 +74,7 @@ public class ArrowReflector {
         if (!(stack.getItem() instanceof ItemSlashBlade))
             return;
 
-        stack.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(s -> {
+        BladeStateHelper.getBladeState(stack).ifPresent(s -> {
             int ticks = attacker.getTicksUsingItem();
 
             if (ticks == 0)

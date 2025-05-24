@@ -1,8 +1,7 @@
 package com.flechazo.slashblade.event;
 
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.server.ServerAboutToStartEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.minecraft.server.MinecraftServer;
 
 public class AllowFlightOverrwrite {
 
@@ -10,19 +9,17 @@ public class AllowFlightOverrwrite {
         private static final AllowFlightOverrwrite instance = new AllowFlightOverrwrite();
     }
 
-    public static AllowFlightOverrwrite getInstance() {
+    public static AllowFlightOverrwrite getInstance () {
         return AllowFlightOverrwrite.SingletonHolder.instance;
     }
 
-    private AllowFlightOverrwrite() {
+    private AllowFlightOverrwrite () {
     }
 
-    public void register() {
-        MinecraftForge.EVENT_BUS.register(this);
+    public void register () {
+        ServerLifecycleEvents.SERVER_STARTING.register(this::enableFlight);
     }
-
-    @SubscribeEvent
-    public void onFMLServerAboutToStartEvent(ServerAboutToStartEvent event) {
-        event.getServer().setFlightAllowed(true);
+    private void enableFlight (MinecraftServer server) {
+        server.setFlightAllowed(true);
     }
 }

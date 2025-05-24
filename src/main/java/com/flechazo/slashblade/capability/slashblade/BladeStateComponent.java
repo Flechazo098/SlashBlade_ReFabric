@@ -21,6 +21,7 @@ import dev.onyxstudios.cca.api.v3.component.Component;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -210,7 +211,7 @@ public interface BladeStateComponent extends Component {
     int getTargetEntityId();
 
     // 设置目标实体ID
-    void setTargetEntityId(int id);
+    void setTargetEntityIdInt(int id);
 
     // 获取目标实体
     @Nullable
@@ -225,9 +226,9 @@ public interface BladeStateComponent extends Component {
     // 设置目标实体ID
     default void setTargetEntityId(Entity target) {
         if (target != null)
-            this.setTargetEntityId(target.getId());
+            this.setTargetEntityIdInt(target.getId());
         else
-            this.setTargetEntityId(-1);
+            this.setTargetEntityIdInt(-1);
     }
 
     // 获取完全充能刻
@@ -326,10 +327,8 @@ public interface BladeStateComponent extends Component {
 
     // 更新连击序列
     default void updateComboSeq(LivingEntity entity, ResourceLocation loc) {
-        // 在Fabric中，我们需要使用不同的事件系统
-        // MinecraftForge.EVENT_BUS.post(new BladeMotionEvent(entity, loc));
-        BladeMotionEvent.EVENT.invoker().onBladeMotion(entity, loc);
 
+        BladeMotionEvent.BLADE_MOTION.post(new BladeMotionEvent(entity, loc));
         this.setComboSeq(loc);
         this.setLastActionTime(entity.level().getGameTime());
         ComboState cs = ComboStateRegistry.REGISTRY.get().getValue(loc);
@@ -404,12 +403,11 @@ public interface BladeStateComponent extends Component {
 
     // 发送变化
     default void sendChanges(Entity entityIn) {
-        // 在Fabric中，我们需要使用不同的网络系统
         if (!entityIn.level().isClientSide() && this.hasChangedActiveState()) {
             ActiveStateSyncMessage msg = new ActiveStateSyncMessage();
             msg.activeTag = this.getActiveState();
             msg.id = entityIn.getId();
-            NetworkManager.INSTANCE.sendToTrackingAndSelf(entityIn, msg);
+            NetworkManager.sendToTrackingAndSelf(entityIn, msg);
 
             this.setHasChangedActiveState(false);
         }
@@ -420,29 +418,107 @@ public interface BladeStateComponent extends Component {
         CompoundTag tag = new CompoundTag();
 
         NBTHelper.getNBTCoupler(tag)
-                .put("BladeUniqueId", this.getUniqueId())
-                .put("lastActionTime", this.getLastActionTime()).put("TargetEntity", this.getTargetEntityId())
+                // Action State
+                .put("lastActionTime", this.getLastActionTime())
+                .put("TargetEntity", this.getTargetEntityId())
                 .put("_onClick", this.onClick())
                 .put("fallDecreaseRate", this.getFallDecreaseRate())
-                .put("AttackAmplifier", this.getAttackAmplifier()).put("currentCombo", this.getComboSeq().toString())
+                .put("AttackAmplifier", this.getAttackAmplifier())
+                .put("currentCombo", this.getComboSeq().toString())
+                .put("Damage", this.getDamage())
+                .put("maxDamage", this.getMaxDamage())
                 .put("proudSoul", this.getProudSoulCount())
-                .put("killCount", this.getKillCount())
-                .put("Damage", this.getDamage()).put("isBroken", this.isBroken());
+                .put("isBroken", this.isBroken())
 
+                // Passive State
+                .put("isSealed", this.isSealed())
+                .put("baseAttackModifier", this.getBaseAttackModifier())
+                .put("killCount", this.getKillCount())
+                .put("RepairCounter", this.getRefine())
+
+                // UUID
+                .put("BladeUniqueId", this.getUniqueId())
+
+                // Performance Setting
+                .put("SpecialAttackType",
+                        Optional.ofNullable(this.getSlashArtsKey())
+                                .orElse(SlashArtsRegistry.JUDGEMENT_CUT.getId()).toString()
+                )
+                .put("isDefaultBewitched", this.isDefaultBewitched())
+                .put("translationKey", this.getTranslationKey())
+
+                // Render Info
+                .put("StandbyRenderType", (byte) this.getCarryType().ordinal())
+                .put("SummonedSwordColor", this.getColorCode())
+                .put("SummonedSwordColorInverse", this.isEffectColorInverse())
+                .put("adjustXYZ", NBTHelper.newDoubleNBTList(this.getAdjust()))
+
+                // Texture & Model
+                .put("TextureName", this.getTexture().map(ResourceLocation::toString).orElse(null))
+                .put("ModelName", this.getModel().map(ResourceLocation::toString).orElse(null))
+
+                // Combo Root
+                .put("ComboRoot",
+                        Optional.ofNullable(this.getComboRoot())
+                                .orElse(ComboStateRegistry.STANDBY.getId()).toString()
+                );
+
+        if (this.getSpecialEffects() != null && ! this.getSpecialEffects().isEmpty()) {
+            ListTag seList = new ListTag();
+            this.getSpecialEffects().forEach(se -> seList.add(StringTag.valueOf(se.toString())));
+            tag.put("SpecialEffects", seList);
+
+        }
         return tag;
     }
 
+
     // 设置活动状态
     default void setActiveState(CompoundTag tag) {
+        if (tag == null) return;
+        this.setNonEmpty();
+
         NBTHelper.getNBTCoupler(tag)
+                // Action State
                 .get("BladeUniqueId", this::setUniqueId)
                 .get("lastActionTime", this::setLastActionTime)
-                .get("TargetEntity", ((Integer id) -> this.setTargetEntityId(id))).get("_onClick", this::setOnClick)
-                .get("fallDecreaseRate", this::setFallDecreaseRate).get("AttackAmplifier", this::setAttackAmplifier)
-                .get("currentCombo", ((String s) -> this.setComboSeq(ResourceLocation.tryParse(s))))
+                .get("TargetEntity", this::setTargetEntityIdInt)
+                .get("_onClick", this::setOnClick)
+                .get("fallDecreaseRate", this::setFallDecreaseRate)
+                .get("AttackAmplifier", this::setAttackAmplifier)
+                .get("currentCombo", (String s) -> this.setComboSeq(ResourceLocation.tryParse(s)))
                 .get("proudSoul", this::setProudSoulCount)
+                .get("Damage", this::setDamage)
+                .get("isBroken", this::setBroken)
+
+                // Passive State
+                .get("isSealed", this::setSealed)
+                .get("baseAttackModifier", this::setBaseAttackModifier)
                 .get("killCount", this::setKillCount)
-                .get("Damage", this::setDamage).get("isBroken", this::setBroken);
+                .get("RepairCounter", this::setRefine)
+
+                // Performance Setting
+                .get("SpecialAttackType", (String s) -> this.setSlashArtsKey(ResourceLocation.tryParse(s)))
+                .get("isDefaultBewitched", this::setDefaultBewitched)
+                .get("translationKey", this::setTranslationKey)
+
+                // Render Info
+                .get("StandbyRenderType", (Byte b) -> this.setCarryType(EnumSetConverter.fromOrdinal(CarryType.values(), b, CarryType.PSO2)))
+                .get("SummonedSwordColor", this::setColorCode)
+                .get("SummonedSwordColorInverse", this::setEffectColorInverse)
+                .get("adjustXYZ", (ListTag list) -> this.setAdjust(NBTHelper.getVector3d(tag, "adjustXYZ")))
+
+                // Texture & Model
+                .get("TextureName", (String s) -> this.setTexture(new ResourceLocation(s)))
+                .get("ModelName", (String s) -> this.setModel(new ResourceLocation(s)))
+
+                // Combo Root
+                .get("ComboRoot", (String s) -> this.setComboRoot(ResourceLocation.tryParse(s)));
+
+                if (tag.contains("SpecialEffects")) {
+                 ListTag list = tag.getList("SpecialEffects", Tag.TAG_STRING);
+                 this.setSpecialEffects(list);
+               }
 
         this.setHasChangedActiveState(false);
     }

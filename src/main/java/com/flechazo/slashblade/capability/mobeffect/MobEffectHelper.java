@@ -2,6 +2,8 @@ package com.flechazo.slashblade.capability.mobeffect;
 
 import net.minecraft.world.entity.LivingEntity;
 
+import java.util.Optional;
+
 public class MobEffectHelper {
 
     /**
@@ -9,7 +11,7 @@ public class MobEffectHelper {
      * @param entity 实体
      * @return MobEffect组件
      */
-    public static MobEffectComponent getMobEffect(LivingEntity entity) {
-        return MobEffectComponentRegistry.MOB_EFFECT.get(entity);
+    public static Optional<MobEffectComponent> getMobEffect(LivingEntity entity) {
+        return MobEffectComponentRegistry.MOB_EFFECT.maybeGet(entity);
     }
 }

@@ -4,6 +4,8 @@ import java.util.EnumSet;
 import java.util.Map;
 
 import com.flechazo.slashblade.capability.inputstate.InputStateComponentRegistry;
+import com.flechazo.slashblade.capability.inputstate.InputStateHelper;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.event.InputCommandEvent;
 import com.flechazo.slashblade.item.ItemSlashBlade;
 import com.flechazo.slashblade.item.SwordType;
@@ -36,10 +38,9 @@ public class SuperSlashArts {
 	}
 
 	public void register() {
-		MinecraftForge.EVENT_BUS.register(this);
+		InputCommandEvent.INPUT_COMMAND.register(this::onInputChange);
 	}
 
-	@SubscribeEvent
 	public void onInputChange(InputCommandEvent event) {
 
 		EnumSet<InputCommand> old = event.getOld();
@@ -53,7 +54,7 @@ public class SuperSlashArts {
 		final Long pressTime = event.getState().getLastPressTime(targetCommnad);
 		if (onDown) {
 
-			sender.getCapability(InputStateComponentRegistry.INPUT_STATE).ifPresent(input -> {
+			InputStateHelper.getInputState(sender).ifPresent(input -> {
 				input.getScheduler().schedule("sendPartical", pressTime + 5, new TimerCallback<LivingEntity>() {
 					@Override
 					public void handle(LivingEntity rawEntity, TimerQueue<LivingEntity> queue, long now) {
@@ -63,7 +64,7 @@ public class SuperSlashArts {
 						ServerPlayer entity = (ServerPlayer) rawEntity;
 
 						InputCommand targetCommnad = InputCommand.SPRINT;
-						boolean inputSucceed = entity.getCapability(InputStateComponentRegistry.INPUT_STATE)
+						boolean inputSucceed = InputStateHelper.getInputState(entity)
 								.filter(input -> input.getCommands().contains(targetCommnad)
 										&& (!InputCommand.anyMatch(input.getCommands(), InputCommand.move)
 												|| !input.getCommands().contains(InputCommand.SNEAK))
@@ -72,7 +73,7 @@ public class SuperSlashArts {
 						if (!inputSucceed)
 							return;
 						ItemStack mainHandItem = entity.getMainHandItem();
-						mainHandItem.getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+						BladeStateHelper.getBladeState(mainHandItem).ifPresent((state) -> {
 							if (state.isBroken() || state.getDamage() > 0 || state.isSealed()
 									|| !SwordType.from(mainHandItem).contains(SwordType.BEWITCHED)
 									|| !SwordType.from(mainHandItem).contains(SwordType.FIERCEREDGE))
@@ -104,7 +105,7 @@ public class SuperSlashArts {
 						ServerPlayer entity = (ServerPlayer) rawEntity;
 
 						InputCommand targetCommnad = InputCommand.SPRINT;
-						boolean inputSucceed = entity.getCapability(InputStateComponentRegistry.INPUT_STATE)
+						boolean inputSucceed = InputStateHelper.getInputState(entity)
 								.filter(input -> input.getCommands().contains(targetCommnad)
 										&& (!InputCommand.anyMatch(input.getCommands(), InputCommand.move)
 												|| !input.getCommands().contains(InputCommand.SNEAK))
@@ -123,7 +124,7 @@ public class SuperSlashArts {
 
 	public static void releaseSSA(ServerPlayer entity) {
 		ItemStack mainHandItem = entity.getMainHandItem();
-		mainHandItem.getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+		BladeStateHelper.getBladeState(mainHandItem).ifPresent((state) -> {
 			if (state.isBroken() || state.getDamage() > 0 || state.isSealed()
 					|| !SwordType.from(mainHandItem).contains(SwordType.BEWITCHED)
 					|| !SwordType.from(mainHandItem).contains(SwordType.FIERCEREDGE))

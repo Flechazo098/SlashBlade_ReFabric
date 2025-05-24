@@ -6,8 +6,6 @@ import com.google.common.cache.LoadingCache;
 import jp.nyatla.nymmd.MmdException;
 import jp.nyatla.nymmd.MmdVmdMotionMc;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;
@@ -55,7 +53,6 @@ public class BladeMotionManager {
                 }, Executors.newCachedThreadPool()));
     }
 
-    @SubscribeEvent
     public void reload(TextureStitchEvent.Post event) {
         cache.invalidateAll();
 

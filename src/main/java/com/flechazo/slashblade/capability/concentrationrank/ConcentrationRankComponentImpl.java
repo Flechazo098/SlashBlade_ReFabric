@@ -142,15 +142,13 @@ public class ConcentrationRankComponentImpl implements ConcentrationRankComponen
         LivingEntity user = (LivingEntity) src.getEntity();
         ItemStack stack = user.getMainHandItem();
 
-        // 使用CCA方式获取BladeState
         Optional<ResourceLocation> combo = Optional.empty();
         if (stack.getItem() instanceof ItemSlashBlade) {
-            // 假设在迁移到CCA后，BladeState组件的键名为"blade_state"
             combo = BladeStateComponentRegistry.BLADE_STATE.maybeGet(stack)
                     .map(state -> state.resolvCurrentComboState(user));
         }
 
-        float modifier = combo.map(c -> getRankPointModifier(c)).orElse(getRankPointModifier(src));
+        float modifier = combo.map(this::getRankPointModifier).orElse(getRankPointModifier(src));
         addRankPoint(user, (long) (modifier * getUnitCapacity()));
     }
 }

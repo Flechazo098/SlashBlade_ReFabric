@@ -1,30 +1,29 @@
 package com.flechazo.slashblade.ability;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.event.InputCommandEvent;
-import com.flechazo.slashblade.item.ItemSlashBlade;
 import com.flechazo.slashblade.registry.ComboStateRegistry;
 import com.flechazo.slashblade.util.AdvancementHelper;
 import com.flechazo.slashblade.util.InputCommand;
+import com.flechazo.slashblade.util.accessor.PersistentDataAccessor;
+import io.github.fabricators_of_create.porting_lib.entity.events.PlayerTickEvents;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-
 import java.util.EnumSet;
 
 public class KickJump {
@@ -40,7 +39,9 @@ public class KickJump {
     }
 
     public void register() {
-        MinecraftForge.EVENT_BUS.register(this);
+        InputCommandEvent.INPUT_COMMAND.register(this::onInputChange);
+
+        PlayerTickEvents.START.register(this::onTick);
     }
 
     static final TargetingConditions tc = new TargetingConditions(false).ignoreLineOfSight()
@@ -51,7 +52,6 @@ public class KickJump {
 
     static public final String KEY_KICKJUMP = "sb.kickjump";
 
-    @SubscribeEvent
     public void onInputChange(InputCommandEvent event) {
 
         EnumSet<InputCommand> old = event.getOld();
@@ -66,7 +66,7 @@ public class KickJump {
         if (!current.contains(InputCommand.JUMP))
             return;
 
-        if (0 != sender.getPersistentData().getInt(KEY_KICKJUMP))
+        if (0 != ((PersistentDataAccessor) sender).slashbladerefabriced$getPersistentData().getInt(KEY_KICKJUMP))
             return;
 
         Iterable<VoxelShape> list = worldIn.getBlockCollisions(sender, sender.getBoundingBox().inflate(0.5, 0, 1));
@@ -77,7 +77,7 @@ public class KickJump {
         Untouchable.setUntouchable(sender, Untouchable.JUMP_TICKS);
 
         // set cooldown
-        sender.getPersistentData().putInt(KEY_KICKJUMP, 2);
+        ((PersistentDataAccessor) sender).slashbladerefabriced$getPersistentData().putInt(KEY_KICKJUMP, 2);
 
         Vec3 delta = sender.getDeltaMovement();
         Vec3 motion = new Vec3(delta.x, +0.8, delta.z);
@@ -89,7 +89,7 @@ public class KickJump {
         AdvancementHelper.grantCriterion(sender, ADVANCEMENT_KICK_JUMP);
         sender.playNotifySound(SoundEvents.PLAYER_SMALL_FALL, SoundSource.PLAYERS, 0.5f, 1.2f);
 
-        sender.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(s -> {
+        BladeStateHelper.getBladeState(sender.getMainHandItem()).ifPresent(s -> {
             s.updateComboSeq(sender, ComboStateRegistry.NONE.getId());
         });
 
@@ -101,21 +101,20 @@ public class KickJump {
 
     }
 
-    @SubscribeEvent
-    public void onTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase == TickEvent.Phase.START) {
-            LivingEntity player = event.player;
-            // cooldown
-            if (player.onGround() && 0 < player.getPersistentData().getInt(KEY_KICKJUMP)) {
+    public void onTick(Player player) {
+        // 只在服务端执行
+        if (player.level().isClientSide) return;
 
-                int count = player.getPersistentData().getInt(KEY_KICKJUMP);
-                count--;
+        CompoundTag tag = ((PersistentDataAccessor) player).slashbladerefabriced$getPersistentData();
+        if (player.onGround() && 0 < tag.getInt(KEY_KICKJUMP)) {
 
-                if (count <= 0) {
-                    player.getPersistentData().remove(KEY_KICKJUMP);
-                } else {
-                    player.getPersistentData().putInt(KEY_KICKJUMP, count);
-                }
+            int count = tag.getInt(KEY_KICKJUMP);
+            count--;
+
+            if (count <= 0) {
+                tag.remove(KEY_KICKJUMP);
+            } else {
+                tag.putInt(KEY_KICKJUMP, count);
             }
         }
     }

@@ -2,13 +2,14 @@ package com.flechazo.slashblade.registry.slashblade;
 
 import java.util.Comparator;
 import java.util.List;
+
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.capability.slashblade.BladeStateComponentImpl;
-import com.flechazo.slashblade.item.ItemSlashBlade;
 import net.minecraft.Util;
 import net.minecraft.core.Holder.Reference;
 import net.minecraft.core.Registry;
@@ -17,7 +18,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class SlashBladeDefinition {
 
@@ -84,7 +84,7 @@ public class SlashBladeDefinition {
 
 	public ItemStack getBlade(Item bladeItem) {
 		ItemStack result = new ItemStack(bladeItem);
-		var state = result.getCapability(ItemSlashBlade.BLADESTATE).orElse(new BladeStateComponentImpl(result));
+		var state = BladeStateHelper.getBladeState(result).orElse(new BladeStateComponentImpl(result));
 		state.setNonEmpty();
 		state.setBaseAttackModifier(this.stateDefinition.getBaseAttackModifier());
 		state.setMaxDamage(this.stateDefinition.getMaxDamage());
@@ -114,7 +114,7 @@ public class SlashBladeDefinition {
 		if (!this.getName().equals(SlashBladeRefabriced.prefix("none")))
 			state.setTranslationKey(this.getTranslationKey());
 
-		result.getOrCreateTag().put("bladeState", state.serializeNBT());
+		result.getOrCreateTag().put("bladeState", state.getActiveState());
 
 		for (var instance : this.enchantments) {
 			var enchantment = BuiltInRegistries.ENCHANTMENT.get(instance.getEnchantmentID());

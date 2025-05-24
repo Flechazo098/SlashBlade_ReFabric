@@ -5,6 +5,8 @@ import com.flechazo.slashblade.registry.ComboStateRegistry;
 import com.flechazo.slashblade.registry.SlashArtsRegistry;
 import com.flechazo.slashblade.registry.SpecialEffectsRegistry;
 import com.flechazo.slashblade.util.NBTHelper;
+import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
+import dev.onyxstudios.cca.api.v3.item.ItemComponent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -19,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class BladeStateComponentImpl implements BladeStateComponent {
+public class BladeStateComponentImpl extends ItemComponent implements BladeStateComponent{
 
     // action state
     protected long lastActionTime; // lastActionTime
@@ -76,6 +78,7 @@ public class BladeStateComponentImpl implements BladeStateComponent {
     private final ItemStack blade;
 
     public BladeStateComponentImpl(ItemStack blade) {
+        super(blade);
         this.blade = blade;
         if(!blade.isEmpty()) {
             if(blade.getOrCreateTag().contains("bladeState"))
@@ -289,7 +292,7 @@ public class BladeStateComponentImpl implements BladeStateComponent {
     }
 
     @Override
-    public void setTargetEntityId(int id) {
+    public void setTargetEntityIdInt(int id) {
         targetEntityId = id;
         setHasChangedActiveState(true);
     }
@@ -369,7 +372,7 @@ public class BladeStateComponentImpl implements BladeStateComponent {
         List<ResourceLocation> result = new ArrayList<>();
         list.forEach(tag->{
             ResourceLocation se = ResourceLocation.tryParse(tag.getAsString());
-            if(SpecialEffectsRegistry.REGISTRY.get().containsKey(se))
+            if(SpecialEffectsRegistry.REGISTRY.containsKey(se))
                 result.add(se);
         });
         this.specialEffects = result;
@@ -377,7 +380,7 @@ public class BladeStateComponentImpl implements BladeStateComponent {
 
     @Override
     public boolean addSpecialEffect(ResourceLocation se) {
-        if(SpecialEffectsRegistry.REGISTRY.get().containsKey(se)) {
+        if(SpecialEffectsRegistry.REGISTRY.containsKey(se)) {
             return this.specialEffects.add(se);
         }
         return false;
@@ -390,7 +393,7 @@ public class BladeStateComponentImpl implements BladeStateComponent {
 
     @Override
     public boolean hasSpecialEffect(ResourceLocation se) {
-        if(SpecialEffectsRegistry.REGISTRY.get().containsKey(se)) {
+        if(SpecialEffectsRegistry.REGISTRY.containsKey(se)) {
             return this.specialEffects.contains(se);
         }
         this.specialEffects.remove(se);
@@ -408,12 +411,13 @@ public class BladeStateComponentImpl implements BladeStateComponent {
     }
 
     @Override
-    public void readFromNbt(CompoundTag tag) {
-        if (tag == null) return;
+    public CompoundTag getActiveState() {
+        CompoundTag tag = new CompoundTag();
+
         this.setNonEmpty();
         // action state
         this.setLastActionTime(tag.getLong("lastActionTime"));
-        this.setTargetEntityId(tag.getInt("TargetEntity"));
+        this.setTargetEntityIdInt(tag.getInt("TargetEntity"));
         this.setOnClick(tag.getBoolean("_onClick"));
         this.setFallDecreaseRate(tag.getFloat("fallDecreaseRate"));
         this.setAttackAmplifier(tag.getFloat("AttackAmplifier"));
@@ -466,10 +470,11 @@ public class BladeStateComponentImpl implements BladeStateComponent {
         if(tag.contains("SpecialEffects")) {
             this.setSpecialEffects(tag.getList("SpecialEffects", 8));
         }
+        return tag;
     }
 
     @Override
-    public void writeToNbt(CompoundTag tag) {
+    public void setActiveState(CompoundTag tag) {
         // action state
         tag.putLong("lastActionTime", this.getLastActionTime());
         tag.putInt("TargetEntity", this.getTargetEntityId());

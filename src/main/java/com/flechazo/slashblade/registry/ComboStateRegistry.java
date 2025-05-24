@@ -14,7 +14,6 @@ import com.flechazo.slashblade.item.ItemSlashBlade;
 import com.flechazo.slashblade.registry.combo.ComboCommands;
 import com.flechazo.slashblade.registry.combo.ComboState;
 import com.flechazo.slashblade.slasharts.*;
-import mods.flammpfeil.slashblade.slasharts.*;
 import com.flechazo.slashblade.util.AdvancementHelper;
 import com.flechazo.slashblade.util.AttackManager;
 import com.flechazo.slashblade.util.InputCommand;
@@ -28,11 +27,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.IForgeRegistry;
-import net.minecraftforge.registries.RegistryBuilder;
-import net.minecraftforge.registries.RegistryObject;
 
 public class ComboStateRegistry {
     public static final DeferredRegister<ComboState> COMBO_STATE = DeferredRegister.create(ComboState.REGISTRY_KEY,
@@ -56,7 +50,7 @@ public class ComboStateRegistry {
             .next(ComboState.TimeoutNext.buildFromFrame(5, entity -> SlashBladeRefabriced.prefix("combo_a2")))
             .nextOfTimeout(entity -> SlashBladeRefabriced.prefix("combo_a1_end"))
             .clickAction(entity -> AttackManager.doSlash(entity, -10, true,false,0.22))
-            .addTickAction(entity -> UserPoseOverrider.resetRot(entity)).addHitEffect(StunManager::setStun)::build);
+            .addTickAction(UserPoseOverrider::resetRot).addHitEffect(StunManager::setStun)::build);
 
     public static final RegistryObject<ComboState> COMBO_A1_END = COMBO_STATE.register("combo_a1_end",
             ComboState.Builder.newInstance().startAndEnd(10, 21).priority(100)

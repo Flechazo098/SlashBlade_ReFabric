@@ -1,13 +1,13 @@
 package com.flechazo.slashblade.event;
 
-import com.flechazo.slashblade.capability.concentrationrank.CapabilityConcentrationRank;
+import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankHelper;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.item.ItemSlashBlade;
+import io.github.fabricators_of_create.porting_lib.entity.events.living.LivingHurtEvent;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.world.item.ItemStack;
 
 public class RankPointHandler {
     private static final class SingletonHolder {
@@ -22,7 +22,7 @@ public class RankPointHandler {
     }
 
     public void register() {
-        MinecraftForge.EVENT_BUS.register(this);
+        LivingHurtEvent.HURT.register(this::onLivingDeathEvent);
     }
 
     /**
@@ -30,23 +30,20 @@ public class RankPointHandler {
      * 
      * @param event
      */
-    @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onLivingDeathEvent(LivingHurtEvent event) {
-
         LivingEntity victim = event.getEntity();
         if (victim != null)
-            victim.getCapability(CapabilityConcentrationRank.RANK_POINT)
+            ConcentrationRankHelper.getConcentrationRank(victim)
                     .ifPresent(cr -> cr.addRankPoint(victim, -cr.getUnitCapacity()));
 
         Entity trueSource = event.getSource().getEntity();
-        if (!(trueSource instanceof LivingEntity))
+        if (!(trueSource instanceof LivingEntity sourceEntity))
             return;
-        
-    	LivingEntity sourceEntity = (LivingEntity) trueSource;
-		if (!sourceEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).isPresent())
+
+        if (BladeStateHelper.getBladeState(sourceEntity.getMainHandItem()).isEmpty())
             return;
-        
-        trueSource.getCapability(CapabilityConcentrationRank.RANK_POINT)
+
+       ConcentrationRankHelper.getConcentrationRank(sourceEntity)
                 .ifPresent(cr -> cr.addRankPoint(event.getSource()));
     }
 }

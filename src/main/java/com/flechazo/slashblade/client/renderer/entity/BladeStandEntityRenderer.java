@@ -1,5 +1,6 @@
 package com.flechazo.slashblade.client.renderer.entity;
 
+import com.flechazo.slashblade.event.NameTagRenderCallback;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.flechazo.slashblade.client.renderer.util.MSAutoCloser;
 import com.flechazo.slashblade.entity.BladeStandEntity;
@@ -94,18 +95,10 @@ public class BladeStandEntityRenderer extends ItemFrameRenderer<BladeStandEntity
             }
         }
 
-        net.minecraftforge.client.event.RenderNameTagEvent renderNameplateEvent = new net.minecraftforge.client.event.RenderNameTagEvent(
-                entity, entity.getDisplayName(), this, matrixStackIn, bufferIn, packedLightIn, partialTicks);
-        // net.minecraftforge.client.event.RenderNameplateEvent renderNameplateEvent =
-        // new net.minecraftforge.client.event.RenderNameplateEvent(entity,
-        // entity.getDisplayName().getFormatedText(), this, matrixStackIn, bufferIn,
-        // packedLightIn);
-        net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(renderNameplateEvent);
-        if (renderNameplateEvent.getResult() != net.minecraftforge.eventbus.api.Event.Result.DENY
-                && (renderNameplateEvent.getResult() == net.minecraftforge.eventbus.api.Event.Result.ALLOW
-                        || this.shouldShowName(entity))) {
-            this.renderNameTag(entity, renderNameplateEvent.getContent(), matrixStackIn, bufferIn, packedLightIn);
+        if (NameTagRenderCallback.EVENT.invoker().shouldRenderNameTag(entity, entity.getDisplayName(), matrixStackIn, bufferIn, packedLightIn)) {
+            this.renderNameTag(entity, entity.getDisplayName(), matrixStackIn, bufferIn, packedLightIn);
         }
+
     }
 
     private void renderItem(BladeStandEntity entity, ItemStack itemstack, PoseStack matrixStackIn,

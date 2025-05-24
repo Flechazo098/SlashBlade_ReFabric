@@ -1,8 +1,8 @@
 package com.flechazo.slashblade.client.renderer.model.obj;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import java.util.ArrayList;
 
@@ -24,7 +24,7 @@ public class GroupObject {
         this.glDrawingMode = glDrawingMode;
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void render(VertexConsumer tessellator) {
         if (faces.size() > 0) {
             for (Face face : faces) {

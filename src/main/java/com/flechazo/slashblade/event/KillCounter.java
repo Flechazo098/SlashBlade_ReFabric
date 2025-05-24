@@ -1,18 +1,16 @@
 package com.flechazo.slashblade.event;
 
 import com.flechazo.slashblade.SlashBladeConfig;
-import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankCapabilityProvider;
-import com.flechazo.slashblade.capability.concentrationrank.IConcentrationRank;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.item.ItemSlashBlade;
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityCombatEvents;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 
 public class KillCounter {
     private static final class SingletonHolder {
@@ -27,49 +25,28 @@ public class KillCounter {
     }
 
     public void register() {
-        MinecraftForge.EVENT_BUS.register(this);
+        ServerEntityCombatEvents.AFTER_KILLED_OTHER_ENTITY.register(this::onKill);
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onLivingDeathEvent(LivingDeathEvent event) {
-        Entity trueSource = event.getSource().getEntity();
+    private void onKill(ServerLevel level, Entity attacker, LivingEntity killed) {
+        if (attacker instanceof LivingEntity livingAttacker) {
+            ItemStack stack = livingAttacker.getMainHandItem();
+            if (!stack.isEmpty() && stack.getItem() instanceof ItemSlashBlade) {
+                BladeStateHelper.getBladeState(stack)
+                        .ifPresent(state -> state.setKillCount(state.getKillCount() + 1));
+            }
+        }
+        if (attacker instanceof ServerPlayer player) {
+            ItemStack stack = player.getMainHandItem();
+            if (!stack.isEmpty() && stack.getItem() instanceof ItemSlashBlade) {
+                int baseXp = killed.getExperienceReward();
+                int looting = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.MENDING, stack);
 
-        if (!(trueSource instanceof LivingEntity))
-            return;
-
-        ItemStack stack = ((LivingEntity) trueSource).getMainHandItem();
-        if (stack.isEmpty())
-            return;
-        if (!(stack.getItem() instanceof ItemSlashBlade))
-            return;
-
-        stack.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
-
-            state.setKillCount(state.getKillCount() + 1);
-        });
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void onXPDropping(LivingExperienceDropEvent event) {
-        Player player = event.getAttackingPlayer();
-        if (player == null)
-            return;
-        ItemStack stack = player.getMainHandItem();
-        if (stack.isEmpty())
-            return;
-        if (!(stack.getItem() instanceof ItemSlashBlade))
-            return;
-
-        IConcentrationRank.ConcentrationRanks rankBonus = player
-                .getCapability(ConcentrationRankCapabilityProvider.RANK_POINT)
-                .map(rp -> rp.getRank(player.getCommandSenderWorld().getGameTime()))
-                .orElse(IConcentrationRank.ConcentrationRanks.NONE);
-        int souls = (int) Math.floor(event.getDroppedExperience() * (1.0F + (rankBonus.level * 0.1F)));
-
-        stack.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(state -> {
-            state.setProudSoulCount(
-                    state.getProudSoulCount() + Math.min(SlashBladeConfig.MAX_PROUD_SOUL_GOT.get(), souls));
-        });
-        
+                int souls = Math.floorDiv(Math.round(baseXp * (1.0F + looting * 0.1F)), 1);
+                souls = Math.min(SlashBladeConfig.getMaxProudSoulGot(), souls);
+                int finalSouls = souls;
+                BladeStateHelper.getBladeState(stack).ifPresent(state -> state.setProudSoulCount(state.getProudSoulCount() + finalSouls));
+            }
+        }
     }
 }

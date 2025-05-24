@@ -6,20 +6,18 @@ import com.google.common.cache.LoadingCache;
 import com.flechazo.slashblade.client.renderer.model.obj.WavefrontObject;
 import com.flechazo.slashblade.init.DefaultResources;
 import com.flechazo.slashblade.registry.slashblade.SlashBladeDefinition;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.concurrent.Executors;
 
 /**
  * Created by Furia on 2016/02/06.
  */
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class BladeModelManager {
 
     private static final class SingletonHolder {
@@ -56,7 +54,6 @@ public class BladeModelManager {
                 }, Executors.newCachedThreadPool()));
     }
 
-    @SubscribeEvent
     public void reload(TextureStitchEvent.Post event) {
         cache.invalidateAll();
 

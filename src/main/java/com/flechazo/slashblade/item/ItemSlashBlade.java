@@ -1,5 +1,6 @@
 package com.flechazo.slashblade.item;
 
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.google.common.collect.*;
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.SlashBladeConfig;
@@ -16,6 +17,7 @@ import com.flechazo.slashblade.registry.ComboStateRegistry;
 import com.flechazo.slashblade.registry.combo.ComboState;
 import com.flechazo.slashblade.registry.specialeffects.SpecialEffect;
 import com.flechazo.slashblade.util.InputCommand;
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffects;
@@ -73,7 +75,7 @@ import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tier;
 
-public class ItemSlashBlade extends SwordItem {
+public class ItemSlashBlade extends SwordItem{
 	protected static final UUID ATTACK_DAMAGE_AMPLIFIER = UUID.fromString("2D988C13-595B-4E58-B254-39BB6FA077FD");
 	protected static final UUID PLAYER_REACH_AMPLIFIER = UUID.fromString("2D988C13-595B-4E58-B254-39BB6FA077FE");
 
@@ -636,8 +638,8 @@ public class ItemSlashBlade extends SwordItem {
 	 */
 	@Override
 	public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
-		return !stack.getCapability(BLADESTATE).filter(s -> s.getLastActionTime() == entity.level().getGameTime())
-				.isPresent();
+		return BladeStateHelper.getBladeState(stack).filter(s -> s.getLastActionTime() == entity.level().getGameTime())
+				.isEmpty();
 	}
 
 	@Override
@@ -666,20 +668,9 @@ public class ItemSlashBlade extends SwordItem {
 		return super.getEntityLifespan(itemStack, world);// Short.MAX_VALUE;
 	}
 
-	@Override
-	public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-
-		consumer.accept(new IClientItemExtensions() {
-			BlockEntityWithoutLevelRenderer renderer = new SlashBladeTEISR(
-					Minecraft.getInstance().getBlockEntityRenderDispatcher(),
-					Minecraft.getInstance().getEntityModels());
-
-			@Override
-			public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-				return renderer;
-			}
-		});
-
-		super.initializeClient(consumer);
+	public void registerClientRenderer() {
+		BuiltinItemRendererRegistry.INSTANCE.register(this, new SlashBladeTEISR(
+				Minecraft.getInstance().getBlockEntityRenderDispatcher(),
+				Minecraft.getInstance().getEntityModels()));
 	}
 }

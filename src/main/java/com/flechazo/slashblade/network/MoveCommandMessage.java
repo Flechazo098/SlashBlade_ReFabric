@@ -22,6 +22,8 @@ public class MoveCommandMessage {
     public MoveCommandMessage(int command) {
         this.command = command;
     }
+    public MoveCommandMessage() {
+    }
 
     // 从客户端发送到服务器
     public static void sendToServer(int command) {
@@ -56,7 +58,7 @@ public class MoveCommandMessage {
                     state.getLastPressTimes().put(c, currentTime);
             });
 
-            InputCommandEvent.EVENT.invoker().onInputChange(player, state, old, current);
+            InputCommandEvent.onInputChange(player, state, old, current);
         });
     }
 }

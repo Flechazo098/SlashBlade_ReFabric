@@ -1,17 +1,18 @@
 package com.flechazo.slashblade.ability;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
-import com.flechazo.slashblade.capability.concentrationrank.CapabilityConcentrationRank;
-import com.flechazo.slashblade.capability.concentrationrank.IConcentrationRank;
-import com.flechazo.slashblade.capability.inputstate.InputStateComponentRegistry;
+import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponent;
+import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankHelper;
 import com.flechazo.slashblade.capability.inputstate.InputStateComponent;
-import com.flechazo.slashblade.capability.slashblade.CapabilitySlashBlade;
+import com.flechazo.slashblade.capability.inputstate.InputStateHelper;
 import com.flechazo.slashblade.capability.slashblade.BladeStateComponent;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.item.ItemSlashBlade;
 import com.flechazo.slashblade.registry.ComboStateRegistry;
 import com.flechazo.slashblade.registry.combo.ComboState;
 import com.flechazo.slashblade.util.AdvancementHelper;
 import com.flechazo.slashblade.util.InputCommand;
+import io.github.fabricators_of_create.porting_lib.entity.events.LivingAttackEvent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
@@ -24,12 +25,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.event.entity.living.LivingAttackEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.EnumSet;
+import java.util.Optional;
 
 public class Guard {
     private static final class SingletonHolder {
@@ -44,7 +42,6 @@ public class Guard {
     }
 
     public void register() {
-        MinecraftForge.EVENT_BUS.register(this);
     }
 
     static public final ResourceLocation ADVANCEMENT_GUARD = new ResourceLocation(SlashBladeRefabriced.MODID, "abilities/guard");
@@ -54,7 +51,6 @@ public class Guard {
     final static EnumSet<InputCommand> move = EnumSet.of(InputCommand.FORWARD, InputCommand.BACK, InputCommand.LEFT,
             InputCommand.RIGHT);
 
-    @SubscribeEvent
     public void onLivingAttack(LivingAttackEvent event) {
         LivingEntity victim = event.getEntity();
         DamageSource source = event.getSource();
@@ -62,25 +58,25 @@ public class Guard {
         // begin executable check -----------------
         // item check
         ItemStack stack = victim.getMainHandItem();
-        LazyOptional<BladeStateComponent> slashBlade = stack.getCapability(CapabilitySlashBlade.BLADESTATE);
-        if (!slashBlade.isPresent())
+        Optional<BladeStateComponent> slashBlade = BladeStateHelper.getBladeState(stack);
+        if (slashBlade.isEmpty())
             return;
-        if (slashBlade.filter(b -> b.isBroken()).isPresent())
+        if (slashBlade.filter(BladeStateComponent::isBroken).isPresent())
             return;
-        if (stack.getEnchantmentLevel(Enchantments.THORNS) <= 0)
+        if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.THORNS, stack) <= 0)
         	return;
 
         // user check
         if (!victim.onGround())
             return;
-        LazyOptional<InputStateComponent> input = victim.getCapability(InputStateComponentRegistry.INPUT_STATE);
-        if (!input.isPresent())
+        Optional<InputStateComponent> input = InputStateHelper.getInputState(victim);
+        if (input.isEmpty())
             return;
 
         // commanc check
         InputCommand targetCommand = InputCommand.SNEAK;
         boolean handleCommand = input.filter(i -> i.getCommands().contains(targetCommand)
-                && !i.getCommands().stream().anyMatch(cc -> move.contains(cc))).isPresent();
+                && i.getCommands().stream().noneMatch(move::contains)).isPresent();
 
         if (handleCommand)
             AdvancementHelper.grantCriterion(victim, ADVANCEMENT_GUARD);
@@ -115,8 +111,8 @@ public class Guard {
 
         // rank check
         boolean isHighRank = false;
-        LazyOptional<IConcentrationRank> rank = victim.getCapability(CapabilityConcentrationRank.RANK_POINT);
-        if (rank.filter(r -> IConcentrationRank.ConcentrationRanks.S.level <= r.getRank(timeCurrent).level).isPresent())
+        Optional<ConcentrationRankComponent> rank = ConcentrationRankHelper.getConcentrationRank(victim);
+        if (rank.filter(r -> ConcentrationRankComponent.ConcentrationRanks.S.level <= r.getRank(timeCurrent).level).isPresent())
             isHighRank = true;
 
         // damage sauce check

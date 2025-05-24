@@ -1,14 +1,15 @@
 package com.flechazo.slashblade.ability;
 
-import com.flechazo.slashblade.capability.mobeffect.MobEffectComponentRegistry;
+import com.flechazo.slashblade.capability.mobeffect.MobEffectComponent;
+import com.flechazo.slashblade.capability.mobeffect.MobEffectHelper;
 import com.flechazo.slashblade.entity.ai.StunGoal;
+import io.github.fabricators_of_create.porting_lib.entity.events.LivingEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerEntityEvents;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.entity.EntityJoinLevelEvent;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
 
 /**
  * Created by Furia on 15/06/20.
@@ -17,24 +18,20 @@ public class StunManager {
 
     static final int DEFAULT_STUN_TICKS = 10;
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onEntityJoinWorldEvent(EntityJoinLevelEvent event) {
-        if (!(event.getEntity() instanceof PathfinderMob))
-            return;
-        PathfinderMob entity = (PathfinderMob) event.getEntity();
-
-        entity.goalSelector.addGoal(-1, new StunGoal(entity));
+    public void register() {
+        LivingEntityEvents.LivingTickEvent.TICK.register(this::onEntityLivingUpdate);
+        ServerEntityEvents.ENTITY_LOAD.register(this::onEntityLoad);
     }
 
-    @SubscribeEvent
-    public void onEntityLivingUpdate(LivingEvent.LivingTickEvent event) {
+
+    public void onEntityLivingUpdate(LivingEntityEvents.LivingTickEvent event) {
         LivingEntity target = event.getEntity();
         if (!(target instanceof PathfinderMob))
             return;
         if (target.level() == null)
             return;
 
-        boolean onStun = target.getCapability(MobEffectComponentRegistry.MOB_EFFECT)
+        boolean onStun = MobEffectHelper.getMobEffect(target)
                 .filter((state) -> state.isStun(target.level().getGameTime())).isPresent();
 
         if (onStun) {
@@ -61,7 +58,7 @@ public class StunManager {
         if (target.level() == null)
             return;
 
-        target.getCapability(MobEffectComponentRegistry.MOB_EFFECT).ifPresent((state) -> {
+        MobEffectHelper.getMobEffect(target).ifPresent((state) -> {
             state.setManagedStun(target.level().getGameTime(), duration);
         });
     }
@@ -72,8 +69,15 @@ public class StunManager {
         if (!(target instanceof LivingEntity))
             return;
 
-        target.getCapability(MobEffectComponentRegistry.MOB_EFFECT).ifPresent((state) -> {
-            state.clearStunTimeOut();
-        });
+        MobEffectHelper.getMobEffect(target).ifPresent(MobEffectComponent::clearStunTimeOut);
+    }
+
+    /** 当任意实体加载时被调用 */
+    private void onEntityLoad (Entity entity, ServerLevel world) {
+        // 只对实现 PathfinderMob（带 goalSelector）的生物有效
+        if (entity instanceof PathfinderMob mob) {
+            // 给它的 GoalSelector 添加一个优先级为 -1（最高）的 StunGoal
+            mob.goalSelector.addGoal(-1, new StunGoal(mob));
+        }
     }
 }

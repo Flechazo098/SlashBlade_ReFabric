@@ -3,9 +3,9 @@ package com.flechazo.slashblade.client.renderer.model.obj;
 import com.google.common.base.Suppliers;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.awt.*;
 import java.util.function.BiFunction;
@@ -83,12 +83,12 @@ public class Face {
     public Vertex faceNormal;
     public TextureCoordinate[] textureCoordinates;
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void addFaceForRender(VertexConsumer tessellator) {
         addFaceForRender(tessellator, 0.0005F);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void addFaceForRender(VertexConsumer tessellator, float textureOffset) {
         if (faceNormal == null) {
             faceNormal = this.calculateFaceNormal();

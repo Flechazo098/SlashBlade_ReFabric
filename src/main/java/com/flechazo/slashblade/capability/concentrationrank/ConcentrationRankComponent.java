@@ -1,11 +1,19 @@
 package com.flechazo.slashblade.capability.concentrationrank;
 
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
+import com.flechazo.slashblade.network.NetworkManager;
+import com.flechazo.slashblade.network.RankSyncMessage;
 import com.google.common.collect.ImmutableRangeMap;
 import com.google.common.collect.Range;
 import com.google.common.collect.RangeMap;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.Optional;
 
 public interface ConcentrationRankComponent extends Component {
     long getRawRankPoint();
@@ -22,17 +30,83 @@ public interface ConcentrationRankComponent extends Component {
 
     long getUnitCapacity();
 
+    default long getMaxCapacity() {
+        return (long) (ConcentrationRanks.MAX_LEVEL * getUnitCapacity()) - 1;
+    }
+
+    default ConcentrationRanks getRank(long time) {
+        return ConcentrationRanks.getRankFromLevel(getRankLevel(time));
+    }
+
+    default long reductionLimitter(long reduction) {
+        long limit = getRawRankPoint() % getUnitCapacity();
+
+        return Math.min(reduction, limit);
+    }
+
+    default float getRankLevel(long currentTime) {
+        return getRankPoint(currentTime) / (float) getUnitCapacity();
+    }
+
+    default float getRankProgress(long currentTime) {
+        float level = getRankLevel(currentTime);
+
+        Range<Float> range = getRank(currentTime).pointRange;
+
+        double bottom = range.hasLowerBound() ? range.lowerEndpoint() : 0;
+
+        double top = range.hasUpperBound() ? range.upperEndpoint() : Math.floor(bottom + 1.0f);
+
+        double len = top - bottom;
+
+        return (float) ((level - bottom) / len);
+    }
+
+    default long getRankPoint(long time) {
+        long reduction = time - getLastUpdate();
+        return getRawRankPoint() - reductionLimitter(reduction);
+    }
+
+    default void addRankPoint(LivingEntity user, long point) {
+        long time = user.level().getGameTime();
+
+        ConcentrationRanks oldRank = getRank(time);
+
+        this.setRawRankPoint(Math.min(Math.max(0, point + getRankPoint(time)), getMaxCapacity()));
+        this.setLastUpdte(time);
+
+        if (oldRank.level < getRank(time).level)
+            this.setLastRankRise(time);
+
+        if (user instanceof ServerPlayer && !user.level().isClientSide()) {
+            if (((ServerPlayer) user).connection == null)
+                return;
+
+            RankSyncMessage msg = new RankSyncMessage();
+            msg.rawPoint = this.getRawRankPoint();
+            NetworkManager.send(NetworkManager.PacketDistributor.PLAYER.with(() -> (ServerPlayer) user), msg);
+        }
+    }
+
+    default void addRankPoint(DamageSource src) {
+        if (!(src.getEntity() instanceof LivingEntity))
+            return;
+
+        LivingEntity user = (LivingEntity) src.getEntity();
+
+        ItemStack stack = user.getMainHandItem();
+
+        Optional<ResourceLocation> combo = BladeStateHelper.getBladeState(stack)
+                .map(s -> s.resolvCurrentComboState(user));
+
+        float modifier = combo.map(this::getRankPointModifier).orElse(getRankPointModifier(src));
+
+        addRankPoint(user, (long) (modifier * getUnitCapacity()));
+    }
+
     float getRankPointModifier(DamageSource ds);
 
     float getRankPointModifier(ResourceLocation combo);
-
-    // 添加获取等级方法
-    ConcentrationRanks getRank(long time);
-
-    // 添加获取等级进度方法
-    float getRankLevel(long time);
-
-    // 定义等级枚举
     enum ConcentrationRanks {
         NONE(0, Range.lessThan(1.0f)),
         D(1, Range.closedOpen(1.0f, 2.0f)),

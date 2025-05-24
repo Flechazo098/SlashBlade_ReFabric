@@ -1,23 +1,20 @@
 package com.flechazo.slashblade.client.renderer.gui;
 
+import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponent;
+import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankHelper;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.flechazo.slashblade.SlashBladeRefabriced;
-import com.flechazo.slashblade.capability.concentrationrank.CapabilityConcentrationRank;
-import com.flechazo.slashblade.capability.concentrationrank.IConcentrationRank;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.joml.Matrix4f;
 
 @Environment(EnvType.CLIENT)
@@ -34,46 +31,38 @@ public class RankRenderer {
     }
 
     public void register() {
-        MinecraftForge.EVENT_BUS.register(this);
+        HudRenderCallback.EVENT.register(this::onHudRender);
     }
 
     static ResourceLocation RankImg = new ResourceLocation(SlashBladeRefabriced.MODID, "textures/gui/rank.png");
 
-    @SubscribeEvent
     @Environment(EnvType.CLIENT)
-    public void renderTick(RenderGuiOverlayEvent.Post event) {
-
+    private void onHudRender(GuiGraphics guiGraphics, float tickDelta) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.player == null)
-            return;
-        // if(!mc.isGameFocused()) return;
-        if (!Minecraft.renderNames())
-            return;
-        if (mc.screen != null) {
-            if (!(mc.screen instanceof ChatScreen))
-                return;
-        }
-
         LocalPlayer player = mc.player;
-        long time = System.currentTimeMillis();
+        if (player == null) return;
 
-        renderRankHud(event.getPartialTick(), player, time);
+        if (!Minecraft.renderNames()) return;
+        if (mc.screen != null && !(mc.screen instanceof ChatScreen)) return;
+
+        long time = System.currentTimeMillis();
+        renderRankHud(tickDelta, player, time);
     }
 
     private void renderRankHud(Float partialTicks, LocalPlayer player, long time) {
         Minecraft mc = Minecraft.getInstance();
 
-        player.getCapability(CapabilityConcentrationRank.RANK_POINT).ifPresent(cr -> {
+        ConcentrationRankHelper.getConcentrationRank(player).ifPresent(cr -> {
             long now = player.level().getGameTime();
 
-            IConcentrationRank.ConcentrationRanks rank = cr.getRank(now);
+            ConcentrationRankComponent.ConcentrationRanks rank = cr.getRank(now);
 
             /*
              * debug rank = IConcentrationRank.ConcentrationRanks.C; now =
              * cr.getLastUpdate();
              */
 
-            if (rank == IConcentrationRank.ConcentrationRanks.NONE)
+            if (rank == ConcentrationRankComponent.ConcentrationRanks.NONE)
                 return;
 
             // todo : korenani loadGUIRenderMatrix

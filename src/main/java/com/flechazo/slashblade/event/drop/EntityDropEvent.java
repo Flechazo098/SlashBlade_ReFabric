@@ -3,48 +3,50 @@ package com.flechazo.slashblade.event.drop;
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.entity.BladeItemEntity;
 import com.flechazo.slashblade.item.ItemSlashBlade;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 
-@Mod.EventBusSubscriber
 public class EntityDropEvent {
-    @SubscribeEvent
-    public static void dropBlade(LivingDropsEvent event) {
-        LivingEntity entity = event.getEntity();
-        var bladeRegistry = SlashBladeRefabriced.getSlashBladeDefinitionRegistry(entity.level());
-        entity.level().registryAccess().registryOrThrow(EntityDropEntry.REGISTRY_KEY).forEach(entry -> {
-            if (!ForgeRegistries.ENTITY_TYPES.containsKey(entry.getEntityType()))
-                return;
-            if (!bladeRegistry.containsKey(entry.getBladeName()))
-                return;
 
-            if (!(event.getSource().getEntity() instanceof LivingEntity))
-                return;
+    public static void handleBladeDrop(ServerLevel level, LivingEntity entity, DamageSource source) {
+        var bladeRegistry = SlashBladeRefabriced.getSlashBladeDefinitionRegistry(level);
 
-            LivingEntity attacker = (LivingEntity) event.getSource().getEntity();
+        // Traverse through custom drop entry
+        level.registryAccess()
+                .registryOrThrow(EntityDropEntry.REGISTRY_KEY)
+                .forEach(entry -> {
+                    ResourceLocation entityId = entry.getEntityType();
+                    EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.get(entityId);
+                    if (type == null) return;
 
-            if (entry.isRequestSlashBladeKill() && !(attacker.getMainHandItem().getItem() instanceof ItemSlashBlade))
-                return;
+                    ResourceLocation bladeName = entry.getBladeName();
+                    if (!bladeRegistry.containsKey(bladeName)) return;
 
-            float resultRate = Math.min(1F, entry.getDropRate() + event.getLootingLevel() * 0.1F);
+                    if (!(source.getEntity() instanceof LivingEntity attacker)) return;
 
-            if (entry.isDropFixedPoint())
-                dropBlade(entity, ForgeRegistries.ENTITY_TYPES.getValue(entry.getEntityType()),
-                        bladeRegistry.get(entry.getBladeName()).getBlade(), resultRate, entry.getDropPoint().x,
-                        entry.getDropPoint().y, entry.getDropPoint().z);
-            else
-                dropBlade(entity, ForgeRegistries.ENTITY_TYPES.getValue(entry.getEntityType()),
-                        bladeRegistry.get(entry.getBladeName()).getBlade(), resultRate, entity.getX(), entity.getY(),
-                        entity.getZ());
-        });
+                    if (entry.isRequestSlashBladeKill()
+                            && !(attacker.getMainHandItem().getItem() instanceof ItemSlashBlade)) return;
 
+                    // drop rate
+                    float rate = Math.min(1F, entry.getDropRate() + EnchantmentHelper.getMobLooting(attacker) * 0.1F);
+
+                    // Calculate the drop coordinates
+                    double x = entry.isDropFixedPoint() ? entry.getDropPoint().x : entity.getX();
+                    double y = entry.isDropFixedPoint() ? entry.getDropPoint().y : entity.getY();
+                    double z = entry.isDropFixedPoint() ? entry.getDropPoint().z : entity.getZ();
+
+                    dropBlade(entity, type, bladeRegistry.get(bladeName).getBlade(), rate, x, y, z);
+                });
     }
+
 
     public static void dropBlade(LivingEntity entity, EntityType<?> type, ItemStack blade, float percent, double x,
             double y, double z) {

@@ -1,10 +1,10 @@
 package com.flechazo.slashblade.client.renderer.model.obj;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.opengl.GL11;
 
 import java.io.BufferedReader;
@@ -133,14 +133,14 @@ public class WavefrontObject {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void tessellateAll(VertexConsumer tessellator) {
         for (GroupObject groupObject : groupObjects) {
             groupObject.render(tessellator);
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void tessellateOnly(VertexConsumer tessellator, String... groupNames) {
         for (GroupObject groupObject : groupObjects) {
             for (String groupName : groupNames) {
@@ -151,7 +151,7 @@ public class WavefrontObject {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void tessellatePart(VertexConsumer tessellator, String partName) {
         for (GroupObject groupObject : groupObjects) {
             if (partName.equalsIgnoreCase(groupObject.name)) {
@@ -160,7 +160,7 @@ public class WavefrontObject {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void tessellateAllExcept(VertexConsumer tessellator, String... excludedGroupNames) {
         boolean exclude;
         for (GroupObject groupObject : groupObjects) {

@@ -1,8 +1,8 @@
 package com.flechazo.slashblade.ability;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.event.InputCommandEvent;
-import com.flechazo.slashblade.item.ItemSlashBlade;
 import com.flechazo.slashblade.registry.ComboStateRegistry;
 import com.flechazo.slashblade.util.AdvancementHelper;
 import com.flechazo.slashblade.util.InputCommand;
@@ -20,8 +20,7 @@ import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+
 
 import java.util.EnumSet;
 import java.util.List;
@@ -39,7 +38,7 @@ public class EnemyStep {
     }
 
     public void register() {
-        MinecraftForge.EVENT_BUS.register(this);
+       InputCommandEvent.INPUT_COMMAND.register(this::onInputChange);
     }
 
     static final TargetingConditions tc = new TargetingConditions(false).ignoreLineOfSight()
@@ -48,7 +47,6 @@ public class EnemyStep {
     static public final ResourceLocation ADVANCEMENT_ENEMY_STEP = new ResourceLocation(SlashBladeRefabriced.MODID,
             "abilities/enemy_step");
 
-    @SubscribeEvent
     public void onInputChange(InputCommandEvent event) {
 
         EnumSet<InputCommand> old = event.getOld();
@@ -79,7 +77,7 @@ public class EnemyStep {
         AdvancementHelper.grantCriterion(sender, ADVANCEMENT_ENEMY_STEP);
         sender.playNotifySound(SoundEvents.PLAYER_SMALL_FALL, SoundSource.PLAYERS, 0.5f, 1.2f);
 
-        sender.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent(s -> {
+        BladeStateHelper.getBladeState(sender.getMainHandItem()).ifPresent(s -> {
             s.updateComboSeq(sender, ComboStateRegistry.NONE.getId());
         });
 

@@ -1,32 +1,27 @@
 package com.flechazo.slashblade.event;
 
 import com.flechazo.slashblade.capability.inputstate.InputStateComponent;
+import com.flechazo.slashblade.capability.inputstate.InputStateHelper;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.client.SlashBladeKeyMappings;
-import com.flechazo.slashblade.item.ItemSlashBlade;
 import com.flechazo.slashblade.network.MoveCommandMessage;
 import com.flechazo.slashblade.network.NetworkManager;
 import com.flechazo.slashblade.util.EnumSetConverter;
 import com.flechazo.slashblade.util.InputCommand;
-import mods.flammpfeil.slashblade.util.*;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-
 import java.util.EnumSet;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT)
+
 public class MoveInputHandler {
 
-    public static final Capability<InputStateComponent> INPUT_STATE = CapabilityManager.get(new CapabilityToken<>() {
-    });
+    public static void register() {
+        ClientTickEvents.END_CLIENT_TICK.register(MoveInputHandler::onClientTick);
+    }
 
     public static final String LAST_CHANGE_TIME = "SB_LAST_CHANGE_TIME";
 
@@ -34,19 +29,14 @@ public class MoveInputHandler {
         return (data & flags) == flags;
     }
 
-    @OnlyIn(Dist.CLIENT)
-    @SubscribeEvent()
-    public static void onPlayerPostTick(TickEvent.PlayerTickEvent event) {
-        if (!event.player.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).isPresent())
-            return;
-    	
-        if (event.phase != TickEvent.Phase.END)
-            return;
+    private static void onClientTick(Minecraft client) {
 
-        if (!(event.player instanceof LocalPlayer))
-            return;
+        if (client.player == null || client.level == null) return;
 
-        LocalPlayer player = (LocalPlayer) event.player;
+        LocalPlayer player = client.player;
+
+        if (BladeStateHelper.getBladeState(player.getMainHandItem()).isEmpty())
+            return;
 
         EnumSet<InputCommand> commands = EnumSet.noneOf(InputCommand.class);
 
@@ -79,16 +69,15 @@ public class MoveInputHandler {
         if (SlashBladeKeyMappings.KEY_SUMMON_BLADE.isDown())
             commands.add(InputCommand.M_DOWN);
 
-        EnumSet<InputCommand> old = player.getCapability(INPUT_STATE).map((state) -> state.getCommands())
+        EnumSet<InputCommand> old = InputStateHelper.getInputState(player).map(InputStateComponent::getCommands)
                 .orElseGet(() -> EnumSet.noneOf(InputCommand.class));
 
         Level worldIn = player.getCommandSenderWorld();
-
         long currentTime = worldIn.getGameTime();
         boolean doSend = !old.equals(commands);
 
         if (doSend) {
-            player.getCapability(INPUT_STATE).ifPresent((state) -> {
+            InputStateHelper.getInputState(player).ifPresent((state) -> {
                 commands.forEach(c -> {
                     if (!old.contains(c))
                         state.getLastPressTimes().put(c, currentTime);
@@ -97,9 +86,11 @@ public class MoveInputHandler {
                 state.getCommands().clear();
                 state.getCommands().addAll(commands);
             });
+
             MoveCommandMessage msg = new MoveCommandMessage();
             msg.command = EnumSetConverter.convertToInt(commands);
-            NetworkManager.INSTANCE.sendToServer(msg);
+            FriendlyByteBuf buf = PacketByteBufs.create();
+            NetworkManager.sendToServer(NetworkManager.MOVE_COMMAND_ID, buf);
         }
     }
 }

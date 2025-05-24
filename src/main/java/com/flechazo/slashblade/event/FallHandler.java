@@ -1,10 +1,13 @@
 package com.flechazo.slashblade.event;
 
-import com.flechazo.slashblade.item.ItemSlashBlade;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.registry.ComboStateRegistry;
 import com.flechazo.slashblade.registry.combo.ComboState;
 import com.flechazo.slashblade.util.AdvancementHelper;
+import io.github.fabricators_of_create.porting_lib.attributes.PortingLibAttributes;
+import io.github.fabricators_of_create.porting_lib.block.CustomLandingEffectsBlock;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.entity.Entity;
@@ -16,40 +19,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.LivingFallEvent;
-import net.minecraftforge.event.entity.player.PlayerFlyableFallEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class FallHandler {
-    private static final class SingletonHolder {
-        private static final FallHandler instance = new FallHandler();
-    }
-
-    public static FallHandler getInstance() {
-        return SingletonHolder.instance;
-    }
-
-    private FallHandler() {
-    }
-
-    public void register() {
-        MinecraftForge.EVENT_BUS.register(this);
-    }
-
-    @SubscribeEvent
-    public void onFall(LivingFallEvent event) {
-        resetState(event.getEntity());
-    }
-
-    @SubscribeEvent
-    public void onFlyableFall(PlayerFlyableFallEvent event) {
-        resetState(event.getEntity());
-    }
 
     public static void resetState(LivingEntity user) {
-        user.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+        BladeStateHelper.getBladeState(user.getMainHandItem()).ifPresent((state) -> {
             state.setFallDecreaseRate(0);
 
             ComboState combo = ComboStateRegistry.REGISTRY.get().getValue(state.getComboSeq()) != null
@@ -74,12 +48,19 @@ public class FallHandler {
             if (!state.isAir()) {
                 double d0 = Math.min((double) (0.2F + f / 15.0F), 2.5D);
                 int i = (int) (150.0D * d0);
-                if (!state.addLandingEffects((ServerLevel) user.level(), pos, state, user, i))
-                    ((ServerLevel) user.level()).sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, state),
-                            user.getX(), user.getY(), user.getZ(), i, 0.0D, 0.0D, 0.0D, (double) 0.15F);
+                Block block = state.getBlock();
+
+                if (block instanceof CustomLandingEffectsBlock custom) {
+                    if (custom.addLandingEffects(state, (ServerLevel) user.level(), pos, state, user, i)) {
+                        return;
+                    }
+                }
+
+                ((ServerLevel) user.level()).sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, state), user.getX(), user.getY(), user.getZ(), i, 0.0D, 0.0D, 0.0D, 0.15D);
             }
         }
     }
+
 
     public static void spawnLandingParticle(Entity user, Vec3 targetPos, Vec3 normal, float fallFactor) {
         if (!user.level().isClientSide()) {
@@ -106,7 +87,7 @@ public class FallHandler {
         if (!user.isNoGravity() && !user.onGround()) {
             user.fallDistance = 1;
 
-            float currentRatio = user.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).map((state) -> {
+            float currentRatio = BladeStateHelper.getBladeState(user.getMainHandItem()).map((state) -> {
                 float decRatio = state.getFallDecreaseRate();
 
                 float newDecRatio = decRatio + 0.05f;
@@ -124,7 +105,7 @@ public class FallHandler {
                 AdvancementHelper.grantedIf(Enchantments.FALL_PROTECTION, user);
             }
 
-            AttributeInstance gravity = user.getAttribute(ForgeMod.ENTITY_GRAVITY.get());
+            AttributeInstance gravity = user.getAttribute(PortingLibAttributes.ENTITY_GRAVITY);
             double g = gravity.getValue() * gravityReductionFactor;
 
             Vec3 motion = user.getDeltaMovement();
@@ -138,7 +119,7 @@ public class FallHandler {
             user.fallDistance = 1;
 
             Vec3 motion = user.getDeltaMovement();
-            AttributeInstance gravity = user.getAttribute(ForgeMod.ENTITY_GRAVITY.get());
+            AttributeInstance gravity = user.getAttribute(PortingLibAttributes.ENTITY_GRAVITY);
             double g = gravity.getValue();
             if (motion.y < 0)
                 user.setDeltaMovement(motion.x, (motion.y + g + 0.002f), motion.z);

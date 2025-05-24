@@ -76,7 +76,7 @@ public class BlandStandEventHandler {
 		if (tag.contains("SpecialEffectType")) {
 			var bladeStand = event.getBladeStand();
 			ResourceLocation SEKey = new ResourceLocation(tag.getString("SpecialEffectType"));
-			if (!(SpecialEffectsRegistry.REGISTRY.get().containsKey(SEKey)))
+			if (!(SpecialEffectsRegistry.REGISTRY.containsKey(SEKey)))
 				return;
 			if (state.hasSpecialEffect(SEKey))
 				return;
@@ -114,7 +114,7 @@ public class BlandStandEventHandler {
 			return;
 
 		ResourceLocation SAKey = new ResourceLocation(tag.getString("SpecialAttackType"));
-		if (!SlashArtsRegistry.REGISTRY.get().containsKey(SAKey))
+		if (!SlashArtsRegistry.REGISTRY.containsKey(SAKey))
 			return;
 
 		ItemStack blade = event.getBlade();
@@ -166,9 +166,9 @@ public class BlandStandEventHandler {
 		var specialEffects = state.getSpecialEffects();
 
 		for (var se : specialEffects) {
-			if (!SpecialEffectsRegistry.REGISTRY.get().containsKey(se))
+			if (!SpecialEffectsRegistry.REGISTRY.containsKey(se))
 				continue;
-			if (!SpecialEffectsRegistry.REGISTRY.get().getValue(se).isCopiable())
+			if (!SpecialEffectsRegistry.REGISTRY.get(se).isCopiable())
 				continue;
 			ItemStack orb = new ItemStack(SBItems.proudsoul_crystal);
 			CompoundTag tag = new CompoundTag();
@@ -193,7 +193,7 @@ public class BlandStandEventHandler {
 				}
 			}
 			player.drop(orb, true);
-			if(SpecialEffectsRegistry.REGISTRY.get().getValue(se).isRemovable())
+			if(SpecialEffectsRegistry.REGISTRY.get(se).isRemovable())
 				state.removeSpecialEffect(se);
 			event.setCanceled(true);
 			return;
@@ -219,7 +219,7 @@ public class BlandStandEventHandler {
 			ItemStack orb = new ItemStack(SBItems.proudsoul_sphere);
 			for (Enchantment e : enchantments)
 			{
-				if (EnchantmentHelper.getTagEnchantmentLevel(e, blade) < e.getMaxLevel())
+				if (EnchantmentHelper.getItemEnchantmentLevel(e, blade) < e.getMaxLevel())
 					return;
 			}
 			CompoundTag tag = new CompoundTag();
@@ -268,11 +268,15 @@ public class BlandStandEventHandler {
 		var world = player.level();
 		var random = world.getRandom();
 		var bladeStand = event.getBladeStand();
-		Map<Enchantment, Integer> currentBladeEnchantments = blade.getAllEnchantments();
-		stack.getAllEnchantments().forEach((enchantment, level) -> {
+		Map<Enchantment, Integer> currentBladeEnchantments = EnchantmentHelper.getEnchantments(blade);
+		Map<Enchantment, Integer> proudEnchants = EnchantmentHelper.getEnchantments(stack);
+		for (var entry : proudEnchants.entrySet()) {
 			if(event.isCanceled())
 				return;
-			if (!blade.canApplyAtEnchantingTable(enchantment))
+
+			Enchantment enchantment = entry.getKey();
+			int proudLevel = entry.getValue();
+			if (!enchantment.canEnchant(blade))
 				return;
 
 			var probability = 1.0F;
@@ -283,7 +287,7 @@ public class BlandStandEventHandler {
 			if (stack.is(SBItems.proudsoul_ingot))
 				probability = 0.75F;
 			if (random.nextFloat() <= probability) {
-				int enchantLevel = Math.min(enchantment.getMaxLevel(), EnchantmentHelper.getTagEnchantmentLevel(enchantment, blade) + 1);
+				int enchantLevel = Math.min(enchantment.getMaxLevel(), EnchantmentHelper.getItemEnchantmentLevel(enchantment, blade) + 1);
 				currentBladeEnchantments.put(enchantment, enchantLevel);
 				EnchantmentHelper.setEnchantments(currentBladeEnchantments, blade);
 				world.playSound(bladeStand, bladeStand.getPos(), SoundEvents.WITHER_SPAWN, SoundSource.BLOCKS, 1f, 1f);
@@ -304,6 +308,6 @@ public class BlandStandEventHandler {
 			if (!player.isCreative())
 				stack.shrink(1);
 			event.setCanceled(true);
-		});
+		}
 	}
 }

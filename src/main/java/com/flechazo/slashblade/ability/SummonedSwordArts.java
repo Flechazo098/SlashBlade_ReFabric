@@ -2,22 +2,21 @@ package com.flechazo.slashblade.ability;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.SlashBladeConfig;
-import com.flechazo.slashblade.capability.concentrationrank.CapabilityConcentrationRank;
-import com.flechazo.slashblade.capability.concentrationrank.IConcentrationRank;
-import com.flechazo.slashblade.capability.inputstate.InputStateComponentRegistry;
+import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponent;
+import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankHelper;
+import com.flechazo.slashblade.capability.inputstate.InputStateHelper;
 import com.flechazo.slashblade.capability.slashblade.BladeStateComponentImpl;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.entity.*;
 import com.flechazo.slashblade.util.*;
-import mods.flammpfeil.slashblade.entity.*;
 import com.flechazo.slashblade.event.InputCommandEvent;
-import com.flechazo.slashblade.item.ItemSlashBlade;
 import com.flechazo.slashblade.item.SwordType;
-import mods.flammpfeil.slashblade.util.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -29,8 +28,6 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -50,7 +47,7 @@ public class SummonedSwordArts {
     }
 
     public void register() {
-        MinecraftForge.EVENT_BUS.register(this);
+        InputCommandEvent.INPUT_COMMAND.register(this::onInputChange);
     }
 
     public static final ResourceLocation ADVANCEMENT_SUMMONEDSWORDS = new ResourceLocation(SlashBladeRefabriced.MODID,
@@ -64,7 +61,6 @@ public class SummonedSwordArts {
     public static final ResourceLocation ADVANCEMENT_HEAVY_RAIN_SWORDS = new ResourceLocation(SlashBladeRefabriced.MODID,
             "arts/shooting/heavy_rain_swords");
 
-    @SubscribeEvent
     public void onInputChange(InputCommandEvent event) {
 
         EnumSet<InputCommand> old = event.getOld();
@@ -72,14 +68,13 @@ public class SummonedSwordArts {
         ServerPlayer sender = event.getEntity();
 
         ItemStack blade = sender.getMainHandItem();
-        var bladeState = blade.getCapability(ItemSlashBlade.BLADESTATE).orElse(new BladeStateComponentImpl(blade));
+        var bladeState = BladeStateHelper.getBladeState(blade).orElse(new BladeStateComponentImpl(blade));
         
         if (bladeState.isBroken() || bladeState.isSealed()
                 || !SwordType.from(blade).contains(SwordType.BEWITCHED))
             return;
         
-		int powerLevel = blade
-                .getEnchantmentLevel(Enchantments.POWER_ARROWS);
+		int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, blade);
         if (powerLevel <= 0)
             return;
         
@@ -94,7 +89,7 @@ public class SummonedSwordArts {
         // basic summoned swords
         if (onDown) {
 
-            sender.getCapability(InputStateComponentRegistry.INPUT_STATE).ifPresent(input -> {
+           InputStateHelper.getInputState(sender).ifPresent(input -> {
 
                 // SpiralSwords command
                 input.getScheduler().schedule("SpiralSwords", pressTime + 10, new TimerCallback<LivingEntity>() {
@@ -106,7 +101,7 @@ public class SummonedSwordArts {
                         ServerPlayer entity = (ServerPlayer) rawEntity;
 
                         InputCommand targetCommnad = InputCommand.M_DOWN;
-                        boolean inputSucceed = entity.getCapability(InputStateComponentRegistry.INPUT_STATE)
+                        boolean inputSucceed = InputStateHelper.getInputState(entity)
                                 .filter(input -> input.getCommands().contains(targetCommnad)
                                         && (!InputCommand.anyMatch(input.getCommands(), InputCommand.move)
                                                 || !input.getCommands().contains(InputCommand.SNEAK))
@@ -130,24 +125,24 @@ public class SummonedSwordArts {
                             });
                         } else {
                             // summon
-                            entity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+                            BladeStateHelper.getBladeState(entity.getMainHandItem()).ifPresent((state) -> {
 
-                                if (state.getProudSoulCount() < SlashBladeConfig.SUMMON_SWORD_ART_COST.get())
+                                if (state.getProudSoulCount() < SlashBladeConfig.getSummonSwordCost())
                                     return;
                                 state.setProudSoulCount(
-                                        state.getProudSoulCount() - SlashBladeConfig.SUMMON_SWORD_ART_COST.get());
+                                        state.getProudSoulCount() - SlashBladeConfig.getSummonSwordCost());
 
                                 //圆环幻影剑
                                 AdvancementHelper.grantCriterion(entity, ADVANCEMENT_SPIRAL_SWORDS);
 
                                 Level worldIn = entity.level();
 
-                                int rank = entity.getCapability(CapabilityConcentrationRank.RANK_POINT)
+                                int rank = ConcentrationRankHelper.getConcentrationRank(entity)
                                         .map(r -> r.getRank(worldIn.getGameTime()).level).orElse(0);
 
                                 int count = 6;
 
-                                if (IConcentrationRank.ConcentrationRanks.S.level <= rank) {
+                                if (ConcentrationRankComponent.ConcentrationRanks.S.level <= rank) {
                                     count = 8;
                                 }
 
@@ -184,7 +179,7 @@ public class SummonedSwordArts {
                         ServerPlayer entity = (ServerPlayer) rawEntity;
 
                         InputCommand targetCommnad = InputCommand.M_DOWN;
-                        boolean inputSucceed = entity.getCapability(InputStateComponentRegistry.INPUT_STATE)
+                        boolean inputSucceed = InputStateHelper.getInputState(entity)
                                 .filter(input -> input.getCommands().contains(targetCommnad)
                                         && input.getCommands().contains(InputCommand.SNEAK)
                                         && input.getCommands().contains(InputCommand.BACK)
@@ -195,25 +190,25 @@ public class SummonedSwordArts {
                             return;
 
                         // summon
-                        entity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+                       BladeStateHelper.getBladeState(entity.getMainHandItem()).ifPresent((state) -> {
 
                             Level worldIn = entity.level();
                             Entity target = state.getTargetEntity(worldIn);
 
                             if (target == null || !target.isAlive() || target.isRemoved()) return;
-                            if (state.getProudSoulCount() < SlashBladeConfig.SUMMON_SWORD_ART_COST.get())
+                            if (state.getProudSoulCount() < SlashBladeConfig.getSummonSwordCost())
                                 return;
                             state.setProudSoulCount(
-                                    state.getProudSoulCount() - SlashBladeConfig.SUMMON_SWORD_ART_COST.get());
+                                    state.getProudSoulCount() - SlashBladeConfig.getSummonSwordCost());
                             //烈风环影剑
                             AdvancementHelper.grantCriterion(entity, ADVANCEMENT_STORM_SWORDS);
 
-                            int rank = entity.getCapability(CapabilityConcentrationRank.RANK_POINT)
+                            int rank =ConcentrationRankHelper.getConcentrationRank(entity)
                                     .map(r -> r.getRank(worldIn.getGameTime()).level).orElse(0);
 
                             int count = 6;
 
-                            if (IConcentrationRank.ConcentrationRanks.S.level <= rank) {
+                            if (ConcentrationRankComponent.ConcentrationRanks.S.level <= rank) {
                                 count = 8;
                             }
 
@@ -248,7 +243,7 @@ public class SummonedSwordArts {
                         ServerPlayer entity = (ServerPlayer) rawEntity;
 
                         InputCommand targetCommnad = InputCommand.M_DOWN;
-                        boolean inputSucceed = entity.getCapability(InputStateComponentRegistry.INPUT_STATE)
+                        boolean inputSucceed = InputStateHelper.getInputState(entity)
                                 .filter(input -> input.getCommands().contains(targetCommnad)
                                         && input.getCommands().contains(InputCommand.SNEAK)
                                         && input.getCommands().contains(InputCommand.FORWARD)
@@ -259,23 +254,23 @@ public class SummonedSwordArts {
                             return;
 
                         // summon
-                        entity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+                        BladeStateHelper.getBladeState(entity.getMainHandItem()).ifPresent((state) -> {
 
                             Level worldIn = entity.level();
 
-                            if (state.getProudSoulCount() < SlashBladeConfig.SUMMON_SWORD_ART_COST.get())
+                            if (state.getProudSoulCount() < SlashBladeConfig.getSummonSwordCost())
                                 return;
                             state.setProudSoulCount(
-                                    state.getProudSoulCount() - SlashBladeConfig.SUMMON_SWORD_ART_COST.get());
+                                    state.getProudSoulCount() - SlashBladeConfig.getSummonSwordCost());
                             //急袭幻影剑
                             AdvancementHelper.grantCriterion(entity, ADVANCEMENT_BLISTERING_SWORDS);
 
-                            int rank = entity.getCapability(CapabilityConcentrationRank.RANK_POINT)
+                            int rank = ConcentrationRankHelper.getConcentrationRank(entity)
                                     .map(r -> r.getRank(worldIn.getGameTime()).level).orElse(0);
 
                             int count = 6;
 
-                            if (IConcentrationRank.ConcentrationRanks.S.level <= rank) {
+                            if (ConcentrationRankComponent.ConcentrationRanks.S.level <= rank) {
                                 count = 8;
                             }
 
@@ -312,7 +307,7 @@ public class SummonedSwordArts {
                         ServerPlayer entity = (ServerPlayer) rawEntity;
 
                         InputCommand targetCommnad = InputCommand.M_DOWN;
-                        boolean inputSucceed = entity.getCapability(InputStateComponentRegistry.INPUT_STATE)
+                        boolean inputSucceed = InputStateHelper.getInputState(entity)
                                 .filter(input -> input.getCommands().contains(targetCommnad)
                                         && input.getCommands().contains(InputCommand.SNEAK)
                                         && input.getCommands().contains(InputCommand.FORWARD)
@@ -323,19 +318,19 @@ public class SummonedSwordArts {
                             return;
 
                         // summon
-                        entity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+                       BladeStateHelper.getBladeState(entity.getMainHandItem()).ifPresent((state) -> {
 
                             Level worldIn = entity.level();
                             Entity target = state.getTargetEntity(worldIn);
-                            if (state.getProudSoulCount() < SlashBladeConfig.SUMMON_SWORD_ART_COST.get())
+                            if (state.getProudSoulCount() < SlashBladeConfig.getSummonSwordCost())
                                 return;
                             state.setProudSoulCount(
-                                    state.getProudSoulCount() - SlashBladeConfig.SUMMON_SWORD_ART_COST.get());
+                                    state.getProudSoulCount() - SlashBladeConfig.getSummonSwordCost());
 
                             //五月雨
                             AdvancementHelper.grantCriterion(entity, ADVANCEMENT_HEAVY_RAIN_SWORDS);
 
-                            int rank = entity.getCapability(CapabilityConcentrationRank.RANK_POINT)
+                            int rank = ConcentrationRankHelper.getConcentrationRank(entity)
                                     .map(r -> r.getRank(worldIn.getGameTime()).level).orElse(0);
 
                             Vec3 basePos;
@@ -401,11 +396,11 @@ public class SummonedSwordArts {
 
             });
 
-            blade.getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+            BladeStateHelper.getBladeState(blade).ifPresent((state) -> {
 
-                if (state.getProudSoulCount() < SlashBladeConfig.SUMMON_SWORD_COST.get())
+                if (state.getProudSoulCount() < SlashBladeConfig.getSummonSwordCost())
                     return;
-                state.setProudSoulCount(state.getProudSoulCount() - SlashBladeConfig.SUMMON_SWORD_COST.get());
+                state.setProudSoulCount(state.getProudSoulCount() - SlashBladeConfig.getSummonSwordCost());
                 //幻影剑
                 AdvancementHelper.grantCriterion(sender, ADVANCEMENT_SUMMONEDSWORDS);
 

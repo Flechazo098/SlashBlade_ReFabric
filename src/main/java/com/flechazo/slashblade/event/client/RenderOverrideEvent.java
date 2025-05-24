@@ -17,7 +17,7 @@ public class RenderOverrideEvent {
                 RenderOverrideResult result = new RenderOverrideResult(model, target, texture, false);
                 for (RenderOverrideCallback listener : listeners) {
                     result = listener.onRenderOverride(stack, model, target, texture, matrixStack, buffer);
-                    if (result.isCancelled()) {
+                    if (result.cancelled()) {
                         break;
                     }
                 }
@@ -31,34 +31,8 @@ public class RenderOverrideEvent {
     }
 
     @Environment(EnvType.CLIENT)
-    public static class RenderOverrideResult {
-        private final WavefrontObject model;
-        private final String target;
-        private final ResourceLocation texture;
-        private final boolean cancelled;
-
-        public RenderOverrideResult(WavefrontObject model, String target, ResourceLocation texture, boolean cancelled) {
-            this.model = model;
-            this.target = target;
-            this.texture = texture;
-            this.cancelled = cancelled;
-        }
-
-        public WavefrontObject getModel() {
-            return model;
-        }
-
-        public String getTarget() {
-            return target;
-        }
-
-        public ResourceLocation getTexture() {
-            return texture;
-        }
-
-        public boolean isCancelled() {
-            return cancelled;
-        }
+        public record RenderOverrideResult(WavefrontObject model, String target, ResourceLocation texture,
+                                           boolean cancelled) {
     }
 
     public static RenderOverrideResult onRenderOverride(ItemStack stack, WavefrontObject model, String target,
