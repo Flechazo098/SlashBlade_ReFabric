@@ -1,6 +1,7 @@
 package com.flechazo.slashblade.recipe;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
@@ -21,7 +22,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 
 public class RequestDefinition {
 
@@ -150,9 +151,9 @@ public class RequestDefinition {
     public boolean test(ItemStack blade) {
         if (blade == null || blade.isEmpty())
             return false;
-        if (!blade.getCapability(ItemSlashBlade.BLADESTATE).isPresent())
+        if (BladeStateHelper.getBladeState(blade).isEmpty())
             return false;
-        var state = blade.getCapability(ItemSlashBlade.BLADESTATE).orElseThrow(NullPointerException::new);
+        var state = BladeStateHelper.getBladeState(blade).orElseThrow(NullPointerException::new);
         boolean nameCheck;
         if (this.name.equals(SlashBladeRefabriced.prefix("none"))) {
             nameCheck = state.getTranslationKey().isBlank();
@@ -164,8 +165,8 @@ public class RequestDefinition {
         boolean refineCheck = state.getRefine() >= this.getRefineCount();
 
         for (var enchantment : this.getEnchantments()) {
-            if (blade.getEnchantmentLevel(ForgeRegistries.ENCHANTMENTS
-                    .getValue(enchantment.getEnchantmentID())) < enchantment.getEnchantmentLevel()) {
+            if (EnchantmentHelper.getItemEnchantmentLevel(BuiltInRegistries.ENCHANTMENT
+                    .get(enchantment.getEnchantmentID()), blade) < enchantment.getEnchantmentLevel()) {
                 return false;
             }
         }
@@ -221,14 +222,12 @@ public class RequestDefinition {
         }
 
         public Builder addEnchantment(EnchantmentDefinition... enchantments) {
-            for (var enchantment : enchantments)
-                this.enchantments.add(enchantment);
+            this.enchantments.addAll(Arrays.asList(enchantments));
             return this;
         }
 
         public Builder addSwordType(SwordType... types) {
-            for (var type : types)
-                this.defaultType.add(type);
+            this.defaultType.addAll(Arrays.asList(types));
             return this;
         }
 

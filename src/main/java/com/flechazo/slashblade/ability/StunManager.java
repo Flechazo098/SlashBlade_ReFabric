@@ -16,17 +16,28 @@ import net.minecraft.world.phys.Vec3;
  */
 public class StunManager {
 
-    static final int DEFAULT_STUN_TICKS = 10;
+    private static final class SingletonHolder {
+        private static final StunManager instance = new StunManager();
+    }
 
-    public void register() {
+    public static StunManager getInstance () {
+        return StunManager.SingletonHolder.instance;
+    }
+
+    private StunManager () {
+    }
+
+    public void register () {
         LivingEntityEvents.LivingTickEvent.TICK.register(this::onEntityLivingUpdate);
         ServerEntityEvents.ENTITY_LOAD.register(this::onEntityLoad);
     }
 
+    static final int DEFAULT_STUN_TICKS = 10;
 
-    public void onEntityLivingUpdate(LivingEntityEvents.LivingTickEvent event) {
+
+    public void onEntityLivingUpdate (LivingEntityEvents.LivingTickEvent event) {
         LivingEntity target = event.getEntity();
-        if (!(target instanceof PathfinderMob))
+        if (! (target instanceof PathfinderMob))
             return;
         if (target.level() == null)
             return;
@@ -44,16 +55,16 @@ public class StunManager {
 
     }
 
-    public static void setStun(LivingEntity target, LivingEntity attacker) {
+    public static void setStun (LivingEntity target, LivingEntity attacker) {
         setStun(target);
     }
 
-    public static void setStun(LivingEntity target) {
+    public static void setStun (LivingEntity target) {
         setStun(target, DEFAULT_STUN_TICKS);
     }
 
-    public static void setStun(LivingEntity target, long duration) {
-        if (!(target instanceof PathfinderMob))
+    public static void setStun (LivingEntity target, long duration) {
+        if (! (target instanceof PathfinderMob))
             return;
         if (target.level() == null)
             return;
@@ -63,21 +74,23 @@ public class StunManager {
         });
     }
 
-    public static void removeStun(LivingEntity target) {
+    public static void removeStun (LivingEntity target) {
         if (target.level() == null)
             return;
-        if (!(target instanceof LivingEntity))
+        if (! (target instanceof LivingEntity))
             return;
 
         MobEffectHelper.getMobEffect(target).ifPresent(MobEffectComponent::clearStunTimeOut);
     }
 
-    /** 当任意实体加载时被调用 */
+    /**
+     * 当任意实体加载时被调用
+     */
     private void onEntityLoad (Entity entity, ServerLevel world) {
         // 只对实现 PathfinderMob（带 goalSelector）的生物有效
         if (entity instanceof PathfinderMob mob) {
             // 给它的 GoalSelector 添加一个优先级为 -1（最高）的 StunGoal
-            mob.goalSelector.addGoal(-1, new StunGoal(mob));
+            mob.goalSelector.addGoal(- 1, new StunGoal(mob));
         }
     }
 }

@@ -3,7 +3,6 @@ package com.flechazo.slashblade.ability;
 import java.util.EnumSet;
 import java.util.Map;
 
-import com.flechazo.slashblade.capability.inputstate.InputStateComponentRegistry;
 import com.flechazo.slashblade.capability.inputstate.InputStateHelper;
 import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.event.InputCommandEvent;
@@ -22,8 +21,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.timers.TimerCallback;
 import net.minecraft.world.level.timers.TimerQueue;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class SuperSlashArts {
 	private static final class SingletonHolder {
@@ -138,10 +135,10 @@ public class SuperSlashArts {
 
 			Map.Entry<Integer, ResourceLocation> currentloc = state.resolvCurrentComboStateTicks(entity);
 
-			ComboState currentCS = ComboStateRegistry.REGISTRY.get().getValue(currentloc.getValue());
+			ComboState currentCS = ComboStateRegistry.COMBO_STATE.get(currentloc.getValue());
 
 			ResourceLocation csloc = state.getSlashArts().doArts(SlashArts.ArtsType.Super, entity);
-			ComboState cs = ComboStateRegistry.REGISTRY.get().getValue(csloc);
+			ComboState cs = ComboStateRegistry.COMBO_STATE.get(csloc);
 			if (csloc != ComboStateRegistry.NONE.getId() && !currentloc.getValue().equals(csloc)) {
 
 				if (currentCS.getPriority() > cs.getPriority()) {

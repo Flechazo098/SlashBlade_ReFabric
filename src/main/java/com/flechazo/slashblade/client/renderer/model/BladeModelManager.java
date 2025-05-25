@@ -54,9 +54,8 @@ public class BladeModelManager {
                 }, Executors.newCachedThreadPool()));
     }
 
-    public void reload(TextureStitchEvent.Post event) {
+    public void reload() {
         cache.invalidateAll();
-
         defaultModel = new WavefrontObject(DefaultResources.resourceDefaultModel);
     }
 
@@ -70,5 +69,4 @@ public class BladeModelManager {
         }
         return defaultModel;
     }
-
 }

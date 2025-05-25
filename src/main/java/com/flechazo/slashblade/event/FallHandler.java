@@ -20,15 +20,18 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.server.level.ServerLevel;
 
+/**
+ * 摔落事件处理类
+ * 具体实现请参阅 {@link com.flechazo.slashblade.mixin.event.LivingEntityFallDamageMixin}
+ */
 public class FallHandler {
 
     public static void resetState(LivingEntity user) {
         BladeStateHelper.getBladeState(user.getMainHandItem()).ifPresent((state) -> {
             state.setFallDecreaseRate(0);
 
-            ComboState combo = ComboStateRegistry.REGISTRY.get().getValue(state.getComboSeq()) != null
-                    ? ComboStateRegistry.REGISTRY.get().getValue(state.getComboSeq())
-                    : ComboStateRegistry.NONE.get();
+            ComboStateRegistry.COMBO_STATE.get(state.getComboSeq());
+            ComboState combo = ComboStateRegistry.COMBO_STATE.get(state.getComboSeq());
             if (combo.isAerial()) {
                 state.setComboSeq(combo.getNextOfTimeout(user));
             }

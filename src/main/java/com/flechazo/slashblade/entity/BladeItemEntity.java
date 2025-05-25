@@ -2,6 +2,10 @@ package com.flechazo.slashblade.entity;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.init.DefaultResources;
+import com.flechazo.slashblade.network.util.PlayMessages;
+import com.flechazo.slashblade.registry.EntityTypeRegister;
+import io.github.fabricators_of_create.porting_lib.block.CustomSoundTypeBlock;
+import io.github.fabricators_of_create.porting_lib.entity.PortingLibEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -18,10 +22,9 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.network.PlayMessages;
-import net.minecraftforge.network.NetworkHooks;
 
 public class BladeItemEntity extends ItemEntity {
     private static final EntityDataAccessor<String> DATA_MODEL = SynchedEntityData.defineId(BladeItemEntity.class,
@@ -69,11 +72,11 @@ public class BladeItemEntity extends ItemEntity {
     }
 
     public static BladeItemEntity createInstanceFromPacket(PlayMessages.SpawnEntity packet, Level worldIn) {
-        return new BladeItemEntity(SlashBladeRefabriced.RegistryEvents.BladeItem, worldIn);
+        return new BladeItemEntity(EntityTypeRegister.BladeItem, worldIn);
     }
 
     public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+        return PortingLibEntity.getEntitySpawningPacket(this);
     }
 
     @Override
@@ -128,11 +131,19 @@ public class BladeItemEntity extends ItemEntity {
             int j = Mth.floor(this.getX());
             int k = Mth.floor(this.getY() - (double) 0.2F);
             int l = Mth.floor(this.getZ());
-            BlockState blockstate = this.level().getBlockState(new BlockPos(j, k, l));
+            BlockPos blockPos = new BlockPos(j, k, l);
+            BlockState blockstate = this.level().getBlockState(blockPos);
             if (!blockstate.isAir()) {
-                SoundType soundtype = blockstate.getSoundType(level(), new BlockPos(j, k, l), this);
+                SoundType soundtype;
+                Block block = blockstate.getBlock();
+                if (block instanceof CustomSoundTypeBlock custom) {
+                    soundtype = custom.getSoundType(blockstate, this.level(), blockPos, this);
+                } else {
+                    soundtype = blockstate.getSoundType();
+                }
                 this.playSound(soundtype.getFallSound(), soundtype.getVolume() * 0.5F, soundtype.getPitch() * 0.75F);
             }
+
 
             if (this.isCurrentlyGlowing() && getAirSupply() < 0) {
                 this.setGlowingTag(false);

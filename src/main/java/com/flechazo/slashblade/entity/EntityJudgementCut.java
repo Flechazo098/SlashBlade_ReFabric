@@ -1,8 +1,13 @@
 package com.flechazo.slashblade.entity;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
+import com.flechazo.slashblade.network.util.PlayMessages;
+import com.flechazo.slashblade.registry.EntityTypeRegister;
 import com.flechazo.slashblade.util.*;
-import mods.flammpfeil.slashblade.util.*;
+import com.flechazo.slashblade.util.accessor.PersistentDataAccessor;
+import io.github.fabricators_of_create.porting_lib.entity.PortingLibEntity;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -21,8 +26,6 @@ import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.util.EnumSet;
@@ -30,8 +33,6 @@ import java.util.List;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.phys.EntityHitResult;
-import net.minecraftforge.network.PlayMessages;
-import net.minecraftforge.network.NetworkHooks;
 
 public class EntityJudgementCut extends Projectile implements IShootable {
     private static final EntityDataAccessor<Integer> COLOR = SynchedEntityData
@@ -75,7 +76,7 @@ public class EntityJudgementCut extends Projectile implements IShootable {
     }
 
     public static EntityJudgementCut createInstance(PlayMessages.SpawnEntity packet, Level worldIn) {
-        return new EntityJudgementCut(SlashBladeRefabriced.RegistryEvents.JudgementCut, worldIn);
+        return new EntityJudgementCut(EntityTypeRegister.JudgementCut, worldIn);
     }
 
     @Override
@@ -106,7 +107,7 @@ public class EntityJudgementCut extends Projectile implements IShootable {
 
     @Override
     public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+        return PortingLibEntity.getEntitySpawningPacket(this);
     }
 
     @Override
@@ -115,7 +116,7 @@ public class EntityJudgementCut extends Projectile implements IShootable {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public boolean shouldRenderAtSqrDistance(double distance) {
         double d0 = this.getBoundingBox().getSize() * 10.0D;
         if (Double.isNaN(d0)) {
@@ -127,7 +128,7 @@ public class EntityJudgementCut extends Projectile implements IShootable {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void lerpTo(double x, double y, double z, float yaw, float pitch, int posRotationIncrements,
             boolean teleport) {
         this.setPos(x, y, z);
@@ -135,7 +136,7 @@ public class EntityJudgementCut extends Projectile implements IShootable {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void lerpMotion(double x, double y, double z) {
         this.setDeltaMovement(0, 0, 0);
     }
@@ -221,7 +222,7 @@ public class EntityJudgementCut extends Projectile implements IShootable {
 
             final int count = 3;
             if (getIsCritical() && 0 < tickCount && tickCount <= count) {
-                EntitySlashEffect jc = new EntitySlashEffect(SlashBladeRefabriced.RegistryEvents.SlashEffect, this.level());
+                EntitySlashEffect jc = new EntitySlashEffect(EntityTypeRegister.SlashEffect, this.level());
                 jc.absMoveTo(this.getX(), this.getY(), this.getZ(), (360.0f / count) * tickCount + this.seed, 0);
                 jc.setRotationRoll(30);
 
@@ -339,7 +340,7 @@ public class EntityJudgementCut extends Projectile implements IShootable {
     }
 
     public List<MobEffectInstance> getPotionEffects() {
-        List<MobEffectInstance> effects = PotionUtils.getAllEffects(this.getPersistentData());
+        List<MobEffectInstance> effects = PotionUtils.getAllEffects(((PersistentDataAccessor) this).slashbladerefabriced$getPersistentData());
 
         if (effects.isEmpty())
             effects.add(new MobEffectInstance(MobEffects.POISON, 1, 1));

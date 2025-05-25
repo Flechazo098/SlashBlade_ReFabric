@@ -1,10 +1,10 @@
 package com.flechazo.slashblade.client.renderer.entity;
 
 import com.flechazo.slashblade.event.NameTagRenderCallback;
+import com.flechazo.slashblade.registry.SlashBladeRegister;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.flechazo.slashblade.client.renderer.util.MSAutoCloser;
 import com.flechazo.slashblade.entity.BladeStandEntity;
-import com.flechazo.slashblade.init.SBItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -84,7 +84,7 @@ public class BladeStandEntityRenderer extends ItemFrameRenderer<BladeStandEntity
                 this.renderItem(entity, entity.currentTypeStack, matrixStackIn, bufferIn, packedLightIn);
                 matrixStackIn.popPose();
 
-                if (entity.currentType == SBItems.bladestand_1w || type == SBItems.bladestand_2w) {
+                if (entity.currentType == SlashBladeRegister.bladestand_1w || type == SBItems.bladestand_2w) {
                     matrixStackIn.translate(0, 0, -0.19f);
                 } else if (entity.currentType == SBItems.bladestand_1) {
                 }

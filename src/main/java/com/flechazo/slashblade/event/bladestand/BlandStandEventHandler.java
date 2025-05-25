@@ -6,10 +6,10 @@ import com.flechazo.slashblade.data.builtin.SlashBladeBuiltInRegistry;
 import com.flechazo.slashblade.data.tag.SlashBladeItemTags;
 import com.flechazo.slashblade.entity.BladeStandEntity;
 import com.flechazo.slashblade.event.SlashBladeEvent;
-import com.flechazo.slashblade.init.SBItems;
 import com.flechazo.slashblade.registry.SlashArtsRegistry;
 import com.flechazo.slashblade.recipe.RequestDefinition;
 import com.flechazo.slashblade.recipe.SlashBladeIngredient;
+import com.flechazo.slashblade.registry.SlashBladeRegister;
 import com.flechazo.slashblade.registry.SpecialEffectsRegistry;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -64,7 +64,7 @@ public class BlandStandEventHandler {
 		ItemStack blade = event.getBlade();
 		if (blade.isEmpty())
 			return;
-		if (!stack.is(SBItems.proudsoul_crystal))
+		if (!stack.is(SlashBladeRegister.PROUDSOUL_CRYSTAL))
 			return;
 		var world = player.level();
 		var state = event.getSlashBladeState();
@@ -110,7 +110,7 @@ public class BlandStandEventHandler {
 		ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
 		CompoundTag tag = stack.getTag();
 
-		if (!stack.is(SBItems.proudsoul_sphere) || tag == null || !tag.contains("SpecialAttackType"))
+		if (!stack.is(SlashBladeRegister.PROUDSOUL_SPHERE) || tag == null || !tag.contains("SpecialAttackType"))
 			return;
 
 		ResourceLocation SAKey = new ResourceLocation(tag.getString("SpecialAttackType"));
@@ -158,7 +158,7 @@ public class BlandStandEventHandler {
 		ItemStack blade = event.getBlade();
 		if (blade.isEmpty())
 			return;
-		if (!stack.is(SBItems.proudsoul_crystal))
+		if (!stack.is(SlashBladeRegister.PROUDSOUL_CRYSTAL))
 			return;
 		var world = player.level();
 		var state = event.getSlashBladeState();
@@ -170,7 +170,7 @@ public class BlandStandEventHandler {
 				continue;
 			if (!SpecialEffectsRegistry.REGISTRY.get(se).isCopiable())
 				continue;
-			ItemStack orb = new ItemStack(SBItems.proudsoul_crystal);
+			ItemStack orb = new ItemStack(SlashBladeRegister.PROUDSOUL_CRYSTAL);
 			CompoundTag tag = new CompoundTag();
 			tag.putString("SpecialEffectType", se.toString());
 			orb.setTag(tag);
@@ -208,7 +208,7 @@ public class BlandStandEventHandler {
 		ItemStack blade = event.getBlade();
 		if (blade.isEmpty())
 			return;
-		if (!stack.is(SBItems.proudsoul_ingot) || !stack.isEnchanted())
+		if (!stack.is(SlashBladeRegister.PROUDSOUL_INGOT) || !stack.isEnchanted())
 			return;
 		var world = player.level();
 		var state = event.getSlashBladeState();
@@ -216,7 +216,7 @@ public class BlandStandEventHandler {
 		var enchantments = EnchantmentHelper.getEnchantments(stack).keySet();
 		ResourceLocation SA = state.getSlashArtsKey();
 		if (SA != null && !SA.equals(SlashArtsRegistry.NONE.getId())) {
-			ItemStack orb = new ItemStack(SBItems.proudsoul_sphere);
+			ItemStack orb = new ItemStack(SlashBladeRegister.PROUDSOUL_SPHERE);
 			for (Enchantment e : enchantments)
 			{
 				if (EnchantmentHelper.getItemEnchantmentLevel(e, blade) < e.getMaxLevel())
@@ -280,11 +280,11 @@ public class BlandStandEventHandler {
 				return;
 
 			var probability = 1.0F;
-			if (stack.is(SBItems.proudsoul_tiny))
+			if (stack.is(SlashBladeRegister.PROUDSOUL_TINY))
 				probability = 0.25F;
-			if (stack.is(SBItems.proudsoul))
+			if (stack.is(SlashBladeRegister.PROUDSOUL))
 				probability = 0.5F;
-			if (stack.is(SBItems.proudsoul_ingot))
+			if (stack.is(SlashBladeRegister.PROUDSOUL_INGOT))
 				probability = 0.75F;
 			if (random.nextFloat() <= probability) {
 				int enchantLevel = Math.min(enchantment.getMaxLevel(), EnchantmentHelper.getItemEnchantmentLevel(enchantment, blade) + 1);

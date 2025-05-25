@@ -1,6 +1,7 @@
 package com.flechazo.slashblade.network;
 
 import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponent;
+import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponentImpl;
 import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankHelper;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -9,6 +10,8 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
+
+import java.util.Optional;
 
 public class RankSyncMessage {
     public long rawPoint;
@@ -37,20 +40,18 @@ public class RankSyncMessage {
             Player player = client.player;
             if (player == null) return;
 
-            ConcentrationRankComponent cr = ConcentrationRankHelper.getConcentrationRank(player);
-            if (cr == null) return;
+           ConcentrationRankHelper.getConcentrationRank(player).ifPresent(cr -> {
 
-            long time = player.level().getGameTime();
+                long time = player.level().getGameTime();
 
-            // 使用接口中定义的方法获取等级
-            ConcentrationRankComponent.ConcentrationRanks oldRank = cr.getRank(time);
+                ConcentrationRankComponent.ConcentrationRanks oldRank = cr.getRank(time);
 
-            cr.setRawRankPoint(point);
-            cr.setLastUpdte(time);
+                cr.setRawRankPoint(point);
+                cr.setLastUpdte(time);
 
-            // 比较等级变化
-            if (oldRank.level < cr.getRank(time).level)
-                cr.setLastRankRise(time);
-        });
+                if (oldRank.level < cr.getRank(time).level)
+                    cr.setLastRankRise(time);
+            });
+    });
     }
 }

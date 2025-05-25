@@ -11,7 +11,6 @@ import java.util.EnumSet;
 
 public class InputCommandEvent extends SlashBladeEvent {
 
-    public static final EventBus<InputCommandEvent> INPUT_COMMAND = new EventBus<>();
 
     public InputCommandEvent(ItemStack blade, BladeStateComponent bState, ServerPlayer player, InputStateComponent iSate, EnumSet<InputCommand> old, EnumSet<InputCommand> current) {
         super(blade, bState);

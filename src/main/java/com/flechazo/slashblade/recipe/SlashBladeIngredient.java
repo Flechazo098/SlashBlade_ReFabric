@@ -6,12 +6,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.flechazo.slashblade.registry.SlashBladeRegister;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 
-import com.flechazo.slashblade.init.SBItems;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredient;
 import net.fabricmc.fabric.api.recipe.v1.ingredient.CustomIngredientSerializer;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -39,7 +39,7 @@ public class SlashBladeIngredient implements CustomIngredient {
     }
 
     public static SlashBladeIngredient of(RequestDefinition request) {
-        return new SlashBladeIngredient(Set.of(SBItems.slashblade), request);
+        return new SlashBladeIngredient(Set.of(SlashBladeRegister.SLASHBLADE), request);
     }
 
     @Override

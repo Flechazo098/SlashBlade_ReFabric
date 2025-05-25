@@ -2,8 +2,11 @@ package com.flechazo.slashblade.entity;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.ability.StunManager;
-import com.flechazo.slashblade.capability.inputstate.InputStateCapabilityProvider;
+import com.flechazo.slashblade.capability.inputstate.InputStateHelper;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.item.ItemSlashBlade;
+import com.flechazo.slashblade.network.util.PlayMessages;
+import com.flechazo.slashblade.registry.EntityTypeRegister;
 import com.flechazo.slashblade.util.InputCommand;
 import com.flechazo.slashblade.util.KnockBacks;
 import com.flechazo.slashblade.util.RayTraceHelper;
@@ -23,7 +26,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PlayMessages;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -54,7 +56,7 @@ public class EntityBlisteringSwords extends EntityAbstractSummonedSword {
     }
 
     public static EntityBlisteringSwords createInstance(PlayMessages.SpawnEntity packet, Level worldIn) {
-        return new EntityBlisteringSwords(SlashBladeRefabriced.RegistryEvents.BlisteringSwords, worldIn);
+        return new EntityBlisteringSwords(EntityTypeRegister.BlisteringSwords, worldIn);
     }
 
     long fireTime = -1;
@@ -89,7 +91,7 @@ public class EntityBlisteringSwords extends EntityAbstractSummonedSword {
             Level worldIn = sender.level();
             Entity lockTarget = null;
             if (sender instanceof LivingEntity) {
-                lockTarget = ((LivingEntity) sender).getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE)
+                lockTarget = BladeStateHelper.getBladeState(sender.getMainHandItem())
                         .filter(state -> state.getTargetEntity(worldIn) != null)
                         .map(state -> state.getTargetEntity(worldIn)).orElse(null);
             }
@@ -136,7 +138,6 @@ public class EntityBlisteringSwords extends EntityAbstractSummonedSword {
 
         // this.startRiding()
         this.setDeltaMovement(Vec3.ZERO);
-        if (canUpdate())
             this.baseTick();
 
         faceEntityStandby();
@@ -145,7 +146,7 @@ public class EntityBlisteringSwords extends EntityAbstractSummonedSword {
         // lifetime check
         if (!itFired() && getVehicle() instanceof LivingEntity) {
             LivingEntity owner = (LivingEntity) getVehicle();
-            owner.getCapability(InputStateCapabilityProvider.INPUT_STATE).ifPresent(s -> {
+            InputStateHelper.getInputState(owner).ifPresent(s -> {
                 if (!s.getCommands().contains(InputCommand.M_DOWN)) {
 
                     fireTime = tickCount + getDelay();

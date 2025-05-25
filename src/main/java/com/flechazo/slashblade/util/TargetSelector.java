@@ -1,12 +1,18 @@
 package com.flechazo.slashblade.util;
 
+import com.flechazo.slashblade.ability.StunManager;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
+import com.flechazo.slashblade.data.tag.SlashBladeEntityTypeTagProvider;
+import com.flechazo.slashblade.event.SlashBladeEvent;
 import com.google.common.collect.Lists;
 
 import com.flechazo.slashblade.SlashBladeConfig;
-import com.flechazo.slashblade.data.tag.SlashBladeEntityTypeTagProvider.EntityTypeTags;
 import com.flechazo.slashblade.entity.IShootable;
 import com.flechazo.slashblade.event.InputCommandEvent;
 import com.flechazo.slashblade.item.ItemSlashBlade;
+import io.github.fabricators_of_create.porting_lib.attributes.PortingLibAttributes;
+import io.github.fabricators_of_create.porting_lib.entity.MultiPartEntity;
+import io.github.fabricators_of_create.porting_lib.entity.PartEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.decoration.ArmorStand;
@@ -21,10 +27,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.entity.PartEntity;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-
 import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -39,6 +41,20 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 
 public class TargetSelector {
+	private static final class SingletonHolder {
+		private static final TargetSelector instance = new TargetSelector();
+	}
+
+	public static TargetSelector getInstance () {
+		return TargetSelector.SingletonHolder.instance;
+	}
+
+	private TargetSelector () {
+	}
+	public void register() {
+		SlashBladeEvent.INPUT_COMMAND.register(this::onInputChange);
+	}
+
 	static public final TargetingConditions lockon = new SlashBladeTargetingConditions().range(40.0D)
 			.selector(new AttackablePredicate());
 
@@ -63,7 +79,7 @@ public class TargetSelector {
 
 		public boolean test(LivingEntity livingentity) {
 
-			if (!SlashBladeConfig.PVP_ENABLE.get() && livingentity instanceof Player)
+			if (!SlashBladeConfig.isPvpEnable() && livingentity instanceof Player)
 				return false;
 
 			if (livingentity instanceof ArmorStand)
@@ -77,7 +93,7 @@ public class TargetSelector {
 				return true;
 			}
 			
-			if (!SlashBladeConfig.FRIENDLY_ENABLE.get() && !(livingentity instanceof Enemy)) {
+			if (!SlashBladeConfig.isFriendlyEnable() && !(livingentity instanceof Enemy)) {
 				return false;
 			}
 
@@ -90,7 +106,7 @@ public class TargetSelector {
 			if (livingentity.getTeam() != null)
 				return true;
 
-			return !livingentity.getType().is(EntityTypeTags.ATTACKABLE_BLACKLIST);
+			return !livingentity.getType().is(SlashBladeEntityTypeTagProvider.EntityTypeTags.ATTACKABLE_BLACKLIST);
 		}
 	}
 
@@ -139,8 +155,14 @@ public class TargetSelector {
 		list1.addAll(getReflectableEntitiesWithinAABB(attacker));
 		list1.addAll(getExtinguishableEntitiesWithinAABB(attacker));
 
-		list1.addAll(world.getEntitiesOfClass(LivingEntity.class, aabb.inflate(5), e -> e.isMultipartEntity()).stream()
-				.flatMap(e -> (e.isMultipartEntity()) ? Stream.of(e.getParts()) : Stream.of(e)).filter(t -> {
+		list1.addAll(world.getEntitiesOfClass(LivingEntity.class, aabb.inflate(5)).stream()
+				.flatMap(e -> {
+					if (e instanceof MultiPartEntity multi && multi.isMultipartEntity()) {
+						return Arrays.stream(multi.getParts());
+					} else {
+						return Stream.of(e);
+					}
+				}).filter(t -> {
 					boolean result = false;
 					var check = new AttackablePredicate();
 					if (t instanceof LivingEntity living) {
@@ -150,21 +172,34 @@ public class TargetSelector {
 							result = check.test(living) && part.distanceToSqr(attacker) < (reach * reach);
 					}
 					return result;
-				}).collect(Collectors.toList()));
+				}).toList());
+
 
 		TargetingConditions predicate = getAreaAttackPredicate(reach);
 
 		list1.addAll(world.getEntitiesOfClass(LivingEntity.class, aabb).stream()
-				.flatMap(e -> (e.isMultipartEntity()) ? Stream.of(e.getParts()) : Stream.of(e)).filter(t -> {
+				.flatMap(e -> {
+					if (e instanceof MultiPartEntity multi && multi.isMultipartEntity() && multi.getParts() != null) {
+						return Arrays.stream(multi.getParts());
+					} else {
+						return Stream.of(e);
+					}
+				})
+				.filter(t -> {
 					boolean result = false;
 					if (t instanceof LivingEntity living) {
 						result = predicate.test(attacker, living);
 					} else if (t instanceof PartEntity<?> part) {
-						if (part.getParent() instanceof LivingEntity living)
-							result = predicate.test(attacker, living) && part.distanceToSqr(attacker) < (reach * reach);
+						Entity parent = part.getParent();
+						if (parent instanceof LivingEntity living) {
+							result = predicate.test(attacker, living)
+									&& part.distanceToSqr(attacker) < (reach * reach);
+						}
 					}
 					return result;
-				}).collect(Collectors.toList()));
+				})
+				.toList());
+
 
 		return list1;
 	}
@@ -177,7 +212,7 @@ public class TargetSelector {
 
 		list1.addAll(world.getEntitiesOfClass(EnderDragon.class, aabb.inflate(5)).stream()
 				.flatMap(d -> Arrays.stream(d.getSubEntities())).filter(e -> (e.distanceToSqr(owner) < (reach * reach)))
-				.collect(Collectors.toList()));
+				.toList());
 
 		LivingEntity user;
 		if (owner.getShooter() instanceof LivingEntity)
@@ -190,7 +225,7 @@ public class TargetSelector {
 		TargetingConditions predicate = getAreaAttackPredicate(0); // reach check has already been completed
 
 		list1.addAll(world.getEntitiesOfClass(LivingEntity.class, aabb, (e) -> true).stream()
-				.filter(t -> predicate.test(user, t)).collect(Collectors.toList()));
+				.filter(t -> predicate.test(user, t)).toList());
 
 		return list1;
 	}
@@ -230,15 +265,14 @@ public class TargetSelector {
 
 	static public double getResolvedReach(LivingEntity user) {
 		double reach = 4.0D; /* 4 block */
-		AttributeInstance attrib = user.getAttribute(ForgeMod.ENTITY_REACH.get());
+		AttributeInstance attrib = user.getAttribute(PortingLibAttributes.ENTITY_REACH);
 		if (attrib != null) {
 			reach = attrib.getValue() - 1;
 		}
 		return reach;
 	}
 
-	@SubscribeEvent
-	public static void onInputChange(InputCommandEvent event) {
+	public void onInputChange (InputCommandEvent event) {
 
 		EnumSet<InputCommand> old = event.getOld();
 		EnumSet<InputCommand> current = event.getCurrent();
@@ -256,7 +290,7 @@ public class TargetSelector {
 				&& current.contains(InputCommand.SNEAK)))
 			return;
 
-		stack.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(s -> {
+		BladeStateHelper.getBladeState(stack).ifPresent(s -> {
 			Entity tmp = s.getTargetEntity(sender.level());
 			if (tmp == null)
 				return;

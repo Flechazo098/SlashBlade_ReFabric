@@ -5,7 +5,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.flechazo.slashblade.capability.inputstate.InputStateComponentRegistry;
+import com.flechazo.slashblade.capability.inputstate.InputStateHelper;
 import com.flechazo.slashblade.registry.ComboStateRegistry;
 import com.flechazo.slashblade.util.InputCommand;
 import net.minecraft.resources.ResourceLocation;
@@ -21,14 +21,14 @@ public class ComboCommands {
 
     public static ResourceLocation initStandByCommand(LivingEntity a,
             Map<EnumSet<InputCommand>, ResourceLocation> map) {
-        EnumSet<InputCommand> commands = a.getCapability(InputStateComponentRegistry.INPUT_STATE)
+        EnumSet<InputCommand> commands = InputStateHelper.getInputState(a)
                 .map((state) -> state.getCommands(a)).orElseGet(() -> EnumSet.noneOf(InputCommand.class));
 
         return map.entrySet().stream().filter((entry) -> commands.containsAll(entry.getKey()))
                 // .findFirst()
                 .min(Comparator.comparingInt(
-                        (entry) -> ComboStateRegistry.REGISTRY.get().getValue(entry.getValue()).getPriority()))
-                .map((entry) -> entry.getValue()).orElseGet(ComboStateRegistry.NONE::getId);
+                        (entry) -> ComboStateRegistry.COMBO_STATE.get(entry.getValue()).getPriority()))
+                .map(Map.Entry::getValue).orElseGet(ComboStateRegistry.NONE::getId);
     }
 
     public static void initDefaultStandByCommands() {

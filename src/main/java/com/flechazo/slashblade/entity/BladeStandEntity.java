@@ -2,8 +2,14 @@ package com.flechazo.slashblade.entity;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.capability.slashblade.BladeStateComponent;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.event.SlashBladeEvent;
 import com.flechazo.slashblade.item.ItemSlashBlade;
+import com.flechazo.slashblade.network.util.PlayMessages;
+import com.flechazo.slashblade.registry.EntityTypeRegister;
+import io.github.fabricators_of_create.porting_lib.entity.IEntityAdditionalSpawnData;
+import io.github.fabricators_of_create.porting_lib.entity.PortingLibEntity;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
@@ -19,11 +25,6 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.entity.IEntityAdditionalSpawnData;
-import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.network.PlayMessages;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 
@@ -33,6 +34,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.phys.Vec3;
 
 public class BladeStandEntity extends ItemFrame implements IEntityAdditionalSpawnData {
 
@@ -44,8 +46,14 @@ public class BladeStandEntity extends ItemFrame implements IEntityAdditionalSpaw
 	}
 
 	@Override
+	public void tick () {
+		super.tick();
+		this.setDeltaMovement(Vec3.ZERO); // 速度归零
+	}
+
+	@Override
 	public Packet<ClientGamePacketListener> getAddEntityPacket() {
-		return NetworkHooks.getEntitySpawningPacket(this);
+		return PortingLibEntity.getEntitySpawningPacket(this);
 	}
 
 	@Override
@@ -53,7 +61,7 @@ public class BladeStandEntity extends ItemFrame implements IEntityAdditionalSpaw
 		super.addAdditionalSaveData(compound);
 		String standTypeStr;
 		if (this.currentType != null) {
-			standTypeStr = ForgeRegistries.ITEMS.getKey(this.currentType).toString();
+			standTypeStr = BuiltInRegistries.ITEM.getKey(this.currentType).toString();
 		} else {
 			standTypeStr = "";
 		}
@@ -65,7 +73,7 @@ public class BladeStandEntity extends ItemFrame implements IEntityAdditionalSpaw
 	@Override
 	public void readAdditionalSaveData(CompoundTag compound) {
 		super.readAdditionalSaveData(compound);
-		this.currentType = ForgeRegistries.ITEMS.getValue(new ResourceLocation(compound.getString("StandType")));
+		this.currentType = BuiltInRegistries.ITEM.get(new ResourceLocation(compound.getString("StandType")));
 
 		this.setPose(Pose.values()[compound.getByte("Pose") % Pose.values().length]);
 	}
@@ -84,7 +92,7 @@ public class BladeStandEntity extends ItemFrame implements IEntityAdditionalSpaw
 	}
 
 	public static BladeStandEntity createInstanceFromPos(Level worldIn, BlockPos placePos, Direction dir, Item type) {
-		BladeStandEntity e = new BladeStandEntity(SlashBladeRefabriced.RegistryEvents.BladeStand, worldIn);
+		BladeStandEntity e = new BladeStandEntity(EntityTypeRegister.BladeStand, worldIn);
 
 		e.pos = placePos;
 		e.setDirection(dir);
@@ -94,7 +102,7 @@ public class BladeStandEntity extends ItemFrame implements IEntityAdditionalSpaw
 	}
 
 	public static BladeStandEntity createInstance(PlayMessages.SpawnEntity spawnEntity, Level world) {
-		return new BladeStandEntity(SlashBladeRefabriced.RegistryEvents.BladeStand, world);
+		return new BladeStandEntity(EntityTypeRegister.BladeStand, world);
 	}
 
 	@Nullable
@@ -116,12 +124,12 @@ public class BladeStandEntity extends ItemFrame implements IEntityAdditionalSpaw
 		if (blade.isEmpty())
 			return super.hurt(damageSource, cat);
 		
-		if(!blade.getCapability(ItemSlashBlade.BLADESTATE).isPresent())
+		if(! BladeStateHelper.getBladeState(blade).isPresent())
 			return super.hurt(damageSource, cat);
 		
-		BladeStateComponent state = blade.getCapability(ItemSlashBlade.BLADESTATE).orElseThrow(NullPointerException::new);
+		BladeStateComponent state = BladeStateHelper.getBladeState(blade).orElseThrow(NullPointerException::new);
 		
-		if(MinecraftForge.EVENT_BUS.post(new SlashBladeEvent.BladeStandAttackEvent(blade, state, this, damageSource)))
+		if(SlashBladeEvent.BLADE_STAND_ATTACK.post(new SlashBladeEvent.BladeStandAttackEvent(blade, state, this, damageSource)))
 			return true;
 
 		return super.hurt(damageSource, cat);

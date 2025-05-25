@@ -1,9 +1,11 @@
 package com.flechazo.slashblade.slasharts;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
-import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankCapabilityProvider;
+import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankHelper;
+import com.flechazo.slashblade.capability.slashblade.BladeStateComponent;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.entity.EntitySlashEffect;
-import com.flechazo.slashblade.item.ItemSlashBlade;
+import com.flechazo.slashblade.registry.EntityTypeRegister;
 import com.flechazo.slashblade.util.KnockBacks;
 import com.flechazo.slashblade.util.VectorHelper;
 import net.minecraft.sounds.SoundEvent;
@@ -23,7 +25,7 @@ public class CircleSlash {
                 .add(VectorHelper.getVectorForRotation(0, living.getViewYRot(0) + 90).scale(Vec3.ZERO.z))
                 .add(living.getLookAngle().scale(Vec3.ZERO.z));
 
-        EntitySlashEffect jc = new EntitySlashEffect(SlashBladeRefabriced.RegistryEvents.SlashEffect, living.level()) {
+        EntitySlashEffect jc = new EntitySlashEffect(EntityTypeRegister.SlashEffect, living.level()) {
 
             @Override
             public SoundEvent getSlashSound() {
@@ -37,8 +39,8 @@ public class CircleSlash {
         jc.setYRot(living.getYRot() - 22.5F + yRot);
         jc.setXRot(0);
 
-        int colorCode = living.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE)
-                .map(state -> state.getColorCode()).orElseGet(() -> 0xFFFFFF);
+        int colorCode = BladeStateHelper.getBladeState(living.getMainHandItem())
+                .map(BladeStateComponent::getColorCode).orElseGet(() -> 0xFFFFFF);
         jc.setColor(colorCode);
 
         jc.setMute(false);
@@ -49,7 +51,7 @@ public class CircleSlash {
         jc.setKnockBack(KnockBacks.cancel);
 
         if (living != null)
-            living.getCapability(ConcentrationRankCapabilityProvider.RANK_POINT)
+            ConcentrationRankHelper.getConcentrationRank(living)
                     .ifPresent(rank -> jc.setRank(rank.getRankLevel(living.level().getGameTime())));
 
         living.level().addFreshEntity(jc);

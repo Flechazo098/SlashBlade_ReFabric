@@ -44,17 +44,12 @@ public class SlashArts {
     private Function<LivingEntity, ResourceLocation> comboStateSuper;
 
     public ResourceLocation doArts(ArtsType type, LivingEntity user) {
-        switch (type) {
-        case Jackpot:
-            return getComboStateJust(user);
-        case Success:
-            return getComboState(user);
-        case Super:
-            return getComboStateSuper().apply(user);
-        default:
-            break;
-        }
-        return ComboStateRegistry.NONE.getId();
+        return switch (type) {
+            case Jackpot -> getComboStateJust(user);
+            case Success -> getComboState(user);
+            case Super -> getComboStateSuper().apply(user);
+            default -> ComboStateRegistry.NONE.getId();
+        };
     }
 
     private int costSoul = 20;
@@ -100,14 +95,14 @@ public class SlashArts {
     }
 
     public String toString() {
-        return SlashArtsRegistry.REGISTRY.get().getKey(this).toString();
+        return SlashArtsRegistry.REGISTRY.getKey(this).toString();
     }
 
     private String descriptionId;
 
     protected String getOrCreateDescriptionId() {
         if (this.descriptionId == null) {
-            this.descriptionId = Util.makeDescriptionId("slash_art", SlashArtsRegistry.REGISTRY.get().getKey(this));
+            this.descriptionId = Util.makeDescriptionId("slash_art", SlashArtsRegistry.REGISTRY.getKey(this));
         }
         return this.descriptionId;
     }

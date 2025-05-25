@@ -3,6 +3,8 @@ package com.flechazo.slashblade.event.drop;
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.entity.BladeItemEntity;
 import com.flechazo.slashblade.item.ItemSlashBlade;
+import com.flechazo.slashblade.registry.EntityTypeRegister;
+import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -15,6 +17,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 
 public class EntityDropEvent {
+
+    public void register() {
+        // 在服务端实体死亡后触发
+        ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
+            // 只对存活实体（非玩家等）进行处理
+            if (! (entity.level() instanceof ServerLevel world)) return;
+            handleBladeDrop(world, entity, source);
+        });
+    }
 
     public static void handleBladeDrop(ServerLevel level, LivingEntity entity, DamageSource source) {
         var bladeRegistry = SlashBladeRefabriced.getSlashBladeDefinitionRegistry(level);
@@ -56,7 +67,7 @@ public class EntityDropEvent {
             if (rand.nextFloat() > percent)
                 return;
             ItemEntity itementity = new ItemEntity(entity.level(), x, y, z, blade);
-            BladeItemEntity e = new BladeItemEntity(SlashBladeRefabriced.RegistryEvents.BladeItem, entity.level());
+            BladeItemEntity e = new BladeItemEntity(EntityTypeRegister.BladeItem, entity.level());
 
             e.restoreFrom(itementity);
             e.init();

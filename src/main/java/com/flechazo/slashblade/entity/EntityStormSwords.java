@@ -2,7 +2,10 @@ package com.flechazo.slashblade.entity;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.ability.StunManager;
+import com.flechazo.slashblade.network.util.PlayMessages;
+import com.flechazo.slashblade.registry.EntityTypeRegister;
 import com.flechazo.slashblade.util.KnockBacks;
+import io.github.fabricators_of_create.porting_lib.entity.events.EntityEventFactory;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -15,7 +18,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PlayMessages;
 
 public class EntityStormSwords extends EntityAbstractSummonedSword {
     private static final EntityDataAccessor<Boolean> IT_FIRED = SynchedEntityData.defineId(EntityStormSwords.class,
@@ -43,7 +45,7 @@ public class EntityStormSwords extends EntityAbstractSummonedSword {
     }
 
     public static EntityStormSwords createInstance(PlayMessages.SpawnEntity packet, Level worldIn) {
-        return new EntityStormSwords(SlashBladeRefabriced.RegistryEvents.StormSwords, worldIn);
+        return new EntityStormSwords(EntityTypeRegister.StormSwords, worldIn);
     }
 
     @Override
@@ -64,7 +66,6 @@ public class EntityStormSwords extends EntityAbstractSummonedSword {
 
         // this.startRiding()
         this.setDeltaMovement(Vec3.ZERO);
-        if (canUpdate())
             this.baseTick();
 
         faceEntityStandby();
@@ -100,7 +101,7 @@ public class EntityStormSwords extends EntityAbstractSummonedSword {
         }
 
         if (raytraceresult != null && raytraceresult.getType() == HitResult.Type.ENTITY
-                && !net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, raytraceresult)) {
+                && ! EntityEventFactory.onProjectileImpact(this, raytraceresult)) {
             this.onHit(raytraceresult);
             this.resetAlreadyHits();
             this.hasImpulse = true;

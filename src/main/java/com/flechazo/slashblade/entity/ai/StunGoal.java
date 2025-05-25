@@ -1,6 +1,8 @@
 package com.flechazo.slashblade.entity.ai;
 
+import com.flechazo.slashblade.capability.mobeffect.MobEffectComponent;
 import com.flechazo.slashblade.capability.mobeffect.MobEffectComponentRegistry;
+import com.flechazo.slashblade.capability.mobeffect.MobEffectHelper;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;
 
@@ -18,10 +20,9 @@ public class StunGoal extends Goal {
      * Returns whether the EntityAIBase should begin execution.
      */
     public boolean canUse() {
-        boolean onStun = this.entity.getCapability(MobEffectComponentRegistry.MOB_EFFECT)
-                .filter((state) -> state.isStun(this.entity.level().getGameTime())).isPresent();
 
-        return onStun;
+        return MobEffectHelper.getMobEffect(entity)
+                .filter((state) -> state.isStun(this.entity.level().getGameTime())).isPresent();
     }
 
     /**
@@ -29,8 +30,6 @@ public class StunGoal extends Goal {
      * another one
      */
     public void stop() {
-        this.entity.getCapability(MobEffectComponentRegistry.MOB_EFFECT).ifPresent((state) -> {
-            state.clearStunTimeOut();
-        });
+        MobEffectHelper.getMobEffect(this.entity).ifPresent(MobEffectComponent::clearStunTimeOut);
     }
 }

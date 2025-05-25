@@ -228,24 +228,21 @@ public class LayerMainBlade<T extends LivingEntity, M extends EntityModel<T>> ex
 
             MmdMotionPlayerGL2 mmp = getMotionPlayer();
             if (mmp != null) {
-                ComboState combo = ComboStateRegistry.REGISTRY.get().getValue(s.getComboSeq()) != null
-                        ? ComboStateRegistry.REGISTRY.get().getValue(s.getComboSeq())
-                        : ComboStateRegistry.NONE.get();
+                ComboStateRegistry.COMBO_STATE.get(s.getComboSeq());
+                ComboState combo = ComboStateRegistry.COMBO_STATE.get(s.getComboSeq());
                 // tick to msec
                 double time = TimeValueHelper.getMSecFromTicks(
                         Math.max(0, entity.level().getGameTime() - s.getLastActionTime()) + partialTicks);
 
-                while (combo != ComboStateRegistry.NONE.get() && combo.getTimeoutMS() < time) {
+                while (combo != ComboStateRegistry.NONE && combo.getTimeoutMS() < time) {
                     time -= combo.getTimeoutMS();
 
-                    combo = ComboStateRegistry.REGISTRY.get().getValue(combo.getNextOfTimeout(entity)) != null
-                            ? ComboStateRegistry.REGISTRY.get().getValue(combo.getNextOfTimeout(entity))
-                            : ComboStateRegistry.NONE.get();
+                    ComboStateRegistry.COMBO_STATE.get(combo.getNextOfTimeout(entity));
+                    combo = ComboStateRegistry.COMBO_STATE.get(combo.getNextOfTimeout(entity));
                 }
-                if (combo == ComboStateRegistry.NONE.get()) {
-                    combo = ComboStateRegistry.REGISTRY.get().getValue(s.getComboRoot()) != null
-                            ? ComboStateRegistry.REGISTRY.get().getValue(s.getComboRoot())
-                            : ComboStateRegistry.STANDBY.get();
+                if (combo == ComboStateRegistry.NONE) {
+                    ComboStateRegistry.COMBO_STATE.get(s.getComboRoot());
+                    combo = ComboStateRegistry.COMBO_STATE.get(s.getComboRoot());
                 }
 
                 MmdVmdMotionMc motion = BladeMotionManager.getInstance().getMotion(combo.getMotionLoc());

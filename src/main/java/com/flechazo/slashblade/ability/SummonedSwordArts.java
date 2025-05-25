@@ -8,6 +8,8 @@ import com.flechazo.slashblade.capability.inputstate.InputStateHelper;
 import com.flechazo.slashblade.capability.slashblade.BladeStateComponentImpl;
 import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.entity.*;
+import com.flechazo.slashblade.registry.EntityTypeRegister;
+import com.flechazo.slashblade.registry.SlashBladeStats;
 import com.flechazo.slashblade.util.*;
 import com.flechazo.slashblade.event.InputCommandEvent;
 import com.flechazo.slashblade.item.SwordType;
@@ -148,7 +150,7 @@ public class SummonedSwordArts {
 
                                 for (int i = 0; i < count; i++) {
                                     EntitySpiralSwords ss = new EntitySpiralSwords(
-                                            SlashBladeRefabriced.RegistryEvents.SpiralSwords, worldIn);
+                                           EntityTypeRegister.SpiralSwords, worldIn);
                                     ss.setPos(entity.position());
                                     ss.setOwner(entity);
                                     ss.setColor(state.getColorCode());
@@ -213,7 +215,7 @@ public class SummonedSwordArts {
                             }
 
                             for (int i = 0; i < count; i++) {
-                                EntityStormSwords ss = new EntityStormSwords(SlashBladeRefabriced.RegistryEvents.StormSwords,
+                                EntityStormSwords ss = new EntityStormSwords(EntityTypeRegister.StormSwords,
                                         worldIn);
 
                                 ss.setPos(entity.position());
@@ -276,7 +278,7 @@ public class SummonedSwordArts {
 
                             for (int i = 0; i < count; i++) {
                                 EntityBlisteringSwords ss = new EntityBlisteringSwords(
-                                        SlashBladeRefabriced.RegistryEvents.BlisteringSwords, worldIn);
+                                        EntityTypeRegister.BlisteringSwords, worldIn);
 
                                 ss.setPos(entity.position());
                                 ss.setOwner(entity);
@@ -347,7 +349,7 @@ public class SummonedSwordArts {
 
                             {// no random pos
                                 EntityHeavyRainSwords ss = new EntityHeavyRainSwords(
-                                        SlashBladeRefabriced.RegistryEvents.HeavyRainSwords, worldIn);
+                                        EntityTypeRegister.HeavyRainSwords, worldIn);
 
                                 ss.setOwner(entity);
                                 ss.setColor(state.getColorCode());
@@ -370,7 +372,7 @@ public class SummonedSwordArts {
                             for (int i = 0; i < count; i++)
                                 for (int l = 0; l < multiplier; l++) {
                                     EntityHeavyRainSwords ss = new EntityHeavyRainSwords(
-                                            SlashBladeRefabriced.RegistryEvents.HeavyRainSwords, worldIn);
+                                            EntityTypeRegister.HeavyRainSwords, worldIn);
 
                                     ss.setOwner(entity);
                                     ss.setColor(state.getColorCode());
@@ -416,11 +418,11 @@ public class SummonedSwordArts {
                             return result.getLocation();
                         });
 
-                int counter = StatHelper.increase(sender, SlashBladeRefabriced.RegistryEvents.SWORD_SUMMONED, 1);
+                int counter = StatHelper.increase(sender, SlashBladeStats.SWORD_SUMMONED, 1);
                 boolean sided = counter % 2 == 0;
 
                 EntityAbstractSummonedSword ss = new EntityAbstractSummonedSword(
-                        SlashBladeRefabriced.RegistryEvents.SummonedSword, worldIn);
+                        EntityTypeRegister.SummonedSword, worldIn);
 
                 Vec3 pos = sender.getEyePosition(1.0f)
                         .add(VectorHelper.getVectorForRotation(0.0f, sender.getViewYRot(0) + 90).scale(sided ? 1 : -1));

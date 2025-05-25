@@ -7,18 +7,19 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
+import com.flechazo.slashblade.registry.SlashBladeRegister;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import com.flechazo.slashblade.init.SBItems;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.CriterionTriggerInstance;
 import net.minecraft.advancements.RequirementsStrategy;
 import net.minecraft.advancements.critereon.RecipeUnlockedTrigger;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.CraftingRecipeBuilder;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeBuilder;
@@ -30,7 +31,6 @@ import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.registries.ForgeRegistries;
 
 public class SlashBladeShapedRecipeBuilder extends CraftingRecipeBuilder implements RecipeBuilder {
     private final RecipeCategory category = RecipeCategory.COMBAT;
@@ -50,7 +50,7 @@ public class SlashBladeShapedRecipeBuilder extends CraftingRecipeBuilder impleme
     }
 
     public static SlashBladeShapedRecipeBuilder shaped(ResourceLocation blade) {
-        return shaped(SBItems.slashblade, 1).blade(blade);
+        return shaped(SlashBladeRegister.SLASHBLADE, 1).blade(blade);
     }
 
     public static SlashBladeShapedRecipeBuilder shaped(ItemLike result) {
@@ -115,7 +115,7 @@ public class SlashBladeShapedRecipeBuilder extends CraftingRecipeBuilder impleme
 
     @Override
     public void save(Consumer<FinishedRecipe> consumer) {
-        this.save(consumer, this.blade != null ? this.blade : ForgeRegistries.ITEMS.getKey(this.getResult()));
+        this.save(consumer, this.blade != null ? this.blade : BuiltInRegistries.ITEM.getKey(this.getResult()));
     }
 
     public void save(Consumer<FinishedRecipe> consumer, ResourceLocation id) {
@@ -208,7 +208,7 @@ public class SlashBladeShapedRecipeBuilder extends CraftingRecipeBuilder impleme
 
             json.add("key", jsonobject);
             JsonObject jsonobject1 = new JsonObject();
-            jsonobject1.addProperty("item", ForgeRegistries.ITEMS.getKey(this.result).toString());
+            jsonobject1.addProperty("item", BuiltInRegistries.ITEM.getKey(this.result).toString());
             if (this.count > 1) {
                 jsonobject1.addProperty("count", this.count);
             }

@@ -1,18 +1,19 @@
 package com.flechazo.slashblade.recipe;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+
 
 public class RecipeSerializerRegistry {
-    public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZER = DeferredRegister
-            .create(ForgeRegistries.RECIPE_SERIALIZERS, SlashBladeRefabriced.MODID);
+    public static final ResourceLocation ID_SHAPED_BLADE =
+            new ResourceLocation(SlashBladeRefabriced.MODID, "shaped_blade");
+    public static final ResourceLocation ID_PROUDSOUL =
+            new ResourceLocation(SlashBladeRefabriced.MODID, "proudsoul");
 
-    public static final RegistryObject<RecipeSerializer<?>> SLASHBLADE_SHAPED = RECIPE_SERIALIZER
-            .register("shaped_blade", () -> SlashBladeShapedRecipe.SERIALIZER);
-    
-    public static final RegistryObject<RecipeSerializer<?>> PROUDSOUL_RECIPE = RECIPE_SERIALIZER
-            .register("proudsoul", () -> ProudsoulShapelessRecipe.SERIALIZER);
+    public static void register() {
+        Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, ID_SHAPED_BLADE, SlashBladeShapedRecipe.SERIALIZER);
+        Registry.register(BuiltInRegistries.RECIPE_SERIALIZER, ID_PROUDSOUL, ProudsoulShapelessRecipe.SERIALIZER);
+    }
 }

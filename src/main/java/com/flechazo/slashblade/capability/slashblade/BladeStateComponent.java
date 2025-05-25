@@ -344,7 +344,7 @@ public interface BladeStateComponent extends Component {
 
     // 解析当前连击状态刻
     default Map.Entry<Integer, ResourceLocation> resolvCurrentComboStateTicks(LivingEntity user) {
-        ResourceLocation current = ComboStateRegistry.REGISTRY.get().containsKey(getComboSeq()) ? getComboSeq()
+        ResourceLocation current = ComboStateRegistry.COMBO_STATE.containsKey(getComboSeq()) ? getComboSeq()
                 : ComboStateRegistry.NONE.getId();
         ComboState currentCS = ComboStateRegistry.REGISTRY.get().getValue(current) != null
                 ? ComboStateRegistry.REGISTRY.get().getValue(current)

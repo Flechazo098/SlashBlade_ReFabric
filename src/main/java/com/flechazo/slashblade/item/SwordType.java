@@ -1,9 +1,10 @@
 package com.flechazo.slashblade.item;
 
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.util.LazyOptional;
 
 import java.util.EnumSet;
+import java.util.Optional;
 
 import com.mojang.serialization.Codec;
 
@@ -18,10 +19,10 @@ public enum SwordType {
     public static EnumSet<SwordType> from(ItemStack itemStackIn) {
         EnumSet<SwordType> types = EnumSet.noneOf(SwordType.class);
 
-        LazyOptional<BladeStateComponent> state = itemStackIn.getCapability(ItemSlashBlade.BLADESTATE);
+        Optional<BladeStateComponent> state = BladeStateHelper.getBladeState(itemStackIn);
 
         if (state.isPresent()) {
-            itemStackIn.getCapability(ItemSlashBlade.BLADESTATE).ifPresent(s -> {
+            BladeStateHelper.getBladeState(itemStackIn).ifPresent(s -> {
                 if (s.isBroken() || itemStackIn.getOrCreateTagElement("bladeState").getBoolean("isBroken"))
                     types.add(BROKEN);
 

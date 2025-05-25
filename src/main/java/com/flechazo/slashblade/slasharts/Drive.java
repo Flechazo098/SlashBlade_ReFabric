@@ -1,9 +1,11 @@
 package com.flechazo.slashblade.slasharts;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
-import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankCapabilityProvider;
+import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankHelper;
+import com.flechazo.slashblade.capability.slashblade.BladeStateComponent;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.entity.EntityDrive;
-import com.flechazo.slashblade.item.ItemSlashBlade;
+import com.flechazo.slashblade.registry.EntityTypeRegister;
 import com.flechazo.slashblade.util.KnockBacks;
 import com.flechazo.slashblade.util.VectorHelper;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,8 +20,8 @@ public class Drive {
     public static EntityDrive doSlash(LivingEntity playerIn, float roll, int lifetime, Vec3 centerOffset,
             boolean critical, double damage, KnockBacks knockback, float speed) {
 
-        int colorCode = playerIn.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE)
-                .map(state -> state.getColorCode()).orElse(0xFF3333FF);
+        int colorCode = BladeStateHelper.getBladeState(playerIn.getMainHandItem())
+                .map(BladeStateComponent::getColorCode).orElse(0xFF3333FF);
 
         return doSlash(playerIn, roll, lifetime, colorCode, centerOffset, critical, damage, knockback, speed);
     }
@@ -37,7 +39,7 @@ public class Drive {
         pos = pos.add(VectorHelper.getVectorForRotation(-90.0F, playerIn.getViewYRot(0)).scale(centerOffset.y))
                 .add(VectorHelper.getVectorForRotation(0, playerIn.getViewYRot(0) + 90).scale(centerOffset.z))
                 .add(lookAngle.scale(centerOffset.z));
-        EntityDrive drive = new EntityDrive(SlashBladeRefabriced.RegistryEvents.Drive, playerIn.level());
+        EntityDrive drive = new EntityDrive(EntityTypeRegister.Drive, playerIn.level());
 
         drive.setPos(pos.x, pos.y, pos.z);
         drive.setDamage(damage);
@@ -55,7 +57,7 @@ public class Drive {
         drive.setLifetime(lifetime);
 
         if (playerIn != null)
-            playerIn.getCapability(ConcentrationRankCapabilityProvider.RANK_POINT)
+           ConcentrationRankHelper.getConcentrationRank(playerIn)
                     .ifPresent(rank -> drive.setRank(rank.getRankLevel(playerIn.level().getGameTime())));
 
         playerIn.level().addFreshEntity(drive);

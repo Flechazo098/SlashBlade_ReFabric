@@ -33,32 +33,32 @@ public class MoveCommandMessage {
     }
 
     // 服务器端处理
-    public static void handleServer(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler,
-                                    FriendlyByteBuf buf, PacketSender responseSender) {
+    public static void handleServer(MinecraftServer server, ServerPlayer player, ServerGamePacketListenerImpl handler, FriendlyByteBuf buf, PacketSender responseSender) {
         int command = buf.readInt();
 
         server.execute(() -> {
             ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
             if (stack.isEmpty())
                 return;
-            if (!(stack.getItem() instanceof ItemSlashBlade))
+            if (! (stack.getItem() instanceof ItemSlashBlade))
                 return;
 
-            var state = InputStateHelper.getInputState(player);
-            EnumSet<InputCommand> old = state.getCommands().clone();
+            InputStateHelper.getInputState(player).ifPresent((state) -> {
+                EnumSet<InputCommand> old = state.getCommands().clone();
 
-            state.getCommands().clear();
-            state.getCommands().addAll(EnumSetConverter.convertToEnumSet(InputCommand.class, command));
+                state.getCommands().clear();
+                state.getCommands().addAll(EnumSetConverter.convertToEnumSet(InputCommand.class, command));
 
-            EnumSet<InputCommand> current = state.getCommands().clone();
+                EnumSet<InputCommand> current = state.getCommands().clone();
 
-            long currentTime = player.level().getGameTime();
-            current.forEach(c -> {
-                if (!old.contains(c))
-                    state.getLastPressTimes().put(c, currentTime);
+                long currentTime = player.level().getGameTime();
+                current.forEach(c -> {
+                    if (! old.contains(c))
+                        state.getLastPressTimes().put(c, currentTime);
+                });
+
+                InputCommandEvent.onInputChange(player, state, old, current);
             });
-
-            InputCommandEvent.onInputChange(player, state, old, current);
         });
     }
 }

@@ -1,6 +1,8 @@
 package com.flechazo.slashblade.entity;
 
 import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponent;
+import com.flechazo.slashblade.network.util.PlayMessages;
+import com.flechazo.slashblade.registry.EntityTypeRegister;
 import com.flechazo.slashblade.util.accessor.PersistentDataAccessor;
 import com.google.common.collect.Lists;
 import com.mojang.math.Axis;
@@ -96,8 +98,8 @@ public class EntitySlashEffect extends Projectile implements IShootable {
         // this.setGlowing(true);
     }
 
-    public static EntitySlashEffect createInstance(Level worldIn) {
-        return new EntitySlashEffect(SlashBladeRefabriced.RegistryEvents.SlashEffect, worldIn);
+    public static EntitySlashEffect createInstance(PlayMessages.SpawnEntity packet, Level worldIn) {
+        return new EntitySlashEffect(EntityTypeRegister.SlashEffect, worldIn);
     }
 
     @Override

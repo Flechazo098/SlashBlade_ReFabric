@@ -1,7 +1,10 @@
 package com.flechazo.slashblade.entity;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
+import com.flechazo.slashblade.network.util.PlayMessages;
+import com.flechazo.slashblade.registry.EntityTypeRegister;
 import com.flechazo.slashblade.util.KnockBacks;
+import io.github.fabricators_of_create.porting_lib.entity.events.EntityEventFactory;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -11,7 +14,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.*;
-import net.minecraftforge.network.PlayMessages;
 
 public class EntitySpiralSwords extends EntityAbstractSummonedSword {
     private static final EntityDataAccessor<Boolean> IT_FIRED = SynchedEntityData.defineId(EntitySpiralSwords.class,
@@ -39,7 +41,7 @@ public class EntitySpiralSwords extends EntityAbstractSummonedSword {
     }
 
     public static EntitySpiralSwords createInstance(PlayMessages.SpawnEntity packet, Level worldIn) {
-        return new EntitySpiralSwords(SlashBladeRefabriced.RegistryEvents.SpiralSwords, worldIn);
+        return new EntitySpiralSwords(EntityTypeRegister.SpiralSwords, worldIn);
     }
 
     @Override
@@ -74,7 +76,6 @@ public class EntitySpiralSwords extends EntityAbstractSummonedSword {
 
         // this.startRiding()
         this.setDeltaMovement(Vec3.ZERO);
-        if (canUpdate())
             this.baseTick();
 
         faceEntityStandby();
@@ -110,7 +111,7 @@ public class EntitySpiralSwords extends EntityAbstractSummonedSword {
         }
 
         if (raytraceresult != null && raytraceresult.getType() == HitResult.Type.ENTITY
-                && !net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, raytraceresult)) {
+                && ! EntityEventFactory.onProjectileImpact(this, raytraceresult)) {
             this.onHit(raytraceresult);
             this.resetAlreadyHits();
             this.hasImpulse = true;

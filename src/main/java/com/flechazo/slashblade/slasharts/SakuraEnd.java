@@ -1,9 +1,11 @@
 package com.flechazo.slashblade.slasharts;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
-import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankCapabilityProvider;
+import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankHelper;
+import com.flechazo.slashblade.capability.slashblade.BladeStateComponent;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.entity.EntitySlashEffect;
-import com.flechazo.slashblade.item.ItemSlashBlade;
+import com.flechazo.slashblade.registry.EntityTypeRegister;
 import com.flechazo.slashblade.util.KnockBacks;
 import com.flechazo.slashblade.util.VectorHelper;
 import net.minecraft.world.entity.LivingEntity;
@@ -18,8 +20,8 @@ public class SakuraEnd {
     public static EntitySlashEffect doSlash(LivingEntity playerIn, float roll, Vec3 centerOffset, boolean mute,
             boolean critical, double damage, KnockBacks knockback) {
 
-        int colorCode = playerIn.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE)
-                .map(state -> state.getColorCode()).orElseGet(() -> 0xFFFFFF);
+        int colorCode = BladeStateHelper.getBladeState(playerIn.getMainHandItem())
+                .map(BladeStateComponent::getColorCode).orElse(0xFFFFFF);
 
         return doSlash(playerIn, roll, colorCode, centerOffset, mute, critical, damage, knockback);
     }
@@ -37,7 +39,7 @@ public class SakuraEnd {
                 .add(VectorHelper.getVectorForRotation(0, playerIn.getViewYRot(0) + 90).scale(centerOffset.z))
                 .add(playerIn.getLookAngle().scale(centerOffset.z));
 
-        EntitySlashEffect jc = new EntitySlashEffect(SlashBladeRefabriced.RegistryEvents.SlashEffect, playerIn.level());
+        EntitySlashEffect jc = new EntitySlashEffect(EntityTypeRegister.SlashEffect, playerIn.level());
 
         jc.setPos(pos.x, pos.y, pos.z);
         jc.setOwner(playerIn);
@@ -55,7 +57,7 @@ public class SakuraEnd {
         jc.setKnockBack(knockback);
 
         if (playerIn != null)
-            playerIn.getCapability(ConcentrationRankCapabilityProvider.RANK_POINT)
+            ConcentrationRankHelper.getConcentrationRank(playerIn)
                     .ifPresent(rank -> jc.setRank(rank.getRankLevel(playerIn.level().getGameTime())));
 
         playerIn.level().addFreshEntity(jc);

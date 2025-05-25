@@ -53,7 +53,7 @@ public class BladeMotionManager {
                 }, Executors.newCachedThreadPool()));
     }
 
-    public void reload(TextureStitchEvent.Post event) {
+    public void reload() {
         cache.invalidateAll();
 
         try {
@@ -75,5 +75,4 @@ public class BladeMotionManager {
         }
         return defaultMotion;
     }
-
 }

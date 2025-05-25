@@ -1,14 +1,24 @@
 package com.flechazo.slashblade.entity;
 
+import com.flechazo.slashblade.SlashBladeConfig;
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.ability.StunManager;
-import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankCapabilityProvider;
-import com.flechazo.slashblade.capability.concentrationrank.IConcentrationRank;
+import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponent;
+import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankHelper;
+import com.flechazo.slashblade.capability.slashblade.BladeStateComponent;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.item.ItemSlashBlade;
+import com.flechazo.slashblade.network.util.PlayMessages;
+import com.flechazo.slashblade.registry.EntityTypeRegister;
 import com.flechazo.slashblade.util.AttackManager;
 import com.flechazo.slashblade.util.EnumSetConverter;
 import com.flechazo.slashblade.util.KnockBacks;
 import com.flechazo.slashblade.util.NBTHelper;
+import com.flechazo.slashblade.util.accessor.PersistentDataAccessor;
+import io.github.fabricators_of_create.porting_lib.entity.PartEntity;
+import io.github.fabricators_of_create.porting_lib.entity.PortingLibEntity;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -34,17 +44,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.entity.PartEntity;
-import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.network.PlayMessages;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
-import static com.flechazo.slashblade.SlashBladeConfig.REFINE_DAMAGE_MULTIPLIER;
-import static com.flechazo.slashblade.SlashBladeConfig.SLASHBLADE_DAMAGE_MULTIPLIER;
 
 public class EntityDrive extends EntityAbstractSummonedSword {
     private static final EntityDataAccessor<Integer> COLOR = SynchedEntityData.<Integer>defineId(EntityDrive.class,
@@ -89,7 +92,7 @@ public class EntityDrive extends EntityAbstractSummonedSword {
     }
 
     public static EntityDrive createInstance(PlayMessages.SpawnEntity packet, Level worldIn) {
-        return new EntityDrive(SlashBladeRefabriced.RegistryEvents.Drive, worldIn);
+        return new EntityDrive(EntityTypeRegister.Drive, worldIn);
     }
 
     @Override
@@ -131,11 +134,11 @@ public class EntityDrive extends EntityAbstractSummonedSword {
 
     @Override
     public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+        return PortingLibEntity.getEntitySpawningPacket(this);
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public boolean shouldRenderAtSqrDistance(double distance) {
         double d0 = this.getBoundingBox().getSize() * 10.0D;
         if (Double.isNaN(d0)) {
@@ -196,8 +199,8 @@ public class EntityDrive extends EntityAbstractSummonedSword {
         this.getEntityData().set(RANK, value);
     }
 
-    public IConcentrationRank.ConcentrationRanks getRankCode() {
-        return IConcentrationRank.ConcentrationRanks.getRankFromLevel(getRank());
+    public ConcentrationRankComponent.ConcentrationRanks getRankCode() {
+        return ConcentrationRankComponent.ConcentrationRanks.getRankFromLevel(getRank());
     }
 
     public float getRotationOffset() {
@@ -252,7 +255,7 @@ public class EntityDrive extends EntityAbstractSummonedSword {
     }
 
     public List<MobEffectInstance> getPotionEffects() {
-        List<MobEffectInstance> effects = PotionUtils.getAllEffects(this.getPersistentData());
+        List<MobEffectInstance> effects = PotionUtils.getAllEffects(((PersistentDataAccessor) this).slashbladerefabriced$getPersistentData());
 
         if (effects.isEmpty())
             effects.add(new MobEffectInstance(MobEffects.POISON, 1, 1));
@@ -306,19 +309,18 @@ public class EntityDrive extends EntityAbstractSummonedSword {
             System.out.println("man" + i);
             //评分等级加成
             if (living instanceof Player player){
-                IConcentrationRank.ConcentrationRanks rankBonus = player
-                        .getCapability(ConcentrationRankCapabilityProvider.RANK_POINT)
+                ConcentrationRankComponent.ConcentrationRanks rankBonus = ConcentrationRankHelper.getConcentrationRank(player)
                         .map(rp -> rp.getRank(player.getCommandSenderWorld().getGameTime()))
-                        .orElse(IConcentrationRank.ConcentrationRanks.NONE);
+                        .orElse(ConcentrationRankComponent.ConcentrationRanks.NONE);
                 float rankDamageBonus = rankBonus.level / 2.0f;
-                if (IConcentrationRank.ConcentrationRanks.S.level <= rankBonus.level) {
-                    int refine = player.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).map(rp -> rp.getRefine()).orElse(0);
+                if (ConcentrationRankComponent.ConcentrationRanks.S.level <= rankBonus.level) {
+                    int refine = BladeStateHelper.getBladeState(player.getMainHandItem()).map(BladeStateComponent::getRefine).orElse(0);
                     int level = player.experienceLevel;
-                    rankDamageBonus = (float) Math.max(rankDamageBonus, Math.min(level, refine) * REFINE_DAMAGE_MULTIPLIER.get());
+                    rankDamageBonus = (float) Math.max(rankDamageBonus, Math.min(level, refine) * SlashBladeConfig.getRefineDamageMultiplier());
                 }
                 damageValue += rankDamageBonus;
             }
-            damageValue *= AttackManager.getSlashBladeDamageScale(living) * SLASHBLADE_DAMAGE_MULTIPLIER.get();
+            damageValue *= AttackManager.getSlashBladeDamageScale(living) * SlashBladeConfig.getSlashbladeDamageMultiplier();
         }
 
         if (targetEntity.hurt(damagesource, damageValue)) {

@@ -62,7 +62,7 @@ public class SlashBladeConfig implements ConfigData {
 
         @Comment("Determining the base exhaustion for slashblade's self-repair.")
         @ConfigEntry.BoundedDiscrete(min = 1L, max = Long.MAX_VALUE)
-        public long bewitchedHungerExhaustion = 50L;
+        public double bewitchedHungerExhaustion = 50L;
 
         @Comment("Blade Damage: Base Damage × Multiplier.[Default: 1.0D]")
         @ConfigEntry.BoundedDiscrete(min = 0, max = 1024)
@@ -116,7 +116,7 @@ public class SlashBladeConfig implements ConfigData {
         return getInstance().general.maxProudSoulGot;
     }
 
-    public static long getBewitchedHungerExhaustion() {
+    public static double getBewitchedHungerExhaustion() {
         return getInstance().general.bewitchedHungerExhaustion;
     }
 

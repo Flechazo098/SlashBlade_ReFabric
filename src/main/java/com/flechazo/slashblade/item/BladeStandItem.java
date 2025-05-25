@@ -2,6 +2,7 @@ package com.flechazo.slashblade.item;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.entity.BladeStandEntity;
+import com.flechazo.slashblade.registry.EntityTypeRegister;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.decoration.HangingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -23,7 +24,7 @@ public class BladeStandItem extends HangingEntityItem {
     }
 
     public BladeStandItem(Properties builder, boolean isWallType) {
-        super(SlashBladeRefabriced.RegistryEvents.BladeStand, builder);
+        super(EntityTypeRegister.BladeStand, builder);
 
         this.isWallType = isWallType;
     }

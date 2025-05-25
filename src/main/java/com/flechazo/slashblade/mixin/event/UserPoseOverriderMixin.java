@@ -30,8 +30,6 @@ public abstract class UserPoseOverriderMixin<T extends LivingEntity, M extends E
         ItemStack stack = entity.getMainHandItem();
         if (stack.isEmpty() || !(stack.getItem() instanceof ItemSlashBlade)) return;
 
-        PoseStack matrices = ((LivingEntityRenderer<T, M>)(Object)this).poseStack;
-        // 如果用更新 Fabric API，请通过渲染上下文传入的 matrices
 
         // 读取自定义NBT
         CompoundTag tag = ((PersistentDataAccessor) entity).slashbladerefabriced$getPersistentData();
@@ -40,22 +38,21 @@ public abstract class UserPoseOverriderMixin<T extends LivingEntity, M extends E
 
         // 1）绕Y轴先旋转到身体朝向的反向
         float bodyYaw = Mth.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
-        matrices.mulPose(Axis.YP.rotationDegrees(180.0F - bodyYaw));
+        poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - bodyYaw));
 
-        // 2）执行“正向”那套飞行／游泳姿态旋转
-        applyFlightSwimRot(matrices, entity, partialTicks, true);
+        // 2）执行"正向"那套飞行／游泳姿态旋转
+        applyFlightSwimRot(poseStack, entity, partialTicks, true);
 
         // 3）再绕Y轴旋转用户自定义角度 sb_yrot
-        matrices.mulPose(Axis.YP.rotationDegrees(Mth.rotLerp(partialTicks, rot, rotPrev)));
+        poseStack.mulPose(Axis.YP.rotationDegrees(Mth.rotLerp(partialTicks, rot, rotPrev)));
 
-        // 4）执行“反向”那套飞行／游泳姿态旋转
-        applyFlightSwimRot(matrices, entity, partialTicks, false);
+        // 4）执行"反向"那套飞行／游泳姿态旋转
+        applyFlightSwimRot(poseStack, entity, partialTicks, false);
 
         // 5）恢复身体原向（180° - bodyYaw）
-        matrices.mulPose(Axis.YN.rotationDegrees(180.0F - bodyYaw));
+        poseStack.mulPose(Axis.YN.rotationDegrees(180.0F - bodyYaw));
     }
 
-    // 将你原来两个方法合并成一个，传入 isPositive 标志
     private static <T extends LivingEntity> void applyFlightSwimRot(PoseStack matrices, T entity, float partialTicks, boolean isPositive) {
 
         float np = isPositive ? 1 : -1;

@@ -1,9 +1,11 @@
 package com.flechazo.slashblade.recipe;
 
-import com.flechazo.slashblade.init.SBItems;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.item.ItemSlashBlade;
+import com.flechazo.slashblade.registry.SlashBladeRegister;
 import com.flechazo.slashblade.registry.slashblade.SlashBladeDefinition;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
 import net.minecraft.world.item.Item;
@@ -12,7 +14,8 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraftforge.registries.ForgeRegistries;
+
+import java.util.Map;
 
 public class SlashBladeShapedRecipe extends ShapedRecipe {
 
@@ -28,8 +31,8 @@ public class SlashBladeShapedRecipe extends ShapedRecipe {
     }
 
     private static ItemStack getResultBlade(ResourceLocation outputBlade) {
-        Item bladeItem = ForgeRegistries.ITEMS.containsKey(outputBlade) ? ForgeRegistries.ITEMS.getValue(outputBlade)
-                : SBItems.slashblade;
+        Item bladeItem = BuiltInRegistries.ITEM.containsKey(outputBlade) ? BuiltInRegistries.ITEM.get(outputBlade)
+                : SlashBladeRegister.SLASHBLADE;
 
         return bladeItem.getDefaultInstance();
     }
@@ -42,7 +45,7 @@ public class SlashBladeShapedRecipe extends ShapedRecipe {
     public ItemStack getResultItem(RegistryAccess access) {
         ItemStack result = SlashBladeShapedRecipe.getResultBlade(this.getOutputBlade());
 
-        if (!ForgeRegistries.ITEMS.getKey(result.getItem()).equals(getOutputBlade())) {
+        if (!BuiltInRegistries.ITEM.getKey(result.getItem()).equals(getOutputBlade())) {
             result = access.registryOrThrow(SlashBladeDefinition.REGISTRY_KEY).get(getOutputBlade())
                     .getBlade(result.getItem());
         }
@@ -54,14 +57,14 @@ public class SlashBladeShapedRecipe extends ShapedRecipe {
     public ItemStack assemble(CraftingContainer container, RegistryAccess access) {
         var result = this.getResultItem(access);
         if (!(result.getItem() instanceof ItemSlashBlade)) {
-        	result = new ItemStack(SBItems.slashblade);
+        	result = new ItemStack(SlashBladeRegister.SLASHBLADE);
         }
         
-        var resultState = result.getCapability(ItemSlashBlade.BLADESTATE).orElseThrow(NullPointerException::new);
+        var resultState = BladeStateHelper.getBladeState(result).orElseThrow(NullPointerException::new);
         for (var stack : container.getItems()) {
             if (!(stack.getItem() instanceof ItemSlashBlade))
                 continue;
-            var ingredientState = stack.getCapability(ItemSlashBlade.BLADESTATE).orElseThrow(NullPointerException::new);
+            var ingredientState = BladeStateHelper.getBladeState(stack).orElseThrow(NullPointerException::new);
 
             resultState.setProudSoulCount(resultState.getProudSoulCount() + ingredientState.getProudSoulCount());
             resultState.setKillCount(resultState.getKillCount() + ingredientState.getKillCount());
@@ -73,30 +76,30 @@ public class SlashBladeShapedRecipe extends ShapedRecipe {
     }
 
     private void updateEnchantment(ItemStack result, ItemStack ingredient) {
-        var newItemEnchants = result.getAllEnchantments();
-        var oldItemEnchants = ingredient.getAllEnchantments();
-        for (Enchantment enchantIndex : oldItemEnchants.keySet()) {
-            Enchantment enchantment = enchantIndex;
+        var newItemEnchants = EnchantmentHelper.getEnchantments(result);
+        var oldItemEnchants = EnchantmentHelper.getEnchantments(ingredient);
 
-            int destLevel = newItemEnchants.containsKey(enchantIndex) ? newItemEnchants.get(enchantIndex) : 0;
-            int srcLevel = oldItemEnchants.get(enchantIndex);
+        for (Map.Entry<Enchantment, Integer> entry : oldItemEnchants.entrySet()) {
+            Enchantment enchant = entry.getKey();
+            int srcLevel = entry.getValue();
+            int destLevel = newItemEnchants.getOrDefault(enchant, 0);
 
-            srcLevel = Math.max(srcLevel, destLevel);
-            srcLevel = Math.min(srcLevel, enchantment.getMaxLevel());
+            int finalLevel = Math.min(enchant.getMaxLevel(), Math.max(srcLevel, destLevel));
 
-            boolean canApplyFlag = enchantment.canApplyAtEnchantingTable(result);
-            if (canApplyFlag) {
-                for (Enchantment curEnchantIndex : newItemEnchants.keySet()) {
-                    if (curEnchantIndex != enchantIndex
-                            && !enchantment.isCompatibleWith(curEnchantIndex) /* canApplyTogether */) {
-                        canApplyFlag = false;
+            if (enchant.canEnchant(result)) {
+                boolean compatible = true;
+                for (Enchantment existing : newItemEnchants.keySet()) {
+                    if (existing != enchant && !enchant.isCompatibleWith(existing)) {
+                        compatible = false;
                         break;
                     }
                 }
-                if (canApplyFlag)
-                    newItemEnchants.put(enchantIndex, Integer.valueOf(srcLevel));
+                if (compatible) {
+                    newItemEnchants.put(enchant, finalLevel);
+                }
             }
         }
+
         EnchantmentHelper.setEnchantments(newItemEnchants, result);
     }
 

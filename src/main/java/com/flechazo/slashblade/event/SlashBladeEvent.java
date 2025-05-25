@@ -15,14 +15,18 @@ import java.util.function.Consumer;
 
 /**
  * SlashBlade事件基类
- * 自定义事件系统
  */
 public abstract class SlashBladeEvent {
 	private final ItemStack blade;
 	private final BladeStateComponent state;
 
-	// 定义事件总线实例
 	public static final EventBus<BladeStandAttackEvent> BLADE_STAND_ATTACK = new EventBus<>();
+	public static final EventBus<UpdateEvent> UPDATE_EVENT = new EventBus<>();
+	public static final EventBus<HitEvent> HIT_EVENT = new EventBus<>();
+	public static final EventBus<PowerBladeEvent> POWER_BLADE_EVENT = new EventBus<>();
+	public static final EventBus<DoSlashEvent> DO_SLASH_EVENT = new EventBus<>();
+	public static final EventBus<UpdateAttackEvent> UPDATE_ATTACK_EVENT = new EventBus<>();
+	public static final EventBus<InputCommandEvent> INPUT_COMMAND = new EventBus<>();
 
 	public SlashBladeEvent(ItemStack blade, BladeStateComponent state) {
 		this.blade = blade;
@@ -37,17 +41,11 @@ public abstract class SlashBladeEvent {
 		return state;
 	}
 
-	/**
-	 * 表示是否可以取消的事件
-	 */
 	public interface Cancelable {
 		boolean isCanceled();
 		void setCanceled(boolean canceled);
 	}
 
-	/**
-	 * 刀剑充能事件
-	 */
 	public static class PowerBladeEvent extends SlashBladeEvent {
 		private final LivingEntity user;
 		private boolean isPowered;
@@ -70,9 +68,6 @@ public abstract class SlashBladeEvent {
 		}
 	}
 
-	/**
-	 * 更新攻击事件
-	 */
 	public static class UpdateAttackEvent extends SlashBladeEvent {
 		private final double originDamage;
 		private double newDamage;
@@ -94,9 +89,6 @@ public abstract class SlashBladeEvent {
 		}
 	}
 
-	/**
-	 * 刀架攻击事件
-	 */
 	public static class BladeStandAttackEvent extends SlashBladeEvent implements Cancelable {
 		private final BladeStandEntity bladeStand;
 		private final DamageSource damageSource;
@@ -127,9 +119,6 @@ public abstract class SlashBladeEvent {
 		}
 	}
 
-	/**
-	 * 命中事件
-	 */
 	public static class HitEvent extends SlashBladeEvent implements Cancelable {
 		private final LivingEntity target;
 		private final LivingEntity user;
@@ -160,9 +149,6 @@ public abstract class SlashBladeEvent {
 		}
 	}
 
-	/**
-	 * 更新事件
-	 */
 	public static class UpdateEvent extends SlashBladeEvent implements Cancelable {
 		private final Level level;
 		private final Entity entity;
@@ -206,9 +192,6 @@ public abstract class SlashBladeEvent {
 		}
 	}
 
-	/**
-	 * 执行斩击事件
-	 */
 	public static class DoSlashEvent extends SlashBladeEvent implements Cancelable {
 		private final LivingEntity user;
 		private float roll;
@@ -275,25 +258,26 @@ public abstract class SlashBladeEvent {
 	}
 
 	/**
-	 * 事件总线，用于注册和触发事件
-	 * @param <T> 事件类型
+	 * An event bus that registers and triggers events
+	 * @param <T> The type of event
 	 */
 	public static class EventBus<T extends SlashBladeEvent> {
 		private final List<Consumer<T>> listeners = new ArrayList<>();
 
 		/**
-		 * 注册事件监听器
-		 * @param listener 事件处理函数
+		 * register event listener
+		 * @param listener Event listener
 		 */
 		public void register(Consumer<T> listener) {
 			listeners.add(listener);
 		}
 
 		/**
-		 * 触发事件
-		 * @param event 要触发的事件
+		 * Trigger event
+		 * @param event The event to be triggered
+		 * @return true if event was canceled (i.e. someone called event.setCanceled(true))
 		 */
-		public void post(T event) {
+		public boolean post(T event) {
 			for (Consumer<T> listener : listeners) {
 				listener.accept(event);
 				// 如果事件可取消且已被取消，则停止处理
@@ -301,6 +285,7 @@ public abstract class SlashBladeEvent {
 					break;
 				}
 			}
-		}
+            return false;
+        }
 	}
 }

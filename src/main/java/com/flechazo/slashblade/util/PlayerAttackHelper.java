@@ -1,8 +1,13 @@
 package com.flechazo.slashblade.util;
 
-import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankCapabilityProvider;
-import com.flechazo.slashblade.capability.concentrationrank.IConcentrationRank;
+import com.flechazo.slashblade.SlashBladeConfig;
+import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponent;
+import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankHelper;
+import com.flechazo.slashblade.capability.slashblade.BladeStateComponent;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.item.ItemSlashBlade;
+import io.github.fabricators_of_create.porting_lib.entity.PartEntity;
+import io.github.fabricators_of_create.porting_lib.entity.events.CriticalHitEvent;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
 import net.minecraft.server.level.ServerLevel;
@@ -21,8 +26,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.phys.Vec3;
 
-import static com.flechazo.slashblade.SlashBladeConfig.REFINE_DAMAGE_MULTIPLIER;
-import static com.flechazo.slashblade.SlashBladeConfig.SLASHBLADE_DAMAGE_MULTIPLIER;
 import static com.flechazo.slashblade.util.AttackManager.getSlashBladeDamageScale;
 
 public class PlayerAttackHelper {
@@ -40,15 +43,14 @@ public class PlayerAttackHelper {
                 baseDamage += 10 * (EnchantmentHelper.getSweepingDamageRatio(attacker) * 0.5f);
 
                 //评分等级加成
-                IConcentrationRank.ConcentrationRanks rankBonus = attacker
-                        .getCapability(ConcentrationRankCapabilityProvider.RANK_POINT)
+                ConcentrationRankComponent.ConcentrationRanks rankBonus = ConcentrationRankHelper.getConcentrationRank(attacker)
                         .map(rp -> rp.getRank(attacker.getCommandSenderWorld().getGameTime()))
-                        .orElse(IConcentrationRank.ConcentrationRanks.NONE);
+                        .orElse(ConcentrationRankComponent.ConcentrationRanks.NONE);
                 float rankDamageBonus = rankBonus.level / 2.0f;
-                if (IConcentrationRank.ConcentrationRanks.S.level <= rankBonus.level) {
-                    int refine = attacker.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE).map(rp -> rp.getRefine()).orElse(0);
+                if (ConcentrationRankComponent.ConcentrationRanks.S.level <= rankBonus.level) {
+                    int refine = BladeStateHelper.getBladeState(attacker.getMainHandItem()).map(BladeStateComponent::getRefine).orElse(0);
                     int level = attacker.experienceLevel;
-                    rankDamageBonus = (float) Math.max(rankDamageBonus, Math.min(level, refine) * REFINE_DAMAGE_MULTIPLIER.get());
+                    rankDamageBonus = (float) Math.max(rankDamageBonus, Math.min(level, refine) * SlashBladeConfig.getRefineDamageMultiplier());
                 }
                 baseDamage += rankDamageBonus;
 
@@ -63,7 +65,7 @@ public class PlayerAttackHelper {
 
 
                 //连招伤害系数 * 拔刀伤害系数(饰品单独给拔刀剑增伤用) * 拔刀剑伤害调整比例(用于提供配置文件使整合包方便调整整体拔刀伤害)
-                baseDamage *= comboRatio * getSlashBladeDamageScale(attacker) * SLASHBLADE_DAMAGE_MULTIPLIER.get();
+                baseDamage *= comboRatio * getSlashBladeDamageScale(attacker) * SlashBladeConfig.getSlashbladeDamageMultiplier();
 
                 //伤害>0时不造成伤害
                 if (baseDamage > 0.0F) {
@@ -82,7 +84,7 @@ public class PlayerAttackHelper {
                             !attacker.onClimbable() && !attacker.isInWater() &&
                             !attacker.hasEffect(MobEffects.BLINDNESS) &&
                             !attacker.isPassenger() && target instanceof LivingEntity && !attacker.isSprinting();
-                    net.minecraftforge.event.entity.player.CriticalHitEvent hitResult = net.minecraftforge.common.ForgeHooks.getCriticalHit(attacker, target, isCritical, isCritical ? 1.5F : 1.0F);
+                    CriticalHitEvent hitResult = net.minecraftforge.common.ForgeHooks.getCriticalHit(attacker, target, isCritical, isCritical ? 1.5F : 1.0F);
                     isCritical = hitResult != null;
                     if (isCritical) {
                         baseDamage *= hitResult.getDamageModifier();
@@ -137,8 +139,8 @@ public class PlayerAttackHelper {
                         EnchantmentHelper.doPostDamageEffects(attacker, target);
                         ItemStack itemstack1 = attacker.getMainHandItem();
                         Entity entity = target;
-                        if (target instanceof net.minecraftforge.entity.PartEntity) {
-                            entity = ((net.minecraftforge.entity.PartEntity<?>) target).getParent();
+                        if (target instanceof PartEntity) {
+                            entity = ((PartEntity<?>) target).getParent();
                         }
 
                         // 减少耐久

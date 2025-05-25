@@ -1,5 +1,6 @@
 package com.flechazo.slashblade.thetwilightforest.mixin;
 
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.item.ItemSlashBlade;
 import com.flechazo.slashblade.util.EnchantmentsHelper;
 import net.minecraft.world.item.ItemStack;
@@ -21,8 +22,8 @@ public class UncraftingMenuMixin {
         }
 
         // 获取刀状态（若缺失能力则直接抛出异常）
-        var inputState = input.getCapability(ItemSlashBlade.BLADESTATE).orElseThrow(NullPointerException::new);
-        var outputState = output.getCapability(ItemSlashBlade.BLADESTATE).orElseThrow(NullPointerException::new);
+        var inputState = BladeStateHelper.getBladeState(input).orElseThrow(NullPointerException::new);
+        var outputState = BladeStateHelper.getBladeState(output).orElseThrow(NullPointerException::new);
 
         // 判断是否为同一类刀
         if (!inputState.getTranslationKey().equals(outputState.getTranslationKey())) {

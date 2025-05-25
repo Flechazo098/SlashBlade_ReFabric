@@ -1,9 +1,10 @@
 package com.flechazo.slashblade.slasharts;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
-import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankCapabilityProvider;
+import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankHelper;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.entity.EntityJudgementCut;
-import com.flechazo.slashblade.item.ItemSlashBlade;
+import com.flechazo.slashblade.registry.EntityTypeRegister;
 import com.flechazo.slashblade.util.RayTraceHelper;
 import com.flechazo.slashblade.util.TargetSelector;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -38,12 +39,10 @@ public class JudgementCut {
 		final double entityReach = 7;
 
 		ItemStack stack = user.getMainHandItem();
-		Optional<Vec3> resultPos = stack.getCapability(ItemSlashBlade.BLADESTATE)
-				.filter(s -> s.getTargetEntity(worldIn) != null)
-				.map(s -> Optional.of(s.getTargetEntity(worldIn).getEyePosition(1.0f)))
-				.orElseGet(() -> Optional.empty());
+		Optional<Vec3> resultPos = BladeStateHelper.getBladeState(stack)
+                .filter(s -> s.getTargetEntity(worldIn) != null).map(s -> s.getTargetEntity(worldIn).getEyePosition(1.0f));
 
-		if (!resultPos.isPresent()) {
+		if (resultPos.isEmpty()) {
 			Optional<HitResult> raytraceresult = RayTraceHelper.rayTrace(worldIn, user, eyePos, user.getLookAngle(),
 					airReach, entityReach, (entity) -> {
 						return !entity.isSpectator() && entity.isAlive() && entity.isPickable() && (entity != user);
@@ -58,8 +57,7 @@ public class JudgementCut {
 					pos = target.position().add(0, target.getEyeHeight() / 2.0f, 0);
 					break;
 				case BLOCK:
-					Vec3 hitVec = rtr.getLocation();
-					pos = hitVec;
+                    pos = rtr.getLocation();
 					break;
 				default:
 					break;
@@ -69,15 +67,15 @@ public class JudgementCut {
 		}
 
 		Vec3 pos = resultPos.orElseGet(() -> eyePos.add(user.getLookAngle().scale(airReach)));
-		EntityJudgementCut jc = new EntityJudgementCut(SlashBladeRefabriced.RegistryEvents.JudgementCut, worldIn);
+		EntityJudgementCut jc = new EntityJudgementCut(EntityTypeRegister.JudgementCut, worldIn);
 		jc.setPos(pos.x, pos.y, pos.z);
 		jc.setOwner(user);
-		stack.getCapability(ItemSlashBlade.BLADESTATE).ifPresent((state) -> {
+		BladeStateHelper.getBladeState(stack).ifPresent((state) -> {
 			jc.setColor(state.getColorCode());
 		});
 
 		if (user != null)
-			user.getCapability(ConcentrationRankCapabilityProvider.RANK_POINT)
+			ConcentrationRankHelper.getConcentrationRank(user)
 					.ifPresent(rank -> jc.setRank(rank.getRankLevel(worldIn.getGameTime())));
 
 		worldIn.addFreshEntity(jc);
@@ -104,12 +102,12 @@ public class JudgementCut {
 			if (entity instanceof LivingEntity) {
 
 				((LivingEntity) entity).addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 40, 10));
-				EntityJudgementCut judgementCut = new EntityJudgementCut(SlashBladeRefabriced.RegistryEvents.JudgementCut, level);
+				EntityJudgementCut judgementCut = new EntityJudgementCut(EntityTypeRegister.JudgementCut, level);
 				judgementCut.setPos(entity.getX(), entity.getY(), entity.getZ());
 				judgementCut.setOwner(owner);
-				stack.getCapability(ItemSlashBlade.BLADESTATE)
+				BladeStateHelper.getBladeState(stack)
 						.ifPresent(state -> judgementCut.setColor(state.getColorCode()));
-				owner.getCapability(ConcentrationRankCapabilityProvider.RANK_POINT)
+				ConcentrationRankHelper.getConcentrationRank(owner)
 						.ifPresent(rank -> judgementCut.setRank(rank.getRankLevel(level.getGameTime())));
 				level.addFreshEntity(judgementCut);
 			}

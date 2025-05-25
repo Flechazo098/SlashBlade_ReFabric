@@ -2,7 +2,10 @@ package com.flechazo.slashblade.entity;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.ability.StunManager;
+import com.flechazo.slashblade.network.util.PlayMessages;
+import com.flechazo.slashblade.registry.EntityTypeRegister;
 import com.flechazo.slashblade.util.KnockBacks;
+import com.flechazo.slashblade.util.accessor.PersistentDataAccessor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -16,7 +19,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.network.PlayMessages;
 
 public class EntityHeavyRainSwords extends EntityAbstractSummonedSword {
     private static final EntityDataAccessor<Boolean> IT_FIRED = SynchedEntityData.defineId(EntityHeavyRainSwords.class,
@@ -27,11 +29,11 @@ public class EntityHeavyRainSwords extends EntityAbstractSummonedSword {
 
         this.setPierce((byte) 5);
 
-        CompoundTag compoundtag = this.getPersistentData();
+        CompoundTag compoundtag = ((PersistentDataAccessor) this).slashbladerefabriced$getPersistentData();
         ListTag listtag = compoundtag.getList("CustomPotionEffects", 9);
         MobEffectInstance mobeffectinstance = new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 10);
         listtag.add(mobeffectinstance.save(new CompoundTag()));
-        this.getPersistentData().put("CustomPotionEffects", listtag);
+        ((PersistentDataAccessor) this).slashbladerefabriced$getPersistentData().put("CustomPotionEffects", listtag);
 
     }
 
@@ -51,7 +53,7 @@ public class EntityHeavyRainSwords extends EntityAbstractSummonedSword {
     }
 
     public static EntityHeavyRainSwords createInstance(PlayMessages.SpawnEntity packet, Level worldIn) {
-        return new EntityHeavyRainSwords(SlashBladeRefabriced.RegistryEvents.HeavyRainSwords, worldIn);
+        return new EntityHeavyRainSwords(EntityTypeRegister.HeavyRainSwords, worldIn);
     }
 
     long fireTime = -1;
@@ -86,7 +88,6 @@ public class EntityHeavyRainSwords extends EntityAbstractSummonedSword {
 
         // this.startRiding()
         this.setDeltaMovement(Vec3.ZERO);
-        if (canUpdate())
             this.baseTick();
 
         faceEntityStandby();

@@ -1,5 +1,7 @@
 package com.flechazo.slashblade.registry.combo;
 
+import com.flechazo.slashblade.capability.slashblade.BladeStateComponent;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.util.AdvancementHelper;
 import com.flechazo.slashblade.util.TimeValueHelper;
 import com.google.common.collect.*;
@@ -185,8 +187,8 @@ public class ComboState {
             if (timeout <= elapsed) {
                 return next.apply(livingEntity);
             } else {
-                return livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE)
-                        .map((state) -> state.getComboSeq()).orElse(SlashBladeRefabriced.prefix("none"));
+                return BladeStateHelper.getBladeState(livingEntity.getMainHandItem())
+                        .map(BladeStateComponent::getComboSeq).orElse(SlashBladeRefabriced.prefix("none"));
             }
         }
     }
@@ -237,7 +239,7 @@ public class ComboState {
     }
 
     static public long getElapsed(LivingEntity livingEntity) {
-        return livingEntity.getMainHandItem().getCapability(ItemSlashBlade.BLADESTATE)
+        return BladeStateHelper.getBladeState(livingEntity.getMainHandItem())
                 .map((state) -> state.getElapsedTime(livingEntity)).orElse(0L);
     }
 
@@ -357,5 +359,8 @@ public class ComboState {
             return this;
         }
 
+    }
+    public ResourceLocation getId() {
+        return ComboStateRegistry.COMBO_STATE.getKey(this);
     }
 }

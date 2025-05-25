@@ -1,5 +1,13 @@
 package com.flechazo.slashblade.entity;
 
+import com.flechazo.slashblade.SlashBladeConfig;
+import com.flechazo.slashblade.network.util.PlayMessages;
+import com.flechazo.slashblade.registry.EntityTypeRegister;
+import com.flechazo.slashblade.util.accessor.PersistentDataAccessor;
+import io.github.fabricators_of_create.porting_lib.entity.PartEntity;
+import io.github.fabricators_of_create.porting_lib.entity.PortingLibEntity;
+import io.github.fabricators_of_create.porting_lib.entity.events.EntityEventFactory;
+import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.ability.StunManager;
@@ -7,6 +15,8 @@ import com.flechazo.slashblade.util.AttackManager;
 import com.flechazo.slashblade.util.EnumSetConverter;
 import com.flechazo.slashblade.util.NBTHelper;
 import com.flechazo.slashblade.util.TargetSelector;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
@@ -41,19 +51,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.*;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.entity.PartEntity;
-import net.minecraftforge.network.PlayMessages;
-import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
-import static com.flechazo.slashblade.SlashBladeConfig.SLASHBLADE_DAMAGE_MULTIPLIER;
 
 public class EntityAbstractSummonedSword extends Projectile implements IShootable {
     private static final EntityDataAccessor<Integer> COLOR = SynchedEntityData
@@ -108,7 +111,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
     }
 
     public static EntityAbstractSummonedSword createInstance(PlayMessages.SpawnEntity packet, Level worldIn) {
-        return new EntityAbstractSummonedSword(SlashBladeRefabriced.RegistryEvents.SummonedSword, worldIn);
+        return new EntityAbstractSummonedSword(EntityTypeRegister.SummonedSword, worldIn);
     }
 
     @Override
@@ -152,7 +155,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
 
     @Override
     public Packet<ClientGamePacketListener> getAddEntityPacket() {
-        return NetworkHooks.getEntitySpawningPacket(this);
+        return PortingLibEntity.getEntitySpawningPacket(this);
     }
 
     @Override
@@ -173,7 +176,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public boolean shouldRenderAtSqrDistance(double distance) {
         double d0 = this.getBoundingBox().getSize() * 10.0D;
         if (Double.isNaN(d0)) {
@@ -185,7 +188,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void lerpTo(double x, double y, double z, float yaw, float pitch, int posRotationIncrements,
             boolean teleport) {
         this.setPos(x, y, z);
@@ -193,7 +196,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void lerpMotion(double x, double y, double z) {
         this.setDeltaMovement(x, y, z);
         if (this.xRotO == 0.0F && this.yRotO == 0.0F) {
@@ -362,7 +365,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
                 }
 
                 if (raytraceresult != null && !(disallowedHitBlock && raytraceresult.getType() == HitResult.Type.BLOCK)
-                        && !net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, raytraceresult)) {
+                        && ! EntityEventFactory.onProjectileImpact(this, raytraceresult)) {
                     this.onHit(raytraceresult);
                     this.hasImpulse = true;
                 }
@@ -521,7 +524,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
         targetEntity.invulnerableTime = 0;
         float scale = 1f;
         if (shooter instanceof LivingEntity living) {
-            scale = (float) (AttackManager.getSlashBladeDamageScale(living) * SLASHBLADE_DAMAGE_MULTIPLIER.get());
+            scale = (float) (AttackManager.getSlashBladeDamageScale(living) * SlashBladeConfig.getSlashbladeDamageMultiplier());
         }
         float damageValue = i * scale;
         if (targetEntity.hurt(damagesource, damageValue)) {
@@ -621,7 +624,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
     }
 
     public List<MobEffectInstance> getPotionEffects() {
-        List<MobEffectInstance> effects = PotionUtils.getAllEffects(this.getPersistentData());
+        List<MobEffectInstance> effects = PotionUtils.getAllEffects(((PersistentDataAccessor) this).slashbladerefabriced$getPersistentData());
 
         if (effects.isEmpty())
             effects.add(new MobEffectInstance(MobEffects.POISON, 1, 1));

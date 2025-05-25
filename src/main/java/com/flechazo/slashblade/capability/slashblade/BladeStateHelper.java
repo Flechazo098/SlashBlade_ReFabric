@@ -25,8 +25,7 @@ public class BladeStateHelper {
      * @param damage 耐久
      * @return 简单的BladeState组件
      */
-    public static BladeStateComponent createSimpleBladeState(ItemStack stack, ResourceLocation model,
-                                                             ResourceLocation texture, float attack, int damage) {
+    public static BladeStateComponent createSimpleBladeState(ItemStack stack, ResourceLocation model, ResourceLocation texture, float attack, int damage) {
         return new SimpleBladeStateComponentImpl(stack, model, texture, attack, damage);
     }
 }

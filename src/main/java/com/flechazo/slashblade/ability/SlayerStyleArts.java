@@ -6,6 +6,7 @@ import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.entity.EntityAbstractSummonedSword;
 import com.flechazo.slashblade.event.InputCommandEvent;
 import com.flechazo.slashblade.item.ItemSlashBlade;
+import com.flechazo.slashblade.registry.EntityTypeRegister;
 import com.flechazo.slashblade.util.AdvancementHelper;
 import com.flechazo.slashblade.util.InputCommand;
 import com.flechazo.slashblade.util.NBTHelper;
@@ -133,7 +134,7 @@ public class SlayerStyleArts {
                             }
                         } else {
                             EntityAbstractSummonedSword ss = new EntityAbstractSummonedSword(
-                                    SlashBladeRefabriced.RegistryEvents.SummonedSword, worldIn) {
+                                    EntityTypeRegister.SummonedSword, worldIn) {
                                 @Override
                                 protected void onHitEntity(EntityHitResult entityHitResult) {
                                     super.onHitEntity(entityHitResult);

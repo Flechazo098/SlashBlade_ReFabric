@@ -81,30 +81,6 @@ dependencies {
 	implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
 	include modImplementation("dev.kosmx.player-anim:player-animation-lib-fabric:${project.player_anim}")
 
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:common:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:items:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:fluids:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:extensions:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:tags:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:recipe_book_categories:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:entity:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:tool_actions:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:transfer:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:registries:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:lazy_registration:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:data:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:model_builders:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:model_generators:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:model_loader:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:model_materials:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:models:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:networking:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:utility:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:base:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:blocks:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:client_events:${port_version}"))
-	modImplementation(include("io.github.fabricators_of_create.Porting-Lib:level_events:${port_version}"))
 
 	// compile against the JEI API but do not include it at runtime
 	modCompileOnly(("mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"))
@@ -126,11 +102,11 @@ dependencies {
 	modApi("me.shedaniel.cloth:cloth-config-fabric:11.1.136") {
 		exclude(group: "net.fabricmc.fabric-api")
 	}
-	modImplementation ("com.flechazo:jzxlib:0.0.1")
+	modImplementation (include("com.flechazo:jzxlib:0.0.4"))
 }
 
 loom {
-	accessWidenerPath = file("src/main/resources/slashbladere.accesswidener")
+	accessWidenerPath = file("src/main/resources/slashblade.accesswidener")
 }
 
 processResources {

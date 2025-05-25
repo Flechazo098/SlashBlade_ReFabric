@@ -13,7 +13,7 @@ import com.flechazo.slashblade.entity.BladeStandEntity;
 import com.flechazo.slashblade.item.ItemSlashBlade;
 import com.flechazo.slashblade.item.ItemSlashBladeDetune;
 import com.flechazo.slashblade.init.DefaultResources;
-import com.flechazo.slashblade.init.SBItems;
+import com.flechazo.slashblade.registry.SlashBladeRegister;
 import com.flechazo.slashblade.item.SwordType;
 import com.flechazo.slashblade.registry.slashblade.SlashBladeDefinition;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
@@ -290,10 +290,10 @@ public class SlashBladeTEISR extends BlockEntityWithoutLevelRenderer implements 
                     break;
                 }
 
-                if (type == SBItems.bladestand_1) {
+                if (type == SlashBladeRegister.BLADESTAND_1) {
                     bladeOffset = Vec3.ZERO;
                     sheathOffset = Vec3.ZERO;
-                } else if (type == SBItems.bladestand_2) {
+                } else if (type == SlashBladeRegister.BLADESTAND_2) {
                     bladeOffset = new Vec3(0, 21.5f, 0);
                     if (hFlip) {
                         sheathOffset = new Vec3(-40, -27, 0);
@@ -301,12 +301,12 @@ public class SlashBladeTEISR extends BlockEntityWithoutLevelRenderer implements 
                         sheathOffset = new Vec3(40, -27, 0);
                     }
                     sheathOffsetBaseRot = -4;
-                } else if (type == SBItems.bladestand_v) {
+                } else if (type == SlashBladeRegister.BLADESTAND_V) {
                     bladeOffset = new Vec3(-100, 230, 0);
                     sheathOffset = new Vec3(-100, 230, 0);
                     bladeOffsetRot = 80;
                     sheathOffsetRot = 80;
-                } else if (type == SBItems.bladestand_s) {
+                } else if (type == SlashBladeRegister.BLADESTAND_S) {
                     if (hFlip) {
                         bladeOffset = new Vec3(60, -25, 0);
                         sheathOffset = new Vec3(60, -25, 0);
@@ -314,10 +314,10 @@ public class SlashBladeTEISR extends BlockEntityWithoutLevelRenderer implements 
                         bladeOffset = new Vec3(-60, -25, 0);
                         sheathOffset = new Vec3(-60, -25, 0);
                     }
-                } else if (type == SBItems.bladestand_1w) {
+                } else if (type == SlashBladeRegister.BLADESTAND_1W) {
                     bladeOffset = Vec3.ZERO;
                     sheathOffset = Vec3.ZERO;
-                } else if (type == SBItems.bladestand_2w) {
+                } else if (type == SlashBladeRegister.BLADESTAND_2W) {
                     bladeOffset = new Vec3(0, 21.5f, 0);
                     if (hFlip) {
                         sheathOffset = new Vec3(-40, -27, 0);
