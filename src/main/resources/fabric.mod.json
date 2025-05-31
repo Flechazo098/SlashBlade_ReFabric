@@ -18,12 +18,21 @@
 		"main": [
           "com.flechazo.slashblade.SlashBladeRefabriced"
 		],
+		"client": [
+			"com.flechazo.slashblade.client.ClientHandler"
+		],
+		"fabric-datagen": [
+			"com.flechazo.slashblade.data.DataGen"
+		],
 		"cardinal-components-entity": [
 			"com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponentRegistry",
 			"com.flechazo.slashblade.capability.inputstate.InputStateComponentRegistry",
 			"com.flechazo.slashblade.capability.mobeffect.MobEffectComponentRegistry",
+			"com.flechazo.slashblade.capability.LivingEntityComponentRegister"
+		],
+		"cardinal-components-item": [
 			"com.flechazo.slashblade.capability.slashblade.BladeStateComponentRegistry"
-		]
+			]
 	},
 	"custom": {
 		"cardinal-components": [

@@ -30,7 +30,7 @@ public class BladeModelManager {
 
     public static Registry<SlashBladeDefinition> getClientSlashBladeRegistry() {
         return Minecraft.getInstance().getConnection().registryAccess()
-                .registryOrThrow(SlashBladeDefinition.REGISTRY_KEY);
+                .registryOrThrow(SlashBladeDefinition.NAMED_BLADES_KEY);
     }
 
     WavefrontObject defaultModel;

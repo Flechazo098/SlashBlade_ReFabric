@@ -19,6 +19,9 @@ public class SlashBladeEntityTypeTagProvider extends FabricTagProvider.EntityTyp
     public SlashBladeEntityTypeTagProvider (FabricDataOutput output, CompletableFuture<Provider> completableFuture) {
         super(output, completableFuture);
     }
+    public SlashBladeEntityTypeTagProvider (FabricDataOutput output, CompletableFuture<Provider> completableFuture, String id) {
+        super(output, completableFuture);
+    }
 
     @Override
     protected void addTags(Provider lookupProvider) {

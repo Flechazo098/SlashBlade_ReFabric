@@ -28,9 +28,8 @@ public class PlayerAnimationOverrider {
 
     public void register() {
         BladeMotionEvent.BLADE_MOTION.register(event -> {
-        if (!(event.getEntity() instanceof AbstractClientPlayer))
+        if (!(event.getEntity() instanceof AbstractClientPlayer player))
             return;
-        AbstractClientPlayer player = (AbstractClientPlayer) event.getEntity();
 
         AnimationStack animationStack = PlayerAnimationAccess.getPlayerAnimLayer(player);
 

@@ -249,7 +249,7 @@ public interface BladeStateComponent extends Component {
     // 进行连击
     default ResourceLocation progressCombo(LivingEntity user, boolean isVirtual) {
         ResourceLocation currentloc = resolvCurrentComboState(user);
-        ComboState current = ComboStateRegistry.REGISTRY.get().getValue(currentloc);
+        ComboState current = ComboStateRegistry.COMBO_STATE.get(currentloc);
 
         if(current == null)
             return ComboStateRegistry.NONE.getId();
@@ -258,9 +258,9 @@ public interface BladeStateComponent extends Component {
         if (!next.equals(ComboStateRegistry.NONE.getId()) && next.equals(currentloc))
             return ComboStateRegistry.NONE.getId();
 
-        ResourceLocation rootNext = ComboStateRegistry.REGISTRY.get().getValue(getComboRoot()).getNext(user);
-        ComboState nextCS = ComboStateRegistry.REGISTRY.get().getValue(next);
-        ComboState rootNextCS = ComboStateRegistry.REGISTRY.get().getValue(rootNext);
+        ResourceLocation rootNext = ComboStateRegistry.COMBO_STATE.get(getComboRoot()).getNext(user);
+        ComboState nextCS = ComboStateRegistry.COMBO_STATE.get(next);
+        ComboState rootNextCS = ComboStateRegistry.COMBO_STATE.get(rootNext);
         ResourceLocation resolved = nextCS.getPriority() <= rootNextCS.getPriority() ? next : rootNext;
 
         if (!isVirtual) {
@@ -285,7 +285,7 @@ public interface BladeStateComponent extends Component {
 
         Map.Entry<Integer, ResourceLocation> currentloc = resolvCurrentComboStateTicks(user);
 
-        ComboState current = ComboStateRegistry.REGISTRY.get().getValue(currentloc.getValue());
+        ComboState current = ComboStateRegistry.COMBO_STATE.get(currentloc.getValue());
         if(current == null)
             return ComboStateRegistry.NONE.getId();
 
@@ -313,7 +313,7 @@ public interface BladeStateComponent extends Component {
         }
 
         ResourceLocation csloc = this.getSlashArts().doArts(type, user);
-        ComboState cs = ComboStateRegistry.REGISTRY.get().getValue(csloc);
+        ComboState cs = ComboStateRegistry.COMBO_STATE.get(csloc);
         if (csloc != ComboStateRegistry.NONE.getId() && !currentloc.getValue().equals(csloc)) {
 
             if (current.getPriority() > cs.getPriority()) {
@@ -331,7 +331,7 @@ public interface BladeStateComponent extends Component {
         BladeMotionEvent.BLADE_MOTION.post(new BladeMotionEvent(entity, loc));
         this.setComboSeq(loc);
         this.setLastActionTime(entity.level().getGameTime());
-        ComboState cs = ComboStateRegistry.REGISTRY.get().getValue(loc);
+        ComboState cs = ComboStateRegistry.COMBO_STATE.get(loc);
         cs.clickAction(entity);
     }
 
@@ -346,9 +346,9 @@ public interface BladeStateComponent extends Component {
     default Map.Entry<Integer, ResourceLocation> resolvCurrentComboStateTicks(LivingEntity user) {
         ResourceLocation current = ComboStateRegistry.COMBO_STATE.containsKey(getComboSeq()) ? getComboSeq()
                 : ComboStateRegistry.NONE.getId();
-        ComboState currentCS = ComboStateRegistry.REGISTRY.get().getValue(current) != null
-                ? ComboStateRegistry.REGISTRY.get().getValue(current)
-                : ComboStateRegistry.NONE.get();
+        ComboState currentCS = ComboStateRegistry.COMBO_STATE.get(current) != null
+                ? ComboStateRegistry.COMBO_STATE.get(current)
+                : ComboStateRegistry.NONE;
         int time = (int) TimeValueHelper.getMSecFromTicks(getElapsedTime(user));
 
         while (!current.equals(ComboStateRegistry.NONE.getId()) && currentCS.getTimeoutMS() < time) {

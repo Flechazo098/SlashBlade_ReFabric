@@ -26,6 +26,7 @@ public class SlashBladeIngredient implements CustomIngredient {
     private final Set<Item> items;
     private final RequestDefinition request;
 
+
     protected SlashBladeIngredient(Set<Item> items, RequestDefinition request) {
         if (items.isEmpty()) {
             throw new IllegalArgumentException("Cannot create a SlashBladeIngredient with no items");

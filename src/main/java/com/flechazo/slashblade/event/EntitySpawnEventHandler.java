@@ -6,7 +6,7 @@ package com.flechazo.slashblade.event;
  * 请参阅 {@link com.flechazo.slashblade.mixin.event.MobSpawnMixin} 类以获得替代实现。
  * @deprecated 使用 {@link com.flechazo.slashblade.mixin.event.MobSpawnMixin} 替代。
  */
-
+@Deprecated
 public class EntitySpawnEventHandler {
 //    @SubscribeEvent
 //    public static void onMobSpawn(MobSpawnEvent.FinalizeSpawn event) {

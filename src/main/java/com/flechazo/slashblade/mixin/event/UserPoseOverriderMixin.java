@@ -15,6 +15,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -26,12 +27,10 @@ public abstract class UserPoseOverriderMixin<T extends LivingEntity, M extends E
     @Inject(method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V", at = @At("HEAD"))
 
     private void onRenderPre(T entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffers, int packedLight, CallbackInfo ci) {
-        // 只针对手持你自定义刀具的实体
         ItemStack stack = entity.getMainHandItem();
         if (stack.isEmpty() || !(stack.getItem() instanceof ItemSlashBlade)) return;
 
 
-        // 读取自定义NBT
         CompoundTag tag = ((PersistentDataAccessor) entity).slashbladerefabriced$getPersistentData();
         float rot = tag.getFloat("sb_yrot");
         float rotPrev = tag.getFloat("sb_yrot_prev");
@@ -53,6 +52,7 @@ public abstract class UserPoseOverriderMixin<T extends LivingEntity, M extends E
         poseStack.mulPose(Axis.YN.rotationDegrees(180.0F - bodyYaw));
     }
 
+    @Unique
     private static <T extends LivingEntity> void applyFlightSwimRot(PoseStack matrices, T entity, float partialTicks, boolean isPositive) {
 
         float np = isPositive ? 1 : -1;

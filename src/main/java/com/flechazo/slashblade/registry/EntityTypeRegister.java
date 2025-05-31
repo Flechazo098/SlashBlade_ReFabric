@@ -70,7 +70,7 @@ public class EntityTypeRegister {
     public static final ResourceLocation SLASH_EFFECT_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "slash_effect");
     public static final ResourceLocation DRIVE_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "drive");
 
-    public void registerEntityTypes() {
+    public static void registerEntityTypes() {
         BladeItem = registerEntity(BLADE_ITEM_ID, BladeItemEntityLoc, BladeItemEntity::new, 0.25f, 0.25f, 4, BladeItemEntity::createInstanceFromPacket);
         BladeStand = registerEntity(BLADE_STAND_ID, BladeStandEntityLoc, BladeStandEntity::new, 0.5f, 0.5f, 10, BladeStandEntity::createInstance);
 
@@ -86,7 +86,7 @@ public class EntityTypeRegister {
     }
 
 
-    private <T extends Entity> EntityType<T> registerEntity(
+    private static <T extends Entity> EntityType<T> registerEntity (
             ResourceLocation id,
             ResourceLocation loc,
             EntityType.EntityFactory<T> constructor,

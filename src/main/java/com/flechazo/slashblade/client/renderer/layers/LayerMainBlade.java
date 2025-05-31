@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import dev.kosmx.playerAnim.api.TransformType;
 import dev.kosmx.playerAnim.core.util.Vec3f;
 import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
+import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import jp.nyatla.nymmd.*;
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.capability.slashblade.BladeStateComponent;
@@ -49,8 +50,7 @@ public class LayerMainBlade<T extends LivingEntity, M extends EntityModel<T>> ex
         super(entityRendererIn);
     }
 
-    // 使用Supplier替代LazyOptional
-    private final Supplier<MmdPmdModelMc> bladeholder = () -> {
+    final LazyOptional<MmdPmdModelMc> bladeholder = LazyOptional.of(() -> {
         try {
             return new MmdPmdModelMc(new ResourceLocation(SlashBladeRefabriced.MODID, "model/bladeholder.pmd"));
         } catch (FileNotFoundException e) {
@@ -61,40 +61,21 @@ public class LayerMainBlade<T extends LivingEntity, M extends EntityModel<T>> ex
             e.printStackTrace();
         }
         return null;
-    };
+    });
 
-    private final Supplier<MmdMotionPlayerGL2> motionPlayer = () -> {
+    final LazyOptional<MmdMotionPlayerGL2> motionPlayer = LazyOptional.of(() -> {
         MmdMotionPlayerGL2 mmp = new MmdMotionPlayerGL2();
 
-        MmdPmdModelMc pmd = bladeholder.get();
-        if (pmd != null) {
+        bladeholder.ifPresent(pmd -> {
             try {
                 mmp.setPmd(pmd);
             } catch (MmdException e) {
                 e.printStackTrace();
             }
-        }
+        });
 
         return mmp;
-    };
-
-    // 缓存实例以避免重复创建
-    private MmdPmdModelMc cachedBladeholder;
-    private MmdMotionPlayerGL2 cachedMotionPlayer;
-
-    private MmdPmdModelMc getBladeholder() {
-        if (cachedBladeholder == null) {
-            cachedBladeholder = bladeholder.get();
-        }
-        return cachedBladeholder;
-    }
-
-    private MmdMotionPlayerGL2 getMotionPlayer() {
-        if (cachedMotionPlayer == null) {
-            cachedMotionPlayer = motionPlayer.get();
-        }
-        return cachedMotionPlayer;
-    }
+    });
 
     public float modifiedSpeed(float baseSpeed, LivingEntity entity) {
         float modif = 6.0f;
@@ -226,8 +207,7 @@ public class LayerMainBlade<T extends LivingEntity, M extends EntityModel<T>> ex
         Optional<BladeStateComponent> state = BladeStateHelper.getBladeState(stack);
         state.ifPresent(s -> {
 
-            MmdMotionPlayerGL2 mmp = getMotionPlayer();
-            if (mmp != null) {
+            motionPlayer.ifPresent(mmp -> {
                 ComboStateRegistry.COMBO_STATE.get(s.getComboSeq());
                 ComboState combo = ComboStateRegistry.COMBO_STATE.get(s.getComboSeq());
                 // tick to msec
@@ -357,7 +337,7 @@ public class LayerMainBlade<T extends LivingEntity, M extends EntityModel<T>> ex
 
                 }
 
-            }
+            });
 
         });
     }

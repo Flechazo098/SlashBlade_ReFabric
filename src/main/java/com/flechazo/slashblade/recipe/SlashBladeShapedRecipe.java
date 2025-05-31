@@ -46,8 +46,14 @@ public class SlashBladeShapedRecipe extends ShapedRecipe {
         ItemStack result = SlashBladeShapedRecipe.getResultBlade(this.getOutputBlade());
 
         if (!BuiltInRegistries.ITEM.getKey(result.getItem()).equals(getOutputBlade())) {
-            result = access.registryOrThrow(SlashBladeDefinition.REGISTRY_KEY).get(getOutputBlade())
-                    .getBlade(result.getItem());
+            // 添加安全检查
+            var registry = access.registry(SlashBladeDefinition.NAMED_BLADES_KEY);
+            if (registry.isPresent()) {
+                var definition = registry.get().get(getOutputBlade());
+                if (definition != null) {
+                    result = definition.getBlade(result.getItem());
+                }
+            }
         }
 
         return result;

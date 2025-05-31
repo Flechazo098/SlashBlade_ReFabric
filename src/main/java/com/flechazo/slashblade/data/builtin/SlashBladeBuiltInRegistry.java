@@ -323,7 +323,7 @@ public class SlashBladeBuiltInRegistry {
     }
 
     private static ResourceKey<SlashBladeDefinition> register(String id) {
-        return ResourceKey.create(SlashBladeDefinition.REGISTRY_KEY,
+        return ResourceKey.create(SlashBladeDefinition.NAMED_BLADES_KEY,
                 SlashBladeRefabriced.prefix(id));
     }
 }

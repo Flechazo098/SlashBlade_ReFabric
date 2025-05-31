@@ -45,6 +45,10 @@ public class ItemSlashBladeDetune extends ItemSlashBlade {
         return this;
     }
 
+    public float getBaseAttack () {
+        return baseAttack;
+    }
+
     public boolean isDestructable() {
         return isDestructable;
     }

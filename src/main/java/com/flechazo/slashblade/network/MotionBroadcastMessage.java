@@ -9,6 +9,8 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
@@ -27,12 +29,14 @@ public class MotionBroadcastMessage {
     }
 
     // 发送到所有客户端
-    public static void broadcastToAll(UUID playerId, String combo) {
+    public static void broadcastToAll(MinecraftServer server, UUID playerId, String combo) {
         FriendlyByteBuf buf = PacketByteBufs.create();
         buf.writeUUID(playerId);
         buf.writeUtf(combo);
-        NetworkManager.sendToAll(NetworkManager.MOTION_BROADCAST_ID, buf);
+
+        NetworkManager.sendToAll(NetworkManager.MOTION_BROADCAST_ID, buf, server);
     }
+
 
     // 客户端处理
     public static void handleClient(Minecraft client, ClientPacketListener handler, FriendlyByteBuf buf, PacketSender responseSender) {
@@ -48,7 +52,7 @@ public class MotionBroadcastMessage {
                 return;
 
             ResourceLocation state = ResourceLocation.tryParse(combo);
-            if (state == null || !ComboStateRegistry.REGISTRY.get().containsKey(state))
+            if (state == null || !ComboStateRegistry.COMBO_STATE.containsKey(state))
                 return;
 
             BladeMotionEvent.BLADE_MOTION.post(new BladeMotionEvent(target, state));

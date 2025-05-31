@@ -9,10 +9,13 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.Entity;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 public class NetworkManager {
@@ -42,8 +45,8 @@ public class NetworkManager {
         ServerPlayNetworking.send(player, id, buf);
     }
 
-    public static void sendToAll(ResourceLocation id, FriendlyByteBuf buf) {
-        for (ServerPlayer player : PlayerLookup.all(ServerPlayNetworking.getServer())) {
+    public static void sendToAll(ResourceLocation id, FriendlyByteBuf buf, MinecraftServer server) {
+        for (ServerPlayer player : PlayerLookup.all(server)) {
             ServerPlayNetworking.send(player, id, buf);
         }
     }

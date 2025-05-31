@@ -19,8 +19,16 @@ public class BladeStateComponentRegistry implements ItemComponentInitializer {
     @Override
     public void registerItemComponentFactories(ItemComponentFactoryRegistry registry) {
         // 为所有SlashBlade物品注册BladeState组件
-        registry.register(item -> item instanceof ItemSlashBlade, BLADE_STATE, BladeStateComponentImpl::new);
-        registry.register(SlashBladeRefabriced.RegistryEvents, BLADE_STATE, stack -> ((ItemSlashBladeDetune) stack.getItem()).createComponent(stack)
-        );
+        registry.register(item -> item instanceof ItemSlashBlade && !(item instanceof ItemSlashBladeDetune), BLADE_STATE, BladeStateComponentImpl::new);
+        registry.register(item -> item instanceof ItemSlashBladeDetune, BLADE_STATE, (stack) -> {
+            ItemSlashBladeDetune item = (ItemSlashBladeDetune) stack.getItem();
+            return new SimpleBladeStateComponentImpl(
+                    stack,
+                    item.getModel(),
+                    item.getTexture(),
+                    item.getBaseAttack(),
+                    item.getTier().getUses()
+            );
+        });
     }
 }

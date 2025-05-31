@@ -82,11 +82,10 @@ public class ArrowReflector {
 
             ResourceLocation old = s.getComboSeq();
             ResourceLocation current = s.resolvCurrentComboState(attacker);
-            ComboState currentCS = ComboStateRegistry.REGISTRY.get().getValue(current) != null
-                    ? ComboStateRegistry.REGISTRY.get().getValue(current)
-                    : ComboStateRegistry.NONE.get();
+            ComboStateRegistry.COMBO_STATE.get(current);
+            ComboState currentCS = ComboStateRegistry.COMBO_STATE.get(current);
             if (old != current) {
-                ComboState oldCS = ComboStateRegistry.REGISTRY.get().getValue(current);
+                ComboState oldCS = ComboStateRegistry.COMBO_STATE.get(current);
                 ticks -= TimeValueHelper.getTicksFromMSec(oldCS.getTimeoutMS());
             }
 

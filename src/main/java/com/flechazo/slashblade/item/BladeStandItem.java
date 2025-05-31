@@ -1,6 +1,5 @@
 package com.flechazo.slashblade.item;
 
-import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.entity.BladeStandEntity;
 import com.flechazo.slashblade.registry.EntityTypeRegister;
 import net.minecraft.world.entity.EntityType;

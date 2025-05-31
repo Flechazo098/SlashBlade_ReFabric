@@ -28,11 +28,11 @@ import java.util.List;
 import static com.flechazo.slashblade.SlashBladeConfig.getTrapezohedronMaxRefine;
 
 public class SlashBladeRegister {
-    private static final ResourceLocation WOOD_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "slashblade_wood");
-    private static final ResourceLocation BAMBOO_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "slashblade_bamboo");
-    private static final ResourceLocation SILVER_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "slashblade_silverbamboo");
-    private static final ResourceLocation WHITE_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "slashblade_white");
-    private static final ResourceLocation SLASHBLADE_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "slashblade");
+    public static final ResourceLocation WOOD_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "slashblade_wood");
+    public static final ResourceLocation BAMBOO_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "slashblade_bamboo");
+    public static final ResourceLocation SILVER_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "slashblade_silverbamboo");
+    public static final ResourceLocation WHITE_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "slashblade_white");
+    public static final ResourceLocation SLASHBLADE_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "slashblade");
 
     private static final ResourceLocation PROUDSOUL_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "proudsoul");
     private static final ResourceLocation PROUDSOUL_INGOT_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "proudsoul_ingot");

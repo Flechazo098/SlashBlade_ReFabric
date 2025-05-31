@@ -2,16 +2,11 @@ package com.flechazo.slashblade.event.client;
 
 import com.flechazo.slashblade.util.accessor.PersistentDataAccessor;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.flechazo.slashblade.item.ItemSlashBlade;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRenderEvents;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
-import net.minecraft.world.phys.Vec3;
 import com.mojang.math.Axis;
 
 @Environment(EnvType.CLIENT)

@@ -10,8 +10,11 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.capability.slashblade.BladeStateComponentImpl;
+import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
+import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.minecraft.Util;
 import net.minecraft.core.Holder.Reference;
+import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -31,8 +34,9 @@ public class SlashBladeDefinition {
 					.forGetter(SlashBladeDefinition::getEnchantments))
 			.apply(instance, SlashBladeDefinition::new));
 
-	public static final ResourceKey<Registry<SlashBladeDefinition>> REGISTRY_KEY = ResourceKey
+	public static final ResourceKey<Registry<SlashBladeDefinition>> NAMED_BLADES_KEY = ResourceKey
 			.createRegistryKey(SlashBladeRefabriced.prefix("named_blades"));
+
 
 	private final ResourceLocation item;
 	private final ResourceLocation name;

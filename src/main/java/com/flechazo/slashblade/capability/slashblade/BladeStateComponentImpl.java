@@ -299,14 +299,14 @@ public class BladeStateComponentImpl extends ItemComponent implements BladeState
 
     @Override
     public ResourceLocation getComboRoot() {
-        if(this.comboRootName == null || !ComboStateRegistry.REGISTRY.get().containsKey(this.comboRootName))
+        if(this.comboRootName == null || !ComboStateRegistry.COMBO_STATE.containsKey(this.comboRootName))
             return ComboStateRegistry.STANDBY.getId();
         return this.comboRootName;
     }
 
     @Override
     public void setComboRoot(ResourceLocation rootLoc) {
-        this.comboRootName = ComboStateRegistry.REGISTRY.get().containsKey(rootLoc) ? rootLoc
+        this.comboRootName = ComboStateRegistry.COMBO_STATE.containsKey(rootLoc) ? rootLoc
                 : ComboStateRegistry.STANDBY.getId();
     }
 

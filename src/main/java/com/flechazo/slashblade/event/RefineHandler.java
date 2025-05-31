@@ -6,6 +6,7 @@ package com.flechazo.slashblade.event;
  * 请参阅 {@link com.flechazo.slashblade.mixin.event.AnvilMenuMixin} 类以获得替代实现。
  * @deprecated 使用 {@link com.flechazo.slashblade.mixin.event.AnvilMenuMixin} 替代。
  */
+@Deprecated
 public class RefineHandler {
 //    private static final class SingletonHolder {
 //        private static final RefineHandler instance = new RefineHandler();

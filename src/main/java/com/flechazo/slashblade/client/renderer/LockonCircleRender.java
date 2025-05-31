@@ -25,6 +25,7 @@ public class LockonCircleRender {
      * @deprecated 使用 {@link com.flechazo.slashblade.mixin.event.LivingEntityRendererMixin} 替代。
      */
 //    @SubscribeEvent
+    @Deprecated
     public void onRenderLiving() {
 //        final Minecraft minecraftInstance = Minecraft.getInstance();
 //        Player player = minecraftInstance.player;

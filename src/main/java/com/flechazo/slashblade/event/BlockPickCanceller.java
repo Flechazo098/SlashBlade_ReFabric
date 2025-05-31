@@ -6,6 +6,7 @@ package com.flechazo.slashblade.event;
  * 请参阅 {@link com.flechazo.slashblade.mixin.event.PickBlockCancellerMixin} 类以获得替代实现。
  * @deprecated 使用 {@link com.flechazo.slashblade.mixin.event.PickBlockCancellerMixin} 替代。
  */
+@Deprecated
 public class BlockPickCanceller {
 //    private static final class SingletonHolder {
 //        private static final BlockPickCanceller instance = new BlockPickCanceller();

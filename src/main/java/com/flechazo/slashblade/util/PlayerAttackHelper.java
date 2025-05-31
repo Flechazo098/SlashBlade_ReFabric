@@ -1,5 +1,6 @@
 package com.flechazo.slashblade.util;
 
+import com.flechazo.jzxlib.common.FabricHooks;
 import com.flechazo.slashblade.SlashBladeConfig;
 import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponent;
 import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankHelper;
@@ -32,7 +33,7 @@ public class PlayerAttackHelper {
     // 该方法伤害公式=(面板攻击力 + 横扫之刃附魔加成 + 评分等级加成 + 杀手类附魔加成) * 连招伤害系数 * 拔刀伤害系数 * 拔刀剑伤害调整比例 * 暴击倍率
     public static void attack(Player attacker, Entity target, float comboRatio) {
         // 触发Forge事件，以兼容其他模组
-        if (!net.minecraftforge.common.ForgeHooks.onPlayerAttackTarget(attacker, target)) return;
+        if (! FabricHooks.onPlayerAttackTarget(attacker, target)) return;
         // 判断攻击目标是否可以被攻击
         if (target.isAttackable()) {
             if (!target.skipAttackInteraction(attacker)) {
@@ -84,7 +85,7 @@ public class PlayerAttackHelper {
                             !attacker.onClimbable() && !attacker.isInWater() &&
                             !attacker.hasEffect(MobEffects.BLINDNESS) &&
                             !attacker.isPassenger() && target instanceof LivingEntity && !attacker.isSprinting();
-                    CriticalHitEvent hitResult = net.minecraftforge.common.ForgeHooks.getCriticalHit(attacker, target, isCritical, isCritical ? 1.5F : 1.0F);
+                    CriticalHitEvent hitResult = FabricHooks.getCriticalHit(attacker, target, isCritical, isCritical ? 1.5F : 1.0F);
                     isCritical = hitResult != null;
                     if (isCritical) {
                         baseDamage *= hitResult.getDamageModifier();
@@ -145,10 +146,11 @@ public class PlayerAttackHelper {
 
                         // 减少耐久
                         if (!attacker.level().isClientSide() && !itemstack1.isEmpty() && entity instanceof LivingEntity) {
-                            ItemStack copy = itemstack1.copy();
+                            ItemStack original = itemstack1.copy();
                             itemstack1.hurtEnemy((LivingEntity) entity, attacker);
                             if (itemstack1.isEmpty()) {
-                                net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem(attacker, copy, InteractionHand.MAIN_HAND);
+                                ItemStack copy = original.copy();
+                                FabricHooks.onPlayerDestroyItem(attacker, copy, InteractionHand.MAIN_HAND);
                                 attacker.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
                             }
                         }

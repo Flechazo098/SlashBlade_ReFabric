@@ -102,7 +102,7 @@ public class ComboState {
     }
 
     public static ResourceLocation getRegistryKey(ComboState state) {
-        return ComboStateRegistry.REGISTRY.get().getKey(state);
+        return ComboStateRegistry.COMBO_STATE.getKey(state);
     }
 
     private ComboState(Builder builder) {
@@ -143,7 +143,7 @@ public class ComboState {
 
     @Nonnull
     public ComboState checkTimeOut(LivingEntity living, float msec) {
-        return this.getTimeoutMS() < msec ? ComboStateRegistry.REGISTRY.get().getValue(this.nextOfTimeout.apply(living))
+        return this.getTimeoutMS() < msec ? ComboStateRegistry.COMBO_STATE.get(this.nextOfTimeout.apply(living))
                 : this;
     }
 

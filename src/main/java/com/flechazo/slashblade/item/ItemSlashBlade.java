@@ -92,7 +92,9 @@ public class ItemSlashBlade extends SwordItem{
 		Multimap<Attribute, AttributeModifier> result = ArrayListMultimap.create();
 
 		result.putAll(Attributes.ATTACK_DAMAGE, def.get(Attributes.ATTACK_DAMAGE));
-		result.putAll(Attributes.ATTACK_SPEED, def.get(Attributes.ATTACK_SPEED));
+		if (!def.get(Attributes.ATTACK_SPEED).isEmpty()) {
+			result.putAll(Attributes.ATTACK_SPEED, def.get(Attributes.ATTACK_SPEED));
+		}
 
 		if (slot == EquipmentSlot.MAINHAND) {
 			Optional<BladeStateComponent> state = BladeStateHelper.getBladeState(stack);

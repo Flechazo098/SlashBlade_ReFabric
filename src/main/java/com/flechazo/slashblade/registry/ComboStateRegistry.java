@@ -20,6 +20,7 @@ import com.flechazo.slashblade.util.KnockBacks;
 import com.flechazo.slashblade.util.TimeValueHelper;
 import io.github.fabricators_of_create.porting_lib.attributes.PortingLibAttributes;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
+import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
 import net.minecraft.core.DefaultedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -33,11 +34,15 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.phys.Vec3;
 
 public class ComboStateRegistry {
+    public static final ResourceLocation DEFAULT_COMBO_STATE_ID =
+            new ResourceLocation(SlashBladeRefabriced.MODID, "default");
+
     public static final ResourceKey<Registry<ComboState>> COMBO_STATE_REGISTRY_KEY =
             ResourceKey.createRegistryKey(new ResourceLocation(SlashBladeRefabriced.MODID, "combo_state"));
 
-    public static final DefaultedRegistry<ComboState> COMBO_STATE =
-            FabricRegistryBuilder.createDefaulted(COMBO_STATE_REGISTRY_KEY, COMBO_STATE_REGISTRY_KEY.location())
+    public static final Registry<ComboState> COMBO_STATE =
+            FabricRegistryBuilder.createSimple(COMBO_STATE_REGISTRY_KEY)
+                    .attribute(RegistryAttribute.SYNCED)
                     .buildAndRegister();
 
     public static final ComboState NONE = register("none", ComboState.Builder.newInstance()
