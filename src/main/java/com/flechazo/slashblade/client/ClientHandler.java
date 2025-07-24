@@ -19,7 +19,6 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
-
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -29,7 +28,7 @@ import java.util.Map;
 
 public class ClientHandler implements ClientModInitializer {
     @Override
-    public void onInitializeClient () {
+    public void onInitializeClient() {
         NetworkManager.registerClientReceivers();
 
         if (LoaderUtil.isClassAvailable("dev.kosmx.playerAnim.api.layered.AnimationStack")) {

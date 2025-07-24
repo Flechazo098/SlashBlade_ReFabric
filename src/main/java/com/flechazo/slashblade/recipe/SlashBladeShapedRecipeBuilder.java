@@ -1,19 +1,11 @@
 package com.flechazo.slashblade.recipe;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.function.Consumer;
-
-import javax.annotation.Nullable;
-
 import com.flechazo.slashblade.registry.SlashBladeRegister;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementRewards;
 import net.minecraft.advancements.CriterionTriggerInstance;
@@ -31,6 +23,12 @@ import net.minecraft.world.item.crafting.CraftingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
+
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Consumer;
 
 public class SlashBladeShapedRecipeBuilder extends CraftingRecipeBuilder implements RecipeBuilder {
     private final RecipeCategory category = RecipeCategory.COMBAT;
@@ -172,8 +170,8 @@ public class SlashBladeShapedRecipeBuilder extends CraftingRecipeBuilder impleme
         private final boolean showNotification;
 
         public Result(ResourceLocation id, Item result, int count, ResourceLocation bladeId, String group,
-                List<String> pattern, Map<Character, Ingredient> key, Advancement.Builder advancement,
-                ResourceLocation advancementId, boolean showNotification) {
+                      List<String> pattern, Map<Character, Ingredient> key, Advancement.Builder advancement,
+                      ResourceLocation advancementId, boolean showNotification) {
             super(CraftingBookCategory.EQUIPMENT);
             this.id = id;
             this.result = result;

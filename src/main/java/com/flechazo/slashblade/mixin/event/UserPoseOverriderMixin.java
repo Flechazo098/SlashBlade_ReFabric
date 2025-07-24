@@ -1,7 +1,7 @@
 package com.flechazo.slashblade.mixin.event;
 
+import com.flechazo.slashblade.capability.persistentdata.PersistentDataHelper;
 import com.flechazo.slashblade.item.ItemSlashBlade;
-import com.flechazo.slashblade.util.accessor.PersistentDataAccessor;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
@@ -30,27 +30,30 @@ public abstract class UserPoseOverriderMixin<T extends LivingEntity, M extends E
         ItemStack stack = entity.getMainHandItem();
         if (stack.isEmpty() || !(stack.getItem() instanceof ItemSlashBlade)) return;
 
+        PersistentDataHelper.getPersistentData(entity).ifPresent(persistentData -> {
+            CompoundTag tag = persistentData.getPersistentData();
 
-        CompoundTag tag = ((PersistentDataAccessor) entity).slashbladerefabriced$getPersistentData();
-        float rot = tag.getFloat("sb_yrot");
-        float rotPrev = tag.getFloat("sb_yrot_prev");
+            float rot = tag.getFloat("sb_yrot");
+            float rotPrev = tag.getFloat("sb_yrot_prev");
 
-        // 1）绕Y轴先旋转到身体朝向的反向
-        float bodyYaw = Mth.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
-        poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - bodyYaw));
+            // 1）绕Y轴先旋转到身体朝向的反向
+            float bodyYaw = Mth.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
+            poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - bodyYaw));
 
-        // 2）执行"正向"那套飞行／游泳姿态旋转
-        applyFlightSwimRot(poseStack, entity, partialTicks, true);
+            // 2）执行"正向"那套飞行／游泳姿态旋转
+            applyFlightSwimRot(poseStack, entity, partialTicks, true);
 
-        // 3）再绕Y轴旋转用户自定义角度 sb_yrot
-        poseStack.mulPose(Axis.YP.rotationDegrees(Mth.rotLerp(partialTicks, rot, rotPrev)));
+            // 3）再绕Y轴旋转用户自定义角度 sb_yrot
+            poseStack.mulPose(Axis.YP.rotationDegrees(Mth.rotLerp(partialTicks, rot, rotPrev)));
 
-        // 4）执行"反向"那套飞行／游泳姿态旋转
-        applyFlightSwimRot(poseStack, entity, partialTicks, false);
+            // 4）执行"反向"那套飞行／游泳姿态旋转
+            applyFlightSwimRot(poseStack, entity, partialTicks, false);
 
-        // 5）恢复身体原向（180° - bodyYaw）
-        poseStack.mulPose(Axis.YN.rotationDegrees(180.0F - bodyYaw));
+            // 5）恢复身体原向（180° - bodyYaw）
+            poseStack.mulPose(Axis.YN.rotationDegrees(180.0F - bodyYaw));
+        });
     }
+
 
     @Unique
     private static <T extends LivingEntity> void applyFlightSwimRot(PoseStack matrices, T entity, float partialTicks, boolean isPositive) {
@@ -70,7 +73,7 @@ public abstract class UserPoseOverriderMixin<T extends LivingEntity, M extends E
             if (d0 > 0 && d1 > 0) {
                 double dot = (motion.x * view.x + motion.z * view.z) / Math.sqrt(d0 * d1);
                 double cross = motion.x * view.z - motion.z * view.x;
-                matrices.mulPose(Axis.YP.rotation((float)(np * Math.signum(cross) * Math.acos(dot))));
+                matrices.mulPose(Axis.YP.rotation((float) (np * Math.signum(cross) * Math.acos(dot))));
             }
         } else if (swim > 0.0F) {
             float f3 = entity.isInWater() ? -90.0F - entity.getXRot() : -90.0F;

@@ -1,7 +1,7 @@
 package com.flechazo.slashblade.event;
 
+import com.flechazo.slashblade.capability.persistentdata.PersistentDataHelper;
 import com.flechazo.slashblade.util.NBTHelper;
-import com.flechazo.slashblade.util.accessor.PersistentDataAccessor;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 
@@ -26,8 +26,11 @@ public class KnockBackHandler {
     }
 
     static public void setFactor(LivingEntity target, double horizontalFactor, double verticalFactor,
-            double addFallDistance) {
-        NBTHelper.putVector3d(((PersistentDataAccessor) target).slashbladerefabriced$getPersistentData(), NBT_KEY,
-                new Vec3(horizontalFactor, verticalFactor, addFallDistance));
+                                 double addFallDistance) {
+        PersistentDataHelper.getPersistentData(target).ifPresent(persistentData -> {
+            NBTHelper.putVector3d(persistentData.getPersistentData(), NBT_KEY,
+                    new Vec3(horizontalFactor, verticalFactor, addFallDistance));
+        });
     }
+
 }

@@ -10,16 +10,16 @@ import net.minecraft.world.item.enchantment.Enchantments;
 
 public class SlashBladeEventHandler {
 
-	public static void onLivingOnFire(LivingAttackEvent event) {
-		LivingEntity victim = event.getEntity();
-		DamageSource source = event.getSource();
+    public static void onLivingOnFire(LivingAttackEvent event) {
+        LivingEntity victim = event.getEntity();
+        DamageSource source = event.getSource();
 
-		ItemStack stack = victim.getMainHandItem();
-		if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FIRE_PROTECTION, stack) <= 0)
-			return;
-		if (!source.is(DamageTypeTags.IS_FIRE))
-			return;
+        ItemStack stack = victim.getMainHandItem();
+        if (EnchantmentHelper.getItemEnchantmentLevel(Enchantments.FIRE_PROTECTION, stack) <= 0)
+            return;
+        if (!source.is(DamageTypeTags.IS_FIRE))
+            return;
 
-		event.setCanceled(true);
-	}
+        event.setCanceled(true);
+    }
 }

@@ -21,10 +21,7 @@ public class ArrowReflector {
     static public boolean isMatch(Entity arrow, Entity attacker) {
         if (arrow == null)
             return false;
-        if (!(arrow instanceof Projectile))
-            return false;
-
-        return true;
+        return arrow instanceof Projectile;
     }
 
     static public void doReflect(Entity arrow, Entity attacker) {

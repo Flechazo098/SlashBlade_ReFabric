@@ -24,7 +24,7 @@ public class MixinBlockBehaviour {
     @SuppressWarnings("deprecation")
     @Inject(at = @At("HEAD"), method = "getCollisionShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;", cancellable = true, remap = true)
     public void getCollisionShape(BlockGetter p_60743_, BlockPos p_60744_, CollisionContext p_60745_,
-            CallbackInfoReturnable<VoxelShape> callback) {
+                                  CallbackInfoReturnable<VoxelShape> callback) {
         if (!(asState().is(BlockTags.LEAVES)))
             return;
         if (p_60745_.isDescending())
@@ -47,7 +47,7 @@ public class MixinBlockBehaviour {
     @SuppressWarnings("deprecation")
     @Inject(at = @At("HEAD"), method = "getVisualShape(Lnet/minecraft/world/level/BlockGetter;Lnet/minecraft/core/BlockPos;Lnet/minecraft/world/phys/shapes/CollisionContext;)Lnet/minecraft/world/phys/shapes/VoxelShape;", cancellable = true, remap = true)
     public void getVisualShape(BlockGetter p_60743_, BlockPos p_60744_, CollisionContext p_60745_,
-            CallbackInfoReturnable<VoxelShape> callback) {
+                               CallbackInfoReturnable<VoxelShape> callback) {
         if (!(asState().is(BlockTags.LEAVES)))
             return;
 
@@ -59,5 +59,6 @@ public class MixinBlockBehaviour {
     @Shadow
     protected BlockState asState() {
         throw new IllegalStateException("Mixin failed to shadow asState()");
-    };
+    }
+
 }

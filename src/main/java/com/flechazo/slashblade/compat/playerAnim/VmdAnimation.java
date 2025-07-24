@@ -1,5 +1,8 @@
 package com.flechazo.slashblade.compat.playerAnim;
 
+import com.flechazo.slashblade.SlashBladeRefabriced;
+import com.flechazo.slashblade.client.renderer.model.BladeMotionManager;
+import com.flechazo.slashblade.util.TimeValueHelper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import dev.kosmx.playerAnim.api.TransformType;
@@ -12,9 +15,6 @@ import jp.nyatla.nymmd.MmdPmdModelMc;
 import jp.nyatla.nymmd.MmdVmdMotionMc;
 import jp.nyatla.nymmd.core.PmdBone;
 import jp.nyatla.nymmd.types.MmdVector3;
-import com.flechazo.slashblade.SlashBladeRefabriced;
-import com.flechazo.slashblade.client.renderer.model.BladeMotionManager;
-import com.flechazo.slashblade.util.TimeValueHelper;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Quaterniond;
@@ -23,7 +23,6 @@ import org.joml.Vector3f;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.Math;
 import java.util.List;
 import java.util.Map;
 
@@ -147,7 +146,7 @@ public class VmdAnimation implements IAnimation {
 
     @Override
     public @NotNull Vec3f get3DTransform(@NotNull String modelName, @NotNull TransformType type, float tickDelta,
-            @NotNull Vec3f value0) {
+                                         @NotNull Vec3f value0) {
         this.setupAnim(tickDelta);
 
         double motionScale = 1.0 / 16.0;
@@ -174,34 +173,34 @@ public class VmdAnimation implements IAnimation {
 
         if (bone != null) {
             switch (type) {
-            case POSITION: {
-                MmdVector3 org = bone.m_vec3Position;
-                Vector3f tmp = new Vector3f(org.x, org.y, org.z);
-                if (modelName.equals("body")) {
-                    tmp = tmp.mul(bodyScale);
-                } else {
-                    tmp = tmp.mul(1, -1, 1);
+                case POSITION: {
+                    MmdVector3 org = bone.m_vec3Position;
+                    Vector3f tmp = new Vector3f(org.x, org.y, org.z);
+                    if (modelName.equals("body")) {
+                        tmp = tmp.mul(bodyScale);
+                    } else {
+                        tmp = tmp.mul(1, -1, 1);
+                    }
+
+                    tmp.mul(finalizeScale).add(blend);
+                    return new Vec3f(tmp.x, tmp.y, tmp.z);
                 }
+                case ROTATION: {
+                    Quaterniond qt = new Quaterniond(bone.m_vec4Rotate.x, bone.m_vec4Rotate.y, bone.m_vec4Rotate.z,
+                            bone.m_vec4Rotate.w);
+                    Vector3d tmp = QuaternionToEulerZYX(qt);
 
-                tmp.mul(finalizeScale).add(blend);
-                return new Vec3f(tmp.x, tmp.y, tmp.z);
-            }
-            case ROTATION: {
-                Quaterniond qt = new Quaterniond(bone.m_vec4Rotate.x, bone.m_vec4Rotate.y, bone.m_vec4Rotate.z,
-                        bone.m_vec4Rotate.w);
-                Vector3d tmp = QuaternionToEulerZYX(qt);
+                    if (modelName.equals("body")) {
+                        tmp = tmp.mul(1, -1, -1);
+                    } else {
+                        tmp = tmp.mul(-1, 1, -1);
+                    }
 
-                if (modelName.equals("body")) {
-                    tmp = tmp.mul(1, -1, -1);
-                } else {
-                    tmp = tmp.mul(-1, 1, -1);
+                    tmp.add(blend);
+                    return new Vec3f((float) tmp.x, (float) tmp.y, (float) tmp.z);
                 }
-
-                tmp.add(blend);
-                return new Vec3f((float) tmp.x, (float) tmp.y, (float) tmp.z);
-            }
-            default:
-                break;
+                default:
+                    break;
             }
         }
         /**/
@@ -209,25 +208,25 @@ public class VmdAnimation implements IAnimation {
         /*
          * int idx = mmp.getBoneIndexByName(boneName); if (0 <= idx) { float[] buf = new
          * float[16]; mmp._skinning_mat[idx].getValue(buf);
-         * 
+         *
          * Matrix4f mat = VectorHelper.matrix4fFromArray(buf); mat = (new
          * Matrix4f()).scale(1, -1, 1).mul(mat).scale(1,-1,1).scale((float)scale);
          * //mat.transpose();
-         * 
+         *
          * switch (type){ case POSITION -> { Vector3f tmp = new Vector3f();
          * mat.getTranslation(tmp); MmdVector3 vec = bone._pmd_bone_position;
-         * 
+         *
          * return new Vec3f(tmp.x,tmp.y,tmp.z).add(value0); } case ROTATION -> {
-         * 
+         *
          * Quaternionf qt = new
          * Quaternionf(bone.m_vec4Rotate.x,bone.m_vec4Rotate.y,bone.m_vec4Rotate.z,bone.
          * m_vec4Rotate.w); Vector3f tmp = new Vector3f(); qt.getEulerAnglesXYZ(tmp);
-         * 
+         *
          * return new Vec3f(tmp.x,tmp.y,tmp.z);
-         * 
+         *
          * //Vector3f tmp = new Vector3f(); //mat = mat; //mat.getEulerAnglesZYX(tmp);
          * //return new Vec3f(tmp.x,tmp.y,tmp.z);
-         * 
+         *
          * } } } /
          **/
 

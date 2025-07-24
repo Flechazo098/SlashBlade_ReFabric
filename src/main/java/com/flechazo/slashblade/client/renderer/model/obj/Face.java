@@ -6,16 +6,15 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-
-import java.awt.*;
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
-
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
+
+import java.awt.*;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 public class Face {
     public static boolean isSmoothShade = true;

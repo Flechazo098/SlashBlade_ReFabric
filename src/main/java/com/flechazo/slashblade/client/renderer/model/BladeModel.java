@@ -10,6 +10,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.block.state.BlockState;
+
 import java.util.List;
 
 /**
@@ -33,7 +34,7 @@ public class BladeModel implements BakedModel {
     @SuppressWarnings("deprecation")
     @Override
     public List<BakedQuad> getQuads(@org.jetbrains.annotations.Nullable BlockState p_235039_,
-            @org.jetbrains.annotations.Nullable Direction p_235040_, RandomSource p_235041_) {
+                                    @org.jetbrains.annotations.Nullable Direction p_235040_, RandomSource p_235041_) {
         return original.getQuads(p_235039_, p_235040_, p_235041_);
     }
 
@@ -66,17 +67,17 @@ public class BladeModel implements BakedModel {
     }
 
     @Override
-    public ItemTransforms getTransforms () {
+    public ItemTransforms getTransforms() {
         return null;
     }
 
     /*
      * ItemCameraTransforms tf = new
      * ItemCameraTransforms(ItemCameraTransforms.DEFAULT){
-     * 
+     *
      * @Override public ItemTransformVec3f getTransform(TransformType srctype) {
      * type = srctype; return super.getTransform(srctype); } } ;
-     * 
+     *
      * @Override public ItemCameraTransforms getItemCameraTransforms() { return tf;
      * }
      */

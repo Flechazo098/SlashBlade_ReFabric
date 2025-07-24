@@ -1,22 +1,16 @@
 package com.flechazo.slashblade.recipe;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import com.flechazo.slashblade.SlashBladeRefabriced;
+import com.flechazo.slashblade.capability.slashblade.BladeStateComponentImpl;
 import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
+import com.flechazo.slashblade.item.SwordType;
+import com.flechazo.slashblade.registry.slashblade.EnchantmentDefinition;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
-import com.flechazo.slashblade.SlashBladeRefabriced;
-import com.flechazo.slashblade.capability.slashblade.BladeStateComponentImpl;
-import com.flechazo.slashblade.item.ItemSlashBlade;
-import com.flechazo.slashblade.item.SwordType;
-import com.flechazo.slashblade.registry.slashblade.EnchantmentDefinition;
 import net.minecraft.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
@@ -24,18 +18,22 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class RequestDefinition {
 
     public static final Codec<RequestDefinition> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            ResourceLocation.CODEC.optionalFieldOf("name", SlashBladeRefabriced.prefix("none"))
-                    .forGetter(RequestDefinition::getName),
-            Codec.INT.optionalFieldOf("proud_soul", 0).forGetter(RequestDefinition::getProudSoulCount),
-            Codec.INT.optionalFieldOf("kill", 0).forGetter(RequestDefinition::getKillCount),
-            Codec.INT.optionalFieldOf("refine", 0).forGetter(RequestDefinition::getRefineCount),
-            EnchantmentDefinition.CODEC.listOf().optionalFieldOf("enchantments", Lists.newArrayList())
-                    .forGetter(RequestDefinition::getEnchantments),
-            SwordType.CODEC.listOf().optionalFieldOf("sword_type", Lists.newArrayList())
-                    .forGetter(RequestDefinition::getDefaultType))
+                    ResourceLocation.CODEC.optionalFieldOf("name", SlashBladeRefabriced.prefix("none"))
+                            .forGetter(RequestDefinition::getName),
+                    Codec.INT.optionalFieldOf("proud_soul", 0).forGetter(RequestDefinition::getProudSoulCount),
+                    Codec.INT.optionalFieldOf("kill", 0).forGetter(RequestDefinition::getKillCount),
+                    Codec.INT.optionalFieldOf("refine", 0).forGetter(RequestDefinition::getRefineCount),
+                    EnchantmentDefinition.CODEC.listOf().optionalFieldOf("enchantments", Lists.newArrayList())
+                            .forGetter(RequestDefinition::getEnchantments),
+                    SwordType.CODEC.listOf().optionalFieldOf("sword_type", Lists.newArrayList())
+                            .forGetter(RequestDefinition::getDefaultType))
             .apply(instance, RequestDefinition::new));
 
     private final ResourceLocation name;
@@ -46,7 +44,7 @@ public class RequestDefinition {
     private final List<SwordType> defaultType;
 
     public RequestDefinition(ResourceLocation name, int proud, int kill, int refine,
-            List<EnchantmentDefinition> enchantments, List<SwordType> defaultType) {
+                             List<EnchantmentDefinition> enchantments, List<SwordType> defaultType) {
         this.name = name;
         this.proudSoulCount = proud;
         this.killCount = kill;
@@ -126,27 +124,27 @@ public class RequestDefinition {
         state.setProudSoulCount(getProudSoulCount());
         state.setKillCount(getKillCount());
         state.setRefine(getRefineCount());
-        
+
         this.getEnchantments()
                 .forEach(enchantment -> blade.enchant(
                         BuiltInRegistries.ENCHANTMENT.get(enchantment.getEnchantmentID()),
                         enchantment.getEnchantmentLevel()));
         this.defaultType.forEach(type -> {
             switch (type) {
-            case BEWITCHED -> state.setDefaultBewitched(true);
-            case BROKEN -> {
-                blade.setDamageValue(blade.getMaxDamage() - 1);
-                state.setBroken(true);
-            }
-            case SEALED -> state.setSealed(true);
-            default -> {}
+                case BEWITCHED -> state.setDefaultBewitched(true);
+                case BROKEN -> {
+                    blade.setDamageValue(blade.getMaxDamage() - 1);
+                    state.setBroken(true);
+                }
+                case SEALED -> state.setSealed(true);
+                default -> {
+                }
             }
         });
-        
+
         blade.getOrCreateTag().put("bladeState", state.getActiveState());
     }
-    
-    
+
 
     public boolean test(ItemStack blade) {
         if (blade == null || blade.isEmpty())
@@ -185,8 +183,8 @@ public class RequestDefinition {
         private int proudCount;
         private int killCount;
         private int refineCount;
-        private List<EnchantmentDefinition> enchantments;
-        private List<SwordType> defaultType;
+        private final List<EnchantmentDefinition> enchantments;
+        private final List<SwordType> defaultType;
 
         private Builder() {
             this.name = SlashBladeRefabriced.prefix("none");

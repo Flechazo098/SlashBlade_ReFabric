@@ -1,14 +1,14 @@
 package com.flechazo.slashblade.event.client;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.flechazo.slashblade.client.renderer.model.obj.WavefrontObject;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 @Environment(EnvType.CLIENT)
 public class RenderOverrideEvent {
@@ -31,8 +31,8 @@ public class RenderOverrideEvent {
     }
 
     @Environment(EnvType.CLIENT)
-        public record RenderOverrideResult(WavefrontObject model, String target, ResourceLocation texture,
-                                           boolean cancelled) {
+    public record RenderOverrideResult(WavefrontObject model, String target, ResourceLocation texture,
+                                       boolean cancelled) {
     }
 
     public static RenderOverrideResult onRenderOverride(ItemStack stack, WavefrontObject model, String target,

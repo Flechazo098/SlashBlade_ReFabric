@@ -1,10 +1,10 @@
 package com.flechazo.slashblade.client.renderer.gui;
 
+import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponent;
 import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankHelper;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.flechazo.slashblade.SlashBladeRefabriced;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
@@ -100,9 +100,9 @@ public class RankRenderer {
 
                 // GL11.glScalef(3,3,3);
                 // iconFrame
-                drawTexturedQuad(poseStack, 0, 0, 0 + textOffset + 64, rankOffset, 64, 32, -95f);
+                drawTexturedQuad(poseStack, 0, 0, textOffset + 64, rankOffset, 64, 32, -95f);
                 // icon
-                drawTexturedQuad(poseStack, 0, progressIconInv + 7, 0 + textOffset, rankOffset + progressIconInv + 7,
+                drawTexturedQuad(poseStack, 0, progressIconInv + 7, textOffset, rankOffset + progressIconInv + 7,
                         64, progressIcon, -90f);
 
                 // gauge frame
@@ -116,7 +116,7 @@ public class RankRenderer {
     }
 
     public static void drawTexturedQuad(PoseStack poseStack, int x, int y, int u, int v, int width, int height,
-            float zLevel) {
+                                        float zLevel) {
         float var7 = 0.00390625F; // 1/256 texturesize
         float var8 = 0.00390625F;
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
@@ -127,10 +127,10 @@ public class RankRenderer {
 
         Matrix4f m = poseStack.last().pose();
 
-        wr.vertex(m, x + 0, y + height, zLevel).uv((u + 0.0f) * var7, (v + height) * var8).endVertex();
+        wr.vertex(m, x, y + height, zLevel).uv((u + 0.0f) * var7, (v + height) * var8).endVertex();
         wr.vertex(m, x + width, y + height, zLevel).uv((u + width) * var7, (v + height) * var8).endVertex();
-        wr.vertex(m, x + width, y + 0, zLevel).uv((u + width) * var7, (v + 0) * var8).endVertex();
-        wr.vertex(m, x + 0, y + 0, zLevel).uv((u + 0) * var7, (v + 0) * var8).endVertex();
+        wr.vertex(m, x + width, y, zLevel).uv((u + width) * var7, (v) * var8).endVertex();
+        wr.vertex(m, x, y, zLevel).uv((u) * var7, (v) * var8).endVertex();
 
         // tessellator.end();
         BufferUploader.drawWithShader(wr.end());

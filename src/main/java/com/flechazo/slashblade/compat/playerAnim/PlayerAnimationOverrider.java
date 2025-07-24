@@ -1,21 +1,21 @@
 package com.flechazo.slashblade.compat.playerAnim;
 
+import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.event.BladeMotionEvent;
+import com.flechazo.slashblade.init.DefaultResources;
+import com.flechazo.slashblade.registry.ComboStateRegistry;
 import com.google.common.collect.Maps;
 import dev.kosmx.playerAnim.api.layered.AnimationStack;
 import dev.kosmx.playerAnim.minecraftApi.PlayerAnimationAccess;
-import com.flechazo.slashblade.SlashBladeRefabriced;
-import com.flechazo.slashblade.init.DefaultResources;
-import com.flechazo.slashblade.registry.ComboStateRegistry;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.Map;
 
 public class PlayerAnimationOverrider {
-    private Map<ResourceLocation, VmdAnimation> animation = initAnimations();
+    private final Map<ResourceLocation, VmdAnimation> animation = initAnimations();
 
-	private static final class SingletonHolder {
+    private static final class SingletonHolder {
         private static final PlayerAnimationOverrider instance = new PlayerAnimationOverrider();
     }
 
@@ -28,17 +28,17 @@ public class PlayerAnimationOverrider {
 
     public void register() {
         BladeMotionEvent.BLADE_MOTION.register(event -> {
-        if (!(event.getEntity() instanceof AbstractClientPlayer player))
-            return;
+            if (!(event.getEntity() instanceof AbstractClientPlayer player))
+                return;
 
-        AnimationStack animationStack = PlayerAnimationAccess.getPlayerAnimLayer(player);
+            AnimationStack animationStack = PlayerAnimationAccess.getPlayerAnimLayer(player);
 
-        VmdAnimation animation = this.getAnimation().get(event.getCombo());
+            VmdAnimation animation = this.getAnimation().get(event.getCombo());
 
-        if (animation != null) {
-            animationStack.removeLayer(0);
-            animation.play();
-            animationStack.addAnimLayer(0, animation.getClone());
+            if (animation != null) {
+                animationStack.removeLayer(0);
+                animation.play();
+                animationStack.addAnimLayer(0, animation.getClone());
             }
         });
     }
@@ -47,8 +47,8 @@ public class PlayerAnimationOverrider {
             "model/pa/player_motion.vmd");
 
     public Map<ResourceLocation, VmdAnimation> getAnimation() {
-		return animation;
-	}
+        return animation;
+    }
 
 
     private Map<ResourceLocation, VmdAnimation> initAnimations() {
@@ -56,7 +56,7 @@ public class PlayerAnimationOverrider {
 
         map.put(ComboStateRegistry.PIERCING.getId(), new VmdAnimation(DefaultResources.testPLLocation, 6, 92, false));
         map.put(ComboStateRegistry.PIERCING_JUST.getId(), new VmdAnimation(DefaultResources.testPLLocation, 37, 92, false));
-        
+
         // guard
         map.put(ComboStateRegistry.COMBO_A1_END2.getId(), new VmdAnimation(MotionLocation, 21, 41, false));
 

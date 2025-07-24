@@ -1,60 +1,62 @@
 package com.flechazo.slashblade.registry.combo;
 
-import com.flechazo.slashblade.capability.slashblade.BladeStateComponent;
-import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
-import com.flechazo.slashblade.util.AdvancementHelper;
-import com.flechazo.slashblade.util.TimeValueHelper;
-import com.google.common.collect.*;
-
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.ability.ArrowReflector;
+import com.flechazo.slashblade.capability.slashblade.BladeStateComponent;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.init.DefaultResources;
-import com.flechazo.slashblade.item.ItemSlashBlade;
 import com.flechazo.slashblade.registry.ComboStateRegistry;
 import com.flechazo.slashblade.slasharts.SlashArts;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.entity.LivingEntity;
+import com.flechazo.slashblade.util.AdvancementHelper;
+import com.flechazo.slashblade.util.TimeValueHelper;
+import com.google.common.collect.Maps;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+
 import javax.annotation.Nonnull;
-import java.util.*;
-import java.util.function.*;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class ComboState {
     public static final ResourceKey<Registry<ComboState>> REGISTRY_KEY = ResourceKey
             .createRegistryKey(new ResourceLocation(SlashBladeRefabriced.MODID, "combo_state"));
 
-    private ResourceLocation motionLoc;
+    private final ResourceLocation motionLoc;
 
     // frame
-    private int start;
+    private final int start;
     // frame
-    private int end;
+    private final int end;
 
-    private float speed;
-    private boolean loop;
+    private final float speed;
+    private final boolean loop;
 
     // Next input acceptance period *ms
     public int timeout;
 
-    private Function<LivingEntity, ResourceLocation> next;
-    private Function<LivingEntity, ResourceLocation> nextOfTimeout;
+    private final Function<LivingEntity, ResourceLocation> next;
+    private final Function<LivingEntity, ResourceLocation> nextOfTimeout;
 
-    private Consumer<LivingEntity> holdAction;
+    private final Consumer<LivingEntity> holdAction;
 
-    private Consumer<LivingEntity> tickAction;
+    private final Consumer<LivingEntity> tickAction;
 
-    private BiConsumer<LivingEntity, LivingEntity> hitEffect;
+    private final BiConsumer<LivingEntity, LivingEntity> hitEffect;
 
-    private Consumer<LivingEntity> clickAction;
+    private final Consumer<LivingEntity> clickAction;
 
-    private BiFunction<LivingEntity, Integer, SlashArts.ArtsType> releaseAction;
+    private final BiFunction<LivingEntity, Integer, SlashArts.ArtsType> releaseAction;
 
-    private boolean isAerial;
+    private final boolean isAerial;
 
-    private int priority;
+    private final int priority;
 
     public ResourceLocation getMotionLoc() {
         return motionLoc;
@@ -360,6 +362,7 @@ public class ComboState {
         }
 
     }
+
     public ResourceLocation getId() {
         return ComboStateRegistry.COMBO_STATE.getKey(this);
     }

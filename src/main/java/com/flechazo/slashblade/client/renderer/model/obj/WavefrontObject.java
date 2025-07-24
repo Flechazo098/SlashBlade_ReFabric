@@ -21,18 +21,18 @@ import java.util.regex.Pattern;
  */
 public class WavefrontObject {
 
-    private static Pattern vertexPattern = Pattern
+    private static final Pattern vertexPattern = Pattern
             .compile("(v( (\\-){0,1}\\d+(\\.\\d+)?){3,4} *\\n)|(v( (\\-){0,1}\\d+(\\.\\d+)?){3,4} *$)");
-    private static Pattern vertexNormalPattern = Pattern
+    private static final Pattern vertexNormalPattern = Pattern
             .compile("(vn( (\\-){0,1}\\d+(\\.\\d+)?){3,4} *\\n)|(vn( (\\-){0,1}\\d+(\\.\\d+)?){3,4} *$)");
-    private static Pattern textureCoordinatePattern = Pattern
+    private static final Pattern textureCoordinatePattern = Pattern
             .compile("(vt( (\\-){0,1}\\d+\\.\\d+){2,3} *\\n)|(vt( (\\-){0,1}\\d+(\\.\\d+)?){2,3} *$)");
-    private static Pattern face_V_VT_VN_Pattern = Pattern
+    private static final Pattern face_V_VT_VN_Pattern = Pattern
             .compile("(f( \\d+/\\d+/\\d+){3,4} *\\n)|(f( \\d+/\\d+/\\d+){3,4} *$)");
-    private static Pattern face_V_VT_Pattern = Pattern.compile("(f( \\d+/\\d+){3,4} *\\n)|(f( \\d+/\\d+){3,4} *$)");
-    private static Pattern face_V_VN_Pattern = Pattern.compile("(f( \\d+//\\d+){3,4} *\\n)|(f( \\d+//\\d+){3,4} *$)");
-    private static Pattern face_V_Pattern = Pattern.compile("(f( \\d+){3,4} *\\n)|(f( \\d+){3,4} *$)");
-    private static Pattern groupObjectPattern = Pattern.compile("([go]( [\\w\\d\\.]+) *\\n)|([go]( [\\w\\d\\.]+) *$)");
+    private static final Pattern face_V_VT_Pattern = Pattern.compile("(f( \\d+/\\d+){3,4} *\\n)|(f( \\d+/\\d+){3,4} *$)");
+    private static final Pattern face_V_VN_Pattern = Pattern.compile("(f( \\d+//\\d+){3,4} *\\n)|(f( \\d+//\\d+){3,4} *$)");
+    private static final Pattern face_V_Pattern = Pattern.compile("(f( \\d+){3,4} *\\n)|(f( \\d+){3,4} *$)");
+    private static final Pattern groupObjectPattern = Pattern.compile("([go]( [\\w\\d\\.]+) *\\n)|([go]( [\\w\\d\\.]+) *$)");
 
     private static Matcher vertexMatcher, vertexNormalMatcher, textureCoordinateMatcher;
     private static Matcher face_V_VT_VN_Matcher, face_V_VT_Matcher, face_V_VN_Matcher, face_V_Matcher;
@@ -43,7 +43,7 @@ public class WavefrontObject {
     public ArrayList<TextureCoordinate> textureCoordinates = new ArrayList<TextureCoordinate>();
     public ArrayList<GroupObject> groupObjects = new ArrayList<GroupObject>();
     private GroupObject currentGroupObject;
-    private String fileName;
+    private final String fileName;
 
     public WavefrontObject(ResourceLocation resource) throws ModelFormatException {
         this.fileName = resource.toString();
@@ -168,6 +168,7 @@ public class WavefrontObject {
             for (String excludedGroupName : excludedGroupNames) {
                 if (excludedGroupName.equalsIgnoreCase(groupObject.name)) {
                     exclude = true;
+                    break;
                 }
             }
             if (!exclude) {
@@ -359,7 +360,7 @@ public class WavefrontObject {
 
     /***
      * Verifies that the given line from the model file is a valid vertex
-     * 
+     *
      * @param line the line being validated
      * @return true if the line is a valid vertex, false otherwise
      */
@@ -374,7 +375,7 @@ public class WavefrontObject {
 
     /***
      * Verifies that the given line from the model file is a valid vertex normal
-     * 
+     *
      * @param line the line being validated
      * @return true if the line is a valid vertex normal, false otherwise
      */
@@ -390,7 +391,7 @@ public class WavefrontObject {
     /***
      * Verifies that the given line from the model file is a valid texture
      * coordinate
-     * 
+     *
      * @param line the line being validated
      * @return true if the line is a valid texture coordinate, false otherwise
      */
@@ -406,7 +407,7 @@ public class WavefrontObject {
     /***
      * Verifies that the given line from the model file is a valid face that is
      * described by vertices, texture coordinates, and vertex normals
-     * 
+     *
      * @param line the line being validated
      * @return true if the line is a valid face that matches the format "f
      *         v1/vt1/vn1 ..." (with a minimum of 3 points in the face, and a
@@ -424,7 +425,7 @@ public class WavefrontObject {
     /***
      * Verifies that the given line from the model file is a valid face that is
      * described by vertices and texture coordinates
-     * 
+     *
      * @param line the line being validated
      * @return true if the line is a valid face that matches the format "f v1/vt1
      *         ..." (with a minimum of 3 points in the face, and a maximum of 4),
@@ -442,7 +443,7 @@ public class WavefrontObject {
     /***
      * Verifies that the given line from the model file is a valid face that is
      * described by vertices and vertex normals
-     * 
+     *
      * @param line the line being validated
      * @return true if the line is a valid face that matches the format "f v1//vn1
      *         ..." (with a minimum of 3 points in the face, and a maximum of 4),
@@ -460,7 +461,7 @@ public class WavefrontObject {
     /***
      * Verifies that the given line from the model file is a valid face that is
      * described by only vertices
-     * 
+     *
      * @param line the line being validated
      * @return true if the line is a valid face that matches the format "f v1 ..."
      *         (with a minimum of 3 points in the face, and a maximum of 4), false
@@ -478,7 +479,7 @@ public class WavefrontObject {
     /***
      * Verifies that the given line from the model file is a valid face of any of
      * the possible face formats
-     * 
+     *
      * @param line the line being validated
      * @return true if the line is a valid face that matches any of the valid face
      *         formats, false otherwise
@@ -490,7 +491,7 @@ public class WavefrontObject {
 
     /***
      * Verifies that the given line from the model file is a valid group (or object)
-     * 
+     *
      * @param line the line being validated
      * @return true if the line is a valid group (or object), false otherwise
      */

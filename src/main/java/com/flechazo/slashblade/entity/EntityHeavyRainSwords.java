@@ -1,11 +1,10 @@
 package com.flechazo.slashblade.entity;
 
-import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.ability.StunManager;
+import com.flechazo.slashblade.capability.persistentdata.PersistentDataHelper;
 import com.flechazo.slashblade.network.util.PlayMessages;
 import com.flechazo.slashblade.registry.EntityTypeRegister;
 import com.flechazo.slashblade.util.KnockBacks;
-import com.flechazo.slashblade.util.accessor.PersistentDataAccessor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -29,12 +28,13 @@ public class EntityHeavyRainSwords extends EntityAbstractSummonedSword {
 
         this.setPierce((byte) 5);
 
-        CompoundTag compoundtag = ((PersistentDataAccessor) this).slashbladerefabriced$getPersistentData();
-        ListTag listtag = compoundtag.getList("CustomPotionEffects", 9);
-        MobEffectInstance mobeffectinstance = new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 10);
-        listtag.add(mobeffectinstance.save(new CompoundTag()));
-        ((PersistentDataAccessor) this).slashbladerefabriced$getPersistentData().put("CustomPotionEffects", listtag);
-
+        PersistentDataHelper.getPersistentData(this).ifPresent(persistentData -> {
+            CompoundTag compoundtag = persistentData.getPersistentData();
+            ListTag listtag = compoundtag.getList("CustomPotionEffects", 9);
+            MobEffectInstance mobeffectinstance = new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 10);
+            listtag.add(mobeffectinstance.save(new CompoundTag()));
+            compoundtag.put("CustomPotionEffects", listtag);
+        });
     }
 
     @Override
@@ -88,7 +88,7 @@ public class EntityHeavyRainSwords extends EntityAbstractSummonedSword {
 
         // this.startRiding()
         this.setDeltaMovement(Vec3.ZERO);
-            this.baseTick();
+        this.baseTick();
 
         faceEntityStandby();
         // this.getVehicle().positionRider(this);

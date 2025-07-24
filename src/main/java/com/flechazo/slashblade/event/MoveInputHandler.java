@@ -14,6 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.Level;
+
 import java.util.EnumSet;
 
 
@@ -51,11 +52,11 @@ public class MoveInputHandler {
 
         if (player.input.shiftKeyDown)
             commands.add(InputCommand.SNEAK);
-        
+
         if (player.input.jumping) {
             commands.add(InputCommand.JUMP);
         }
-        
+
         final Minecraft minecraftInstance = Minecraft.getInstance();
 
         if (SlashBladeKeyMappings.KEY_SPECIAL_MOVE.isDown())

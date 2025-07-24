@@ -26,10 +26,10 @@ public abstract class SneakingMotionCancellerMixin {
         if (stack.isEmpty() || !(stack.getItem() instanceof ItemSlashBlade)) return;
 
         if (player.isCrouching()) {
-            PlayerModel<AbstractClientPlayer> model = ((PlayerRenderer)(Object)this).getModel();
+            PlayerModel<AbstractClientPlayer> model = ((PlayerRenderer) (Object) this).getModel();
             model.crouching = false;
 
-            Vec3 offset = ((PlayerRenderer)(Object)this).getRenderOffset(player, tickDelta).scale(-1);
+            Vec3 offset = ((PlayerRenderer) (Object) this).getRenderOffset(player, tickDelta).scale(-1);
             poseStack.translate(offset.x, offset.y, offset.z);
         }
     }

@@ -1,6 +1,5 @@
 package com.flechazo.slashblade.entity;
 
-import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.ability.StunManager;
 import com.flechazo.slashblade.network.util.PlayMessages;
 import com.flechazo.slashblade.registry.EntityTypeRegister;
@@ -60,13 +59,13 @@ public class EntityStormSwords extends EntityAbstractSummonedSword {
             if (target != null) {
                 dir = target.position().subtract(this.position()).multiply(1, 0, 1).normalize();
             }
-            ((EntityStormSwords) this).shoot(dir.x, dir.y, dir.z, 3.0f, 1.0f);
+            this.shoot(dir.x, dir.y, dir.z, 3.0f, 1.0f);
             return;
         }
 
         // this.startRiding()
         this.setDeltaMovement(Vec3.ZERO);
-            this.baseTick();
+        this.baseTick();
 
         faceEntityStandby();
         // this.getVehicle().positionRider(this);
@@ -91,7 +90,7 @@ public class EntityStormSwords extends EntityAbstractSummonedSword {
         }
 
         if (raytraceresult != null && raytraceresult.getType() == HitResult.Type.ENTITY) {
-            Entity entity = ((EntityHitResult) raytraceresult).getEntity();
+            Entity entity = raytraceresult.getEntity();
             Entity entity1 = this.getShooter();
             if (entity instanceof Player && entity1 instanceof Player
                     && !((Player) entity1).canHarmPlayer((Player) entity)) {
@@ -101,7 +100,7 @@ public class EntityStormSwords extends EntityAbstractSummonedSword {
         }
 
         if (raytraceresult != null && raytraceresult.getType() == HitResult.Type.ENTITY
-                && ! EntityEventFactory.onProjectileImpact(this, raytraceresult)) {
+                && !EntityEventFactory.onProjectileImpact(this, raytraceresult)) {
             this.onHit(raytraceresult);
             this.resetAlreadyHits();
             this.hasImpulse = true;

@@ -30,7 +30,7 @@ public class MobSpawnMixin {
 
         LivingEntity entity = (LivingEntity) (Object) this;
         ItemStack held = entity.getItemBySlot(EquipmentSlot.MAINHAND);
-        if(!held.isEmpty()) return;
+        if (!held.isEmpty()) return;
 
         RandomSource random = world.getRandom();
         float multiplier = difficulty.getSpecialMultiplier();
@@ -44,7 +44,7 @@ public class MobSpawnMixin {
         if (roll < SlashBladeConfig.getSabigatanaSpawnChance() * multiplier) {
             ItemStack blade = bladeRegistry.get(sabigatanaId).getBlade();
             entity.setItemSlot(EquipmentSlot.MAINHAND, blade);
-        }else if (roll < SlashBladeConfig.getBrokenSabigatanaSpawnChance() * multiplier) {
+        } else if (roll < SlashBladeConfig.getBrokenSabigatanaSpawnChance() * multiplier) {
             var brokenId = SlashBladeBuiltInRegistry.SABIGATANA_BROKEN.location();
             ItemStack blade = bladeRegistry.get(brokenId).getBlade();
             entity.setItemSlot(EquipmentSlot.MAINHAND, blade);

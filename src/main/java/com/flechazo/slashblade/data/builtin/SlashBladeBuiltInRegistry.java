@@ -1,10 +1,5 @@
 package com.flechazo.slashblade.data.builtin;
 
-import java.util.List;
-
-import net.minecraft.core.registries.BuiltInRegistries;
-import org.apache.commons.compress.utils.Lists;
-
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.client.renderer.CarryType;
 import com.flechazo.slashblade.item.SwordType;
@@ -14,11 +9,15 @@ import com.flechazo.slashblade.registry.slashblade.EnchantmentDefinition;
 import com.flechazo.slashblade.registry.slashblade.PropertiesDefinition;
 import com.flechazo.slashblade.registry.slashblade.RenderDefinition;
 import com.flechazo.slashblade.registry.slashblade.SlashBladeDefinition;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.worldgen.BootstapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
+import org.apache.commons.compress.utils.Lists;
+
+import java.util.List;
 
 public class SlashBladeBuiltInRegistry {
     public static final ResourceKey<SlashBladeDefinition> YAMATO = register("yamato");
@@ -54,7 +53,7 @@ public class SlashBladeBuiltInRegistry {
     public static final ResourceKey<SlashBladeDefinition> KOSEKI = register("koseki");
 
     public static void registerAll(BootstapContext<SlashBladeDefinition> bootstrap) {
-    	bootstrap.register(KOSEKI,
+        bootstrap.register(KOSEKI,
                 new SlashBladeDefinition(SlashBladeRefabriced.prefix("koseki"),
                         RenderDefinition.Builder
                                 .newInstance()
@@ -64,14 +63,14 @@ public class SlashBladeBuiltInRegistry {
                                 .standbyRenderType(CarryType.NINJA)
                                 .build(),
                         PropertiesDefinition.Builder.newInstance()
-                        .baseAttackModifier(5.0F).maxDamage(70)
-                        
-                        .defaultSwordType(List.of(SwordType.BEWITCHED))
-                        .slashArtsType(SlashArtsRegistry.DRIVE_VERTICAL.getId())
-                        .addSpecialEffect(SpecialEffectsRegistry.WITHER_EDGE.getId())
-                        .build(),
+                                .baseAttackModifier(5.0F).maxDamage(70)
+
+                                .defaultSwordType(List.of(SwordType.BEWITCHED))
+                                .slashArtsType(SlashArtsRegistry.DRIVE_VERTICAL.getId())
+                                .addSpecialEffect(SpecialEffectsRegistry.WITHER_EDGE.getId())
+                                .build(),
                         List.of(new EnchantmentDefinition(getEnchantmentID(Enchantments.POWER_ARROWS), 2))));
-    	
+
         bootstrap.register(SABIGATANA,
                 new SlashBladeDefinition(SlashBladeRefabriced.prefix("sabigatana"),
                         RenderDefinition.Builder
@@ -184,7 +183,7 @@ public class SlashBladeBuiltInRegistry {
         bootstrap.register(RODAI_WOODEN,
                 new SlashBladeDefinition(SlashBladeRefabriced.prefix("rodai_wooden"),
                         RenderDefinition.Builder.newInstance().textureName(SlashBladeRefabriced.prefix("model/rodai_wooden.png"))
-                        .standbyRenderType(CarryType.DEFAULT)
+                                .standbyRenderType(CarryType.DEFAULT)
                                 .build(),
                         PropertiesDefinition.Builder.newInstance().baseAttackModifier(2.0F).maxDamage(60).build(),
                         Lists.newArrayList()));
@@ -192,7 +191,7 @@ public class SlashBladeBuiltInRegistry {
         bootstrap.register(RODAI_STONE,
                 new SlashBladeDefinition(SlashBladeRefabriced.prefix("rodai_stone"),
                         RenderDefinition.Builder.newInstance().textureName(SlashBladeRefabriced.prefix("model/rodai_stone.png"))
-                        .standbyRenderType(CarryType.DEFAULT)
+                                .standbyRenderType(CarryType.DEFAULT)
                                 .build(),
                         PropertiesDefinition.Builder.newInstance().baseAttackModifier(3.0F).maxDamage(132).build(),
                         Lists.newArrayList()));
@@ -200,7 +199,7 @@ public class SlashBladeBuiltInRegistry {
         bootstrap.register(RODAI_IRON,
                 new SlashBladeDefinition(SlashBladeRefabriced.prefix("rodai_iron"),
                         RenderDefinition.Builder.newInstance().textureName(SlashBladeRefabriced.prefix("model/rodai_iron.png"))
-                        .standbyRenderType(CarryType.DEFAULT)
+                                .standbyRenderType(CarryType.DEFAULT)
                                 .build(),
                         PropertiesDefinition.Builder.newInstance().baseAttackModifier(4.0F).maxDamage(250).build(),
                         Lists.newArrayList()));
@@ -208,7 +207,7 @@ public class SlashBladeBuiltInRegistry {
         bootstrap.register(RODAI_GOLDEN,
                 new SlashBladeDefinition(SlashBladeRefabriced.prefix("rodai_golden"),
                         RenderDefinition.Builder.newInstance().textureName(SlashBladeRefabriced.prefix("model/rodai_golden.png"))
-                        .standbyRenderType(CarryType.DEFAULT)
+                                .standbyRenderType(CarryType.DEFAULT)
                                 .build(),
                         PropertiesDefinition.Builder.newInstance().baseAttackModifier(2.0F).maxDamage(33).build(),
                         Lists.newArrayList()));
@@ -216,7 +215,7 @@ public class SlashBladeBuiltInRegistry {
         bootstrap.register(RODAI_DIAMOND,
                 new SlashBladeDefinition(SlashBladeRefabriced.prefix("rodai_diamond"),
                         RenderDefinition.Builder.newInstance().textureName(SlashBladeRefabriced.prefix("model/rodai_diamond.png"))
-                        .standbyRenderType(CarryType.DEFAULT)
+                                .standbyRenderType(CarryType.DEFAULT)
                                 .build(),
                         PropertiesDefinition.Builder.newInstance().baseAttackModifier(7.0F).maxDamage(1561).build(),
                         Lists.newArrayList()));
@@ -232,7 +231,7 @@ public class SlashBladeBuiltInRegistry {
         bootstrap.register(RUBY,
                 new SlashBladeDefinition(SlashBladeRefabriced.prefix("ruby"),
                         RenderDefinition.Builder.newInstance().textureName(SlashBladeRefabriced.prefix("model/ruby.png"))
-                        .standbyRenderType(CarryType.DEFAULT).build(),
+                                .standbyRenderType(CarryType.DEFAULT).build(),
                         PropertiesDefinition.Builder.newInstance().baseAttackModifier(5.0F).maxDamage(45).build(),
                         Lists.newArrayList()));
 
@@ -303,7 +302,7 @@ public class SlashBladeBuiltInRegistry {
                                 .standbyRenderType(CarryType.PSO2)
                                 .build(),
                         PropertiesDefinition.Builder.newInstance().baseAttackModifier(7.0F).maxDamage(50)
-                        .slashArtsType(SlashArtsRegistry.DRIVE_VERTICAL.getId()).build(),
+                                .slashArtsType(SlashArtsRegistry.DRIVE_VERTICAL.getId()).build(),
                         Lists.newArrayList()));
 
         bootstrap.register(SANGE, new SlashBladeDefinition(SlashBladeRefabriced.prefix("sange"),

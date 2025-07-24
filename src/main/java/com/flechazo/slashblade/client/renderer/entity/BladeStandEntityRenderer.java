@@ -1,24 +1,24 @@
 package com.flechazo.slashblade.client.renderer.entity;
 
+import com.flechazo.slashblade.client.renderer.util.MSAutoCloser;
+import com.flechazo.slashblade.entity.BladeStandEntity;
 import com.flechazo.slashblade.event.NameTagRenderCallback;
 import com.flechazo.slashblade.registry.SlashBladeRegister;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.flechazo.slashblade.client.renderer.util.MSAutoCloser;
-import com.flechazo.slashblade.entity.BladeStandEntity;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemFrameRenderer;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
-import com.mojang.math.Axis;
 
 public class BladeStandEntityRenderer extends ItemFrameRenderer<BladeStandEntity> {
     private final net.minecraft.client.renderer.entity.ItemRenderer itemRenderer;
@@ -31,12 +31,12 @@ public class BladeStandEntityRenderer extends ItemFrameRenderer<BladeStandEntity
 
     @Override
     public void render(BladeStandEntity entity, float entityYaw, float partialTicks, PoseStack matrixStackIn,
-            MultiBufferSource bufferIn, int packedLightIn) {
+                       MultiBufferSource bufferIn, int packedLightIn) {
         doRender(entity, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 
     public void doRender(BladeStandEntity entity, float entityYaw, float partialTicks, PoseStack matrixStackIn,
-            MultiBufferSource bufferIn, int packedLightIn) {
+                         MultiBufferSource bufferIn, int packedLightIn) {
 
         if (entity.currentTypeStack.isEmpty()) {
             if (entity.currentType == null || entity.currentType == Items.AIR) {
@@ -102,9 +102,9 @@ public class BladeStandEntityRenderer extends ItemFrameRenderer<BladeStandEntity
     }
 
     private void renderItem(BladeStandEntity entity, ItemStack itemstack, PoseStack matrixStackIn,
-            MultiBufferSource bufferIn, int packedLightIn) {
+                            MultiBufferSource bufferIn, int packedLightIn) {
         if (!itemstack.isEmpty()) {
-            BakedModel ibakedmodel = this.itemRenderer.getModel(itemstack, entity.level(), (LivingEntity) null, 0);
+            BakedModel ibakedmodel = this.itemRenderer.getModel(itemstack, entity.level(), null, 0);
             this.itemRenderer.render(itemstack, ItemDisplayContext.FIXED, false, matrixStackIn, bufferIn, packedLightIn,
                     OverlayTexture.NO_OVERLAY, ibakedmodel);
         }

@@ -1,17 +1,16 @@
 package com.flechazo.slashblade.item;
 
+import com.flechazo.slashblade.capability.slashblade.BladeStateComponent;
 import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
+import com.mojang.serialization.Codec;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.EnumSet;
 import java.util.Optional;
 
-import com.mojang.serialization.Codec;
-
-import com.flechazo.slashblade.capability.slashblade.BladeStateComponent;
-
 public enum SwordType {
-    NONE, EDGEFRAGMENT, BROKEN, ENCHANTED, BEWITCHED, FIERCEREDGE, NOSCABBARD, SEALED,;
+    NONE, EDGEFRAGMENT, BROKEN, ENCHANTED, BEWITCHED, FIERCEREDGE, NOSCABBARD, SEALED,
+    ;
 
     public static final Codec<SwordType> CODEC = Codec.STRING.xmap(string -> SwordType.valueOf(string.toUpperCase()),
             instance -> instance.name().toLowerCase());

@@ -1,25 +1,25 @@
 package com.flechazo.slashblade.data.tag;
 
-import java.util.concurrent.CompletableFuture;
-
+import com.flechazo.slashblade.SlashBladeRefabriced;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
-
-import com.flechazo.slashblade.SlashBladeRefabriced;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
 
+import java.util.concurrent.CompletableFuture;
+
 
 public class SlashBladeEntityTypeTagProvider extends FabricTagProvider.EntityTypeTagProvider {
 
 
-    public SlashBladeEntityTypeTagProvider (FabricDataOutput output, CompletableFuture<Provider> completableFuture) {
+    public SlashBladeEntityTypeTagProvider(FabricDataOutput output, CompletableFuture<Provider> completableFuture) {
         super(output, completableFuture);
     }
-    public SlashBladeEntityTypeTagProvider (FabricDataOutput output, CompletableFuture<Provider> completableFuture, String id) {
+
+    public SlashBladeEntityTypeTagProvider(FabricDataOutput output, CompletableFuture<Provider> completableFuture, String id) {
         super(output, completableFuture);
     }
 

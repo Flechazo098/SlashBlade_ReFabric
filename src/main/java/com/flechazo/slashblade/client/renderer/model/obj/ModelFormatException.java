@@ -4,7 +4,6 @@ package com.flechazo.slashblade.client.renderer.model.obj;
  * Thrown if there is a problem parsing the model
  *
  * @author cpw
- *
  */
 public class ModelFormatException extends RuntimeException {
 

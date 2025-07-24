@@ -33,6 +33,7 @@ public class ModelBakeryMixin {
             SlashBladeRegister.SILVER_ID,
             SlashBladeRegister.BAMBOO_ID
     );
+
     @Inject(method = "bake", at = @At("RETURN"), cancellable = true)
     private void onBake(ResourceLocation id, ModelState state, CallbackInfoReturnable<BakedModel> cir) {
         if (id.getPath().endsWith("_inventory") && TARGET_MODELS.contains(

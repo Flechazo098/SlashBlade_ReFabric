@@ -1,11 +1,7 @@
 package com.flechazo.slashblade.network.util;
 
-import com.flechazo.slashblade.SlashBladeRefabriced;
-import com.flechazo.slashblade.entity.EntityDrive;
 import io.github.fabricators_of_create.porting_lib.entity.IEntityAdditionalSpawnData;
 import io.netty.buffer.Unpooled;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -20,8 +16,7 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.UUID;
 
-public class PlayMessages
-{
+public class PlayMessages {
     /**
      * Used to spawn a custom entity without the same restrictions as
      * {@link ClientboundAddEntityPacket}
@@ -30,8 +25,7 @@ public class PlayMessages
      * {@link EntityType})
      * see {@link EntityType.Builder#setCustomClientFactory}.
      */
-    public static class SpawnEntity
-    {
+    public static class SpawnEntity {
         private final Entity entity;
         private final int typeId;
         private final int entityId;
@@ -41,8 +35,7 @@ public class PlayMessages
         private final int velX, velY, velZ;
         private final FriendlyByteBuf buf;
 
-        public SpawnEntity(Entity e)
-        {
+        public SpawnEntity(Entity e) {
             this.entity = e;
             this.typeId = BuiltInRegistries.ENTITY_TYPE.getId(e.getType());
             this.entityId = e.getId();
@@ -63,8 +56,7 @@ public class PlayMessages
             this.buf = null;
         }
 
-        private SpawnEntity(int typeId, int entityId, UUID uuid, double posX, double posY, double posZ, byte pitch, byte yaw, byte headYaw, int velX, int velY, int velZ, FriendlyByteBuf buf)
-        {
+        private SpawnEntity(int typeId, int entityId, UUID uuid, double posX, double posY, double posZ, byte pitch, byte yaw, byte headYaw, int velX, int velY, int velZ, FriendlyByteBuf buf) {
             this.entity = null;
             this.typeId = typeId;
             this.entityId = entityId;
@@ -81,8 +73,7 @@ public class PlayMessages
             this.buf = buf;
         }
 
-        public static void encode(SpawnEntity msg, FriendlyByteBuf buf)
-        {
+        public static void encode(SpawnEntity msg, FriendlyByteBuf buf) {
             buf.writeVarInt(msg.typeId);
             buf.writeInt(msg.entityId);
             buf.writeLong(msg.uuid.getMostSignificantBits());
@@ -96,8 +87,7 @@ public class PlayMessages
             buf.writeShort(msg.velX);
             buf.writeShort(msg.velY);
             buf.writeShort(msg.velZ);
-            if (msg.entity instanceof IEntityAdditionalSpawnData entityAdditionalSpawnData)
-            {
+            if (msg.entity instanceof IEntityAdditionalSpawnData entityAdditionalSpawnData) {
                 final FriendlyByteBuf spawnDataBuffer = new FriendlyByteBuf(Unpooled.buffer());
 
                 entityAdditionalSpawnData.writeSpawnData(spawnDataBuffer);
@@ -106,22 +96,18 @@ public class PlayMessages
                 buf.writeBytes(spawnDataBuffer);
 
                 spawnDataBuffer.release();
-            } else
-            {
+            } else {
                 buf.writeVarInt(0);
             }
         }
 
-        public static SpawnEntity decode(FriendlyByteBuf buf)
-        {
+        public static SpawnEntity decode(FriendlyByteBuf buf) {
             return new SpawnEntity(buf.readVarInt(), buf.readInt(), new UUID(buf.readLong(), buf.readLong()), buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readByte(), buf.readByte(), buf.readByte(), buf.readShort(), buf.readShort(), buf.readShort(), readSpawnDataPacket(buf));
         }
 
-        private static FriendlyByteBuf readSpawnDataPacket(FriendlyByteBuf buf)
-        {
+        private static FriendlyByteBuf readSpawnDataPacket(FriendlyByteBuf buf) {
             final int count = buf.readVarInt();
-            if (count > 0)
-            {
+            if (count > 0) {
                 final FriendlyByteBuf spawnDataBuffer = new FriendlyByteBuf(Unpooled.buffer());
                 spawnDataBuffer.writeBytes(buf, count);
                 return spawnDataBuffer;
@@ -130,22 +116,18 @@ public class PlayMessages
             return new FriendlyByteBuf(Unpooled.buffer());
         }
 
-        public static void handleClient(Minecraft client, ClientPacketListener handler, FriendlyByteBuf buf, PacketSender responseSender)
-        {
+        public static void handleClient(Minecraft client, ClientPacketListener handler, FriendlyByteBuf buf, PacketSender responseSender) {
             SpawnEntity msg = decode(buf);
             client.execute(() -> {
-                try
-                {
+                try {
                     EntityType<?> type = BuiltInRegistries.ENTITY_TYPE.byId(msg.typeId);
                     ClientLevel world = client.level;
-                    if (world == null)
-                    {
+                    if (world == null) {
                         return;
                     }
 
                     Entity e = type.create(world);
-                    if (e == null)
-                    {
+                    if (e == null) {
                         return;
                     }
 
@@ -162,14 +144,11 @@ public class PlayMessages
                     e.setUUID(msg.uuid);
                     world.putNonPlayerEntity(msg.entityId, e);
                     e.lerpMotion(msg.velX / 8000.0, msg.velY / 8000.0, msg.velZ / 8000.0);
-                    if (e instanceof IEntityAdditionalSpawnData entityAdditionalSpawnData)
-                    {
+                    if (e instanceof IEntityAdditionalSpawnData entityAdditionalSpawnData) {
                         entityAdditionalSpawnData.readSpawnData(msg.buf);
                     }
-                } finally
-                {
-                    if (msg.buf != null)
-                    {
+                } finally {
+                    if (msg.buf != null) {
                         msg.buf.release();
                     }
                 }
@@ -177,73 +156,59 @@ public class PlayMessages
 
         }
 
-        public Entity getEntity()
-        {
+        public Entity getEntity() {
             return entity;
         }
 
-        public int getTypeId()
-        {
+        public int getTypeId() {
             return typeId;
         }
 
-        public int getEntityId()
-        {
+        public int getEntityId() {
             return entityId;
         }
 
-        public UUID getUuid()
-        {
+        public UUID getUuid() {
             return uuid;
         }
 
-        public double getPosX()
-        {
+        public double getPosX() {
             return posX;
         }
 
-        public double getPosY()
-        {
+        public double getPosY() {
             return posY;
         }
 
-        public double getPosZ()
-        {
+        public double getPosZ() {
             return posZ;
         }
 
-        public byte getPitch()
-        {
+        public byte getPitch() {
             return pitch;
         }
 
-        public byte getYaw()
-        {
+        public byte getYaw() {
             return yaw;
         }
 
-        public byte getHeadYaw()
-        {
+        public byte getHeadYaw() {
             return headYaw;
         }
 
-        public int getVelX()
-        {
+        public int getVelX() {
             return velX;
         }
 
-        public int getVelY()
-        {
+        public int getVelY() {
             return velY;
         }
 
-        public int getVelZ()
-        {
+        public int getVelZ() {
             return velZ;
         }
 
-        public FriendlyByteBuf getAdditionalData()
-        {
+        public FriendlyByteBuf getAdditionalData() {
             return buf;
         }
     }

@@ -1,7 +1,6 @@
 package com.flechazo.slashblade.network;
 
 import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponent;
-import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponentImpl;
 import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankHelper;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
@@ -10,8 +9,6 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-
-import java.util.Optional;
 
 public class RankSyncMessage {
     public long rawPoint;
@@ -40,7 +37,7 @@ public class RankSyncMessage {
             Player player = client.player;
             if (player == null) return;
 
-           ConcentrationRankHelper.getConcentrationRank(player).ifPresent(cr -> {
+            ConcentrationRankHelper.getConcentrationRank(player).ifPresent(cr -> {
 
                 long time = player.level().getGameTime();
 
@@ -52,6 +49,6 @@ public class RankSyncMessage {
                 if (oldRank.level < cr.getRank(time).level)
                     cr.setLastRankRise(time);
             });
-    });
+        });
     }
 }

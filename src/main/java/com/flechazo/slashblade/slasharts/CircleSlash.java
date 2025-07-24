@@ -1,6 +1,5 @@
 package com.flechazo.slashblade.slasharts;
 
-import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankHelper;
 import com.flechazo.slashblade.capability.slashblade.BladeStateComponent;
 import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;

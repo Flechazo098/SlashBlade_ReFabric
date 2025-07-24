@@ -11,9 +11,9 @@ import java.util.EnumSet;
 
 public class InputStateComponentImpl implements InputStateComponent {
 
-    private EnumSet<InputCommand> commands = EnumSet.noneOf(InputCommand.class);
-    private Scheduler scheduler = new Scheduler();
-    private EnumMap<InputCommand, Long> lastPressTimes = Maps.newEnumMap(InputCommand.class);
+    private final EnumSet<InputCommand> commands = EnumSet.noneOf(InputCommand.class);
+    private final Scheduler scheduler = new Scheduler();
+    private final EnumMap<InputCommand, Long> lastPressTimes = Maps.newEnumMap(InputCommand.class);
 
     @Override
     public EnumSet<InputCommand> getCommands() {

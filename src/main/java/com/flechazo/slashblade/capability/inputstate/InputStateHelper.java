@@ -8,6 +8,7 @@ public class InputStateHelper {
 
     /**
      * 获取实体的输入状态组件
+     *
      * @param entity 实体
      * @return 输入状态组件
      */

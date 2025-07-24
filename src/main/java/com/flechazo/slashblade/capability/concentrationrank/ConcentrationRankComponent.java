@@ -89,10 +89,8 @@ public interface ConcentrationRankComponent extends Component {
     }
 
     default void addRankPoint(DamageSource src) {
-        if (!(src.getEntity() instanceof LivingEntity))
+        if (!(src.getEntity() instanceof LivingEntity user))
             return;
-
-        LivingEntity user = (LivingEntity) src.getEntity();
 
         ItemStack stack = user.getMainHandItem();
 
@@ -107,6 +105,7 @@ public interface ConcentrationRankComponent extends Component {
     float getRankPointModifier(DamageSource ds);
 
     float getRankPointModifier(ResourceLocation combo);
+
     enum ConcentrationRanks {
         NONE(0, Range.lessThan(1.0f)),
         D(1, Range.closedOpen(1.0f, 2.0f)),
@@ -131,7 +130,7 @@ public interface ConcentrationRankComponent extends Component {
             return concentrationRanksMap.get(point);
         }
 
-        private static RangeMap<Float, ConcentrationRanks> concentrationRanksMap = ImmutableRangeMap
+        private static final RangeMap<Float, ConcentrationRanks> concentrationRanksMap = ImmutableRangeMap
                 .<Float, ConcentrationRanks>builder()
                 .put(ConcentrationRanks.NONE.pointRange, ConcentrationRanks.NONE)
                 .put(ConcentrationRanks.D.pointRange, ConcentrationRanks.D)

@@ -1,54 +1,53 @@
 package com.flechazo.slashblade.util;
 
 import com.flechazo.slashblade.SlashBladeConfig;
+import com.flechazo.slashblade.ability.ArrowReflector;
+import com.flechazo.slashblade.ability.TNTExtinguisher;
 import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponent;
 import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankHelper;
 import com.flechazo.slashblade.capability.slashblade.BladeStateComponent;
 import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
-import com.flechazo.slashblade.registry.EntityTypeRegister;
-import com.google.common.collect.Lists;
-import com.flechazo.slashblade.SlashBladeRefabriced;
-import com.flechazo.slashblade.ability.ArrowReflector;
-import com.flechazo.slashblade.ability.TNTExtinguisher;
 import com.flechazo.slashblade.entity.EntityAbstractSummonedSword;
 import com.flechazo.slashblade.entity.EntitySlashEffect;
 import com.flechazo.slashblade.entity.IShootable;
 import com.flechazo.slashblade.event.SlashBladeEvent;
+import com.flechazo.slashblade.registry.EntityTypeRegister;
 import com.flechazo.slashblade.registry.ModAttributes;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.sounds.SoundSource;
+import com.google.common.collect.Lists;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 import java.util.function.Consumer;
 
 public class AttackManager {
-	
-	public static boolean isPowered(LivingEntity entity) {
-		ItemStack blade = entity.getMainHandItem();
-		boolean result = entity.hasEffect(MobEffects.DAMAGE_BOOST) || entity.hasEffect(MobEffects.HUNGER);
-		if(BladeStateHelper.getBladeState(blade).isPresent()) {
-			var state = BladeStateHelper.getBladeState(blade).orElseThrow(NullPointerException::new);
-			var event = new SlashBladeEvent.PowerBladeEvent(blade, state, entity, result);
-			SlashBladeEvent.POWER_BLADE_EVENT.post(event);
-			result = event.isPowered();
-		}
-		
-		return result;
-	}
-	
+
+    public static boolean isPowered(LivingEntity entity) {
+        ItemStack blade = entity.getMainHandItem();
+        boolean result = entity.hasEffect(MobEffects.DAMAGE_BOOST) || entity.hasEffect(MobEffects.HUNGER);
+        if (BladeStateHelper.getBladeState(blade).isPresent()) {
+            var state = BladeStateHelper.getBladeState(blade).orElseThrow(NullPointerException::new);
+            var event = new SlashBladeEvent.PowerBladeEvent(blade, state, entity, result);
+            SlashBladeEvent.POWER_BLADE_EVENT.post(event);
+            result = event.isPowered();
+        }
+
+        return result;
+    }
+
     static public void areaAttack(LivingEntity playerIn, Consumer<LivingEntity> beforeHit) {
         areaAttack(playerIn, beforeHit, 1.0f, true, true, false);
     }
@@ -90,7 +89,7 @@ public class AttackManager {
         if (playerIn.level().isClientSide())
             return null;
         ItemStack blade = playerIn.getMainHandItem();
-        if(!BladeStateHelper.getBladeState(blade).isPresent())
+        if (!BladeStateHelper.getBladeState(blade).isPresent())
             return null;
         if (SlashBladeEvent.DO_SLASH_EVENT.post(new SlashBladeEvent.DoSlashEvent(blade,
                 BladeStateHelper.getBladeState(blade).orElseThrow(NullPointerException::new),
@@ -155,7 +154,7 @@ public class AttackManager {
             protected void tryDespawn() {
                 if (!this.level().isClientSide()) {
                     if (this.getLifetime() < this.tickCount) {
-                        this.level().playSound((Player) null, this.getX(), this.getY(), this.getZ(),
+                        this.level().playSound(null, this.getX(), this.getY(), this.getZ(),
                                 SoundEvents.GLASS_BREAK, SoundSource.PLAYERS, 1.0F,
                                 0.625F + 0.1f * this.random.nextFloat());
                         ((ServerLevel) this.level()).sendParticles(ParticleTypes.ENCHANTED_HIT, this.getX(),
@@ -165,14 +164,14 @@ public class AttackManager {
                             if (entity.isAlive()) {
                                 float yRot = this.getOwner() != null ? this.getOwner().getYRot() : 0;
                                 entity.addDeltaMovement(new Vec3(
-                                        (double) (-Math.sin(yRot * (float) Math.PI / 180.0F) * 0.5),
+                                        -Math.sin(yRot * (float) Math.PI / 180.0F) * 0.5,
                                         0.05D,
-                                        (double) (Math.cos(yRot * (float) Math.PI / 180.0F) * 0.5)));
+                                        Math.cos(yRot * (float) Math.PI / 180.0F) * 0.5));
                                 double baseAmount = living.getAttributeValue(Attributes.ATTACK_DAMAGE);
                                 int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, living.getMainHandItem());
                                 baseAmount *= (1 + (float) powerLevel * 0.1F);
                                 //评分等级加成
-                                if (living instanceof Player player){
+                                if (living instanceof Player player) {
                                     ConcentrationRankComponent.ConcentrationRanks rankBonus = ConcentrationRankHelper.getConcentrationRank(player)
                                             .map(rp -> rp.getRank(player.getCommandSenderWorld().getGameTime()))
                                             .orElse(ConcentrationRankComponent.ConcentrationRanks.NONE);
@@ -184,7 +183,7 @@ public class AttackManager {
                                     }
                                     baseAmount += rankDamageBonus;
                                 }
-                                if (this.getShooter() instanceof LivingEntity shooter){
+                                if (this.getShooter() instanceof LivingEntity shooter) {
                                     baseAmount *= getSlashBladeDamageScale(shooter) * SlashBladeConfig.getSlashbladeDamageMultiplier();
                                 }
                                 doAttackWith(this.damageSources().indirectMagic(this, this.getShooter()),
@@ -247,7 +246,7 @@ public class AttackManager {
         }
 
         if (!mute)
-            playerIn.level().playSound((Player) null, playerIn.getX(), playerIn.getY(), playerIn.getZ(),
+            playerIn.level().playSound(null, playerIn.getX(), playerIn.getY(), playerIn.getZ(),
                     SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS, 0.5F,
                     0.4F / (playerIn.getRandom().nextFloat() * 0.4F + 0.8F));
 
@@ -284,14 +283,14 @@ public class AttackManager {
                     beforeHit.accept(living);
 
                 float baseAmount = (float) owner.getDamage();
-                if(owner.getShooter() instanceof LivingEntity living) {
-                    if(!(owner instanceof EntitySlashEffect)) {
+                if (owner.getShooter() instanceof LivingEntity living) {
+                    if (!(owner instanceof EntitySlashEffect)) {
                         int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, living.getMainHandItem());
                         baseAmount += ((float) powerLevel * 0.1F);
                     }
                     baseAmount *= living.getAttributeValue(Attributes.ATTACK_DAMAGE);
                     //评分等级加成
-                    if (owner instanceof Player player){
+                    if (owner instanceof Player player) {
                         ConcentrationRankComponent.ConcentrationRanks rankBonus = ConcentrationRankHelper.getConcentrationRank(player)
                                 .map(rp -> rp.getRank(player.getCommandSenderWorld().getGameTime()))
                                 .orElse(ConcentrationRankComponent.ConcentrationRanks.NONE);
@@ -336,7 +335,7 @@ public class AttackManager {
     }
 
     static public void doMeleeAttack(LivingEntity attacker, Entity target, boolean forceHit, boolean resetHit) {
-        doMeleeAttack(attacker, target, forceHit, resetHit,1.0f);
+        doMeleeAttack(attacker, target, forceHit, resetHit, 1.0f);
     }
 
     static public void doMeleeAttack(LivingEntity attacker, Entity target, boolean forceHit, boolean resetHit, float comboRatio) {
@@ -345,7 +344,7 @@ public class AttackManager {
                 BladeStateHelper.getBladeState(attacker.getMainHandItem()).ifPresent((state) -> {
                     try {
                         state.setOnClick(true);
-                        PlayerAttackHelper.attack(((Player) attacker),t,comboRatio);
+                        PlayerAttackHelper.attack(((Player) attacker), t, comboRatio);
 
                     } finally {
                         state.setOnClick(false);
@@ -362,16 +361,16 @@ public class AttackManager {
     }
 
     public static void playQuickSheathSoundAction(LivingEntity entity) {
-        if(entity.level().isClientSide())
-            return ;
-        entity.level().playSound((Player)null, entity.getX(), entity.getY(), entity.getZ(),
+        if (entity.level().isClientSide())
+            return;
+        entity.level().playSound(null, entity.getX(), entity.getY(), entity.getZ(),
                 SoundEvents.CHAIN_HIT, SoundSource.PLAYERS, 1.0F, 1.0F);
     }
 
     public static void playPiercingSoundAction(LivingEntity entity) {
-        if(entity.level().isClientSide())
-            return ;
-        entity.level().playSound((Player)null, entity.getX(), entity.getY(), entity.getZ(),
+        if (entity.level().isClientSide())
+            return;
+        entity.level().playSound(null, entity.getX(), entity.getY(), entity.getZ(),
                 SoundEvents.TRIDENT_THROW, SoundSource.PLAYERS, 1.0F, 1.0F);
     }
 
@@ -380,7 +379,7 @@ public class AttackManager {
     }
 
     public static float getSlashBladeDamageScale(LivingEntity entity) {
-        if (entity.getAttribute(ModAttributes.getSlashBladeDamage()) != null){
+        if (entity.getAttribute(ModAttributes.getSlashBladeDamage()) != null) {
             return (float) entity.getAttribute(ModAttributes.getSlashBladeDamage()).getValue();
         }
         return 1.0f;

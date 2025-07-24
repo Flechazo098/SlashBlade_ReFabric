@@ -21,10 +21,8 @@ public class BladeMotionEventBroadcaster {
 
     public void register() {
         BladeMotionEvent.BLADE_MOTION.register(event -> {
-            if (!(event.getEntity() instanceof ServerPlayer))
+            if (!(event.getEntity() instanceof ServerPlayer sp))
                 return;
-
-            ServerPlayer sp = (ServerPlayer) event.getEntity();
 
             MotionBroadcastMessage msg = new MotionBroadcastMessage();
             msg.playerId = sp.getUUID();
@@ -36,13 +34,13 @@ public class BladeMotionEventBroadcaster {
 
             NetworkManager.sendToNear(
                     sp.serverLevel(),
-                    (int)sp.getX(),
-                    (int)sp.getY(),
-                    (int)sp.getZ(),
+                    (int) sp.getX(),
+                    (int) sp.getY(),
+                    (int) sp.getZ(),
                     20.0,
                     NetworkManager.MOTION_BROADCAST_ID,
                     buf
             );
         });
-     }
+    }
 }

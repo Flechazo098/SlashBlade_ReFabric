@@ -1,10 +1,8 @@
 package com.flechazo.slashblade.entity;
 
-import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.ability.StunManager;
 import com.flechazo.slashblade.capability.inputstate.InputStateHelper;
 import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
-import com.flechazo.slashblade.item.ItemSlashBlade;
 import com.flechazo.slashblade.network.util.PlayMessages;
 import com.flechazo.slashblade.registry.EntityTypeRegister;
 import com.flechazo.slashblade.util.InputCommand;
@@ -79,7 +77,7 @@ public class EntityBlisteringSwords extends EntityAbstractSummonedSword {
             Entity vehicle = getVehicle();
             Vec3 dir = this.getViewVector(0);
             if (!(vehicle instanceof LivingEntity)) {
-                ((EntityBlisteringSwords) this).shoot(dir.x, dir.y, dir.z, 3.0f, 1.0f);
+                this.shoot(dir.x, dir.y, dir.z, 3.0f, 1.0f);
                 return;
             }
 
@@ -128,7 +126,7 @@ public class EntityBlisteringSwords extends EntityAbstractSummonedSword {
             Vec3 pos = this.getPosition(0.0f);
             dir = targetPos.subtract(pos).normalize();
 
-            ((EntityBlisteringSwords) this).shoot(dir.x, dir.y, dir.z, 3.0f, 1.0f);
+            this.shoot(dir.x, dir.y, dir.z, 3.0f, 1.0f);
             if (sender instanceof ServerPlayer) {
                 ((ServerPlayer) sender).playNotifySound(SoundEvents.ENDER_DRAGON_FLAP, SoundSource.PLAYERS, 1.0F, 1.0F);
             }
@@ -138,14 +136,13 @@ public class EntityBlisteringSwords extends EntityAbstractSummonedSword {
 
         // this.startRiding()
         this.setDeltaMovement(Vec3.ZERO);
-            this.baseTick();
+        this.baseTick();
 
         faceEntityStandby();
         // this.getVehicle().positionRider(this);
 
         // lifetime check
-        if (!itFired() && getVehicle() instanceof LivingEntity) {
-            LivingEntity owner = (LivingEntity) getVehicle();
+        if (!itFired() && getVehicle() instanceof LivingEntity owner) {
             InputStateHelper.getInputState(owner).ifPresent(s -> {
                 if (!s.getCommands().contains(InputCommand.M_DOWN)) {
 

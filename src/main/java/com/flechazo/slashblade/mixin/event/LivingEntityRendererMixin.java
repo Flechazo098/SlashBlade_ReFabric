@@ -12,9 +12,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
@@ -46,8 +44,8 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
         // 只在客户端执行
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) return;
-        if (! InputStateHelper.getInputState(mc.player)
-                .filter(input -> input.getCommands().contains(InputCommand.SNEAK)).isPresent())
+        if (InputStateHelper.getInputState(mc.player)
+                .filter(input -> input.getCommands().contains(InputCommand.SNEAK)).isEmpty())
             return;
 
         ItemStack stack = mc.player.getMainHandItem();
@@ -59,7 +57,7 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
             return;
 
 
-        if (! entity.isAlive())
+        if (!entity.isAlive())
             return;
 
         float health = entity.getHealth() / entity.getMaxHealth();
@@ -69,10 +67,10 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
         float f = entity.getBbHeight() * 0.5f;
 
         poseStack.pushPose();
-        poseStack.translate(0.0D, (double) f, 0.0D);
+        poseStack.translate(0.0D, f, 0.0D);
 
         Vec3 offset = dispatcher.camera.getPosition()
-                .subtract(((LivingEntity) entity).getPosition(partialTicks).add(0, f, 0));
+                .subtract(entity.getPosition(partialTicks).add(0, f, 0));
         offset = offset.scale(0.5f);
         poseStack.translate(offset.x(), offset.y(), offset.z());
 

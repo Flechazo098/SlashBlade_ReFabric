@@ -14,11 +14,11 @@ public abstract class LivingEntityFallDamageMixin {
     @Inject(method = "causeFallDamage(FFLnet/minecraft/world/damagesource/DamageSource;)Z", at = @At("HEAD"))
 
     private void onHandleFallDamage(float fallDistance, float damageMultiplier, DamageSource source, CallbackInfoReturnable<Boolean> cir) {
-        LivingEntity living  = (LivingEntity) (Object) this;
+        LivingEntity living = (LivingEntity) (Object) this;
 
         if (living instanceof Player player && player.getAbilities().flying) {
             FallHandler.fallResist(living);
-        }else {
+        } else {
             FallHandler.fallDecrease(living);
         }
     }

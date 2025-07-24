@@ -10,30 +10,27 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenMouseEvents;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.DisplayInfo;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.core.RegistryAccess;
-import net.minecraft.world.item.crafting.*;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.advancements.AdvancementWidget;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.advancements.AdvancementTab;
+import net.minecraft.client.gui.screens.advancements.AdvancementWidget;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.recipebook.GhostRecipe;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.world.Container;
-import net.minecraft.world.item.ItemStack;
-
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
+import net.minecraft.core.Vec3i;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.recipebook.PlaceRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.core.Vec3i;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 
 import java.util.*;
-
-import net.minecraft.recipebook.PlaceRecipe;
-import net.minecraft.world.item.crafting.SmithingTransformRecipe;
 
 @Environment(EnvType.CLIENT)
 public class AdvancementsRecipeRenderer implements PlaceRecipe<Ingredient> {

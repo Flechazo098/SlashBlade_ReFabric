@@ -1,19 +1,19 @@
 package com.flechazo.slashblade.client.renderer.model;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.flechazo.slashblade.client.renderer.layers.LayerMainBlade;
 import com.flechazo.slashblade.client.renderer.util.MSAutoCloser;
 import com.flechazo.slashblade.item.ItemSlashBlade;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
-import net.minecraft.client.CameraType;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.InteractionHand;
-import com.mojang.math.Axis;
 
 /**
  * Created by Furia on 2016/02/07.
@@ -21,8 +21,8 @@ import com.mojang.math.Axis;
 public class BladeFirstPersonRender {
     private LayerMainBlade<LocalPlayer, ?> layer = null;
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-	private BladeFirstPersonRender() {
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    private BladeFirstPersonRender() {
         Minecraft mc = Minecraft.getInstance();
 
         EntityRenderer<?> renderer = mc.getEntityRenderDispatcher().getRenderer(mc.player);

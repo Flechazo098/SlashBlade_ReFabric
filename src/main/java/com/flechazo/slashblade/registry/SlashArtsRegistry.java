@@ -2,19 +2,18 @@ package com.flechazo.slashblade.registry;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.slasharts.SlashArts;
-import net.minecraft.core.Registry;
-import net.minecraft.core.MappedRegistry;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.resources.ResourceKey;
 import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
 import net.fabricmc.fabric.api.event.registry.RegistryAttribute;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 
 public class SlashArtsRegistry {
     public static final ResourceKey<Registry<SlashArts>> SLASH_ARTS_KEY = ResourceKey.createRegistryKey(
             new ResourceLocation(SlashBladeRefabriced.MODID, "slash_arts"));
 
     public static final Registry<SlashArts> REGISTRY = FabricRegistryBuilder
-            .<SlashArts>createSimple(SLASH_ARTS_KEY)
+            .createSimple(SLASH_ARTS_KEY)
             .attribute(RegistryAttribute.SYNCED)
             .buildAndRegister();
 

@@ -54,7 +54,7 @@ public class EntityTypeRegister {
     public static EntityType<EntityDrive> Drive;
 
 
-    private static String classToString (Class<? extends Entity> entityClass) {
+    private static String classToString(Class<? extends Entity> entityClass) {
         return CaseFormat.UPPER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, entityClass.getSimpleName())
                 .replace("entity_", "");
     }
@@ -86,7 +86,7 @@ public class EntityTypeRegister {
     }
 
 
-    private static <T extends Entity> EntityType<T> registerEntity (
+    private static <T extends Entity> EntityType<T> registerEntity(
             ResourceLocation id,
             ResourceLocation loc,
             EntityType.EntityFactory<T> constructor,

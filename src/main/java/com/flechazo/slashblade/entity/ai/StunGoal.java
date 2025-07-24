@@ -1,7 +1,6 @@
 package com.flechazo.slashblade.entity.ai;
 
 import com.flechazo.slashblade.capability.mobeffect.MobEffectComponent;
-import com.flechazo.slashblade.capability.mobeffect.MobEffectComponentRegistry;
 import com.flechazo.slashblade.capability.mobeffect.MobEffectHelper;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.Goal;

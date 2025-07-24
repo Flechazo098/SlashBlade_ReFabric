@@ -1,15 +1,8 @@
 package com.flechazo.slashblade.client.renderer.layers;
 
-import com.flechazo.slashblade.capability.slashblade.BladeStateComponentRegistry;
-import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
-import com.mojang.blaze3d.vertex.PoseStack;
-import dev.kosmx.playerAnim.api.TransformType;
-import dev.kosmx.playerAnim.core.util.Vec3f;
-import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
-import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
-import jp.nyatla.nymmd.*;
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.capability.slashblade.BladeStateComponent;
+import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.client.renderer.model.BladeModelManager;
 import com.flechazo.slashblade.client.renderer.model.BladeMotionManager;
 import com.flechazo.slashblade.client.renderer.model.obj.WavefrontObject;
@@ -21,28 +14,36 @@ import com.flechazo.slashblade.registry.ComboStateRegistry;
 import com.flechazo.slashblade.registry.combo.ComboState;
 import com.flechazo.slashblade.util.TimeValueHelper;
 import com.flechazo.slashblade.util.VectorHelper;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import dev.kosmx.playerAnim.api.TransformType;
+import dev.kosmx.playerAnim.core.util.Vec3f;
+import dev.kosmx.playerAnim.impl.IAnimatedPlayer;
+import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
+import jp.nyatla.nymmd.MmdException;
+import jp.nyatla.nymmd.MmdMotionPlayerGL2;
+import jp.nyatla.nymmd.MmdPmdModelMc;
+import jp.nyatla.nymmd.MmdVmdMotionMc;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.client.model.EntityModel;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.effect.MobEffectUtil;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.effect.MobEffectUtil;
-import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Axis;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public class LayerMainBlade<T extends LivingEntity, M extends EntityModel<T>> extends RenderLayer<T, M> {
 
@@ -101,8 +102,8 @@ public class LayerMainBlade<T extends LivingEntity, M extends EntityModel<T>> ex
     }
 
     public void renderHotbarItem(PoseStack matrixStack, MultiBufferSource bufferIn, int lightIn, T entity) {
-        if(entity instanceof Player player) {
-            if(player.getInventory().selected == 0)
+        if (entity instanceof Player player) {
+            if (player.getInventory().selected == 0)
                 return;
 
             ItemStack blade = player.getInventory().getItem(0);
@@ -129,35 +130,35 @@ public class LayerMainBlade<T extends LivingEntity, M extends EntityModel<T>> ex
                 matrixStack.translate(0, 1.5f, 0);
                 var carrytype = s.getCarryType();
                 final Minecraft mcinstance = Minecraft.getInstance();
-                switch(carrytype) {
+                switch (carrytype) {
                     case PSO2:
-                        matrixStack.translate(1F,-1.125f, 0.20f);
+                        matrixStack.translate(1F, -1.125f, 0.20f);
                         matrixStack.mulPose(new Quaternionf().rotateZYX(-0.122173F, 0, 0));
-                        if(mcinstance.options.getCameraType() == CameraType.FIRST_PERSON
+                        if (mcinstance.options.getCameraType() == CameraType.FIRST_PERSON
                                 && entity == mcinstance.player) return;
                         break;
 
                     case KATANA:
-                        matrixStack.translate(0.25F,-0.875f, -0.55f);
+                        matrixStack.translate(0.25F, -0.875f, -0.55f);
                         matrixStack.mulPose(new Quaternionf().rotateZYX(3.1415927F, 1.570796f, 0.261799F));
                         break;
 
                     case DEFAULT:
-                        matrixStack.translate(0.25F,-0.875f, -0.55f);
+                        matrixStack.translate(0.25F, -0.875f, -0.55f);
                         matrixStack.mulPose(new Quaternionf().rotateZYX(0F, 1.570796f, 0.261799F));
                         break;
 
                     case NINJA:
-                        matrixStack.translate(-0.5F,-2f, 0.20f);
+                        matrixStack.translate(-0.5F, -2f, 0.20f);
                         matrixStack.mulPose(new Quaternionf().rotateZYX(-2.094395F, 0f, 3.1415927F));
-                        if(mcinstance.options.getCameraType() == CameraType.FIRST_PERSON
+                        if (mcinstance.options.getCameraType() == CameraType.FIRST_PERSON
                                 && entity == mcinstance.player) return;
                         break;
 
                     case RNINJA:
-                        matrixStack.translate(0.5F,-2f, 0.20f);
+                        matrixStack.translate(0.5F, -2f, 0.20f);
                         matrixStack.mulPose(new Quaternionf().rotateZYX(-1.047198F, 0, 0));
-                        if(mcinstance.options.getCameraType() == CameraType.FIRST_PERSON
+                        if (mcinstance.options.getCameraType() == CameraType.FIRST_PERSON
                                 && entity == mcinstance.player) return;
                         break;
 

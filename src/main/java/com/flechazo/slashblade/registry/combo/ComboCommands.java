@@ -1,15 +1,15 @@
 package com.flechazo.slashblade.registry.combo;
 
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
-
 import com.flechazo.slashblade.capability.inputstate.InputStateHelper;
 import com.flechazo.slashblade.registry.ComboStateRegistry;
 import com.flechazo.slashblade.util.InputCommand;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
+
+import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ComboCommands {
     public static final EnumSet<InputCommand> COMBO_B1_ALT = EnumSet.of(InputCommand.BACK, InputCommand.R_DOWN);
@@ -20,7 +20,7 @@ public class ComboCommands {
     }
 
     public static ResourceLocation initStandByCommand(LivingEntity a,
-            Map<EnumSet<InputCommand>, ResourceLocation> map) {
+                                                      Map<EnumSet<InputCommand>, ResourceLocation> map) {
         EnumSet<InputCommand> commands = InputStateHelper.getInputState(a)
                 .map((state) -> state.getCommands(a)).orElseGet(() -> EnumSet.noneOf(InputCommand.class));
 

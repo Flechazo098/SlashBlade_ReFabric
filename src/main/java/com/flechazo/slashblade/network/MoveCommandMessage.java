@@ -22,6 +22,7 @@ public class MoveCommandMessage {
     public MoveCommandMessage(int command) {
         this.command = command;
     }
+
     public MoveCommandMessage() {
     }
 
@@ -40,7 +41,7 @@ public class MoveCommandMessage {
             ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
             if (stack.isEmpty())
                 return;
-            if (! (stack.getItem() instanceof ItemSlashBlade))
+            if (!(stack.getItem() instanceof ItemSlashBlade))
                 return;
 
             InputStateHelper.getInputState(player).ifPresent((state) -> {
@@ -53,7 +54,7 @@ public class MoveCommandMessage {
 
                 long currentTime = player.level().getGameTime();
                 current.forEach(c -> {
-                    if (! old.contains(c))
+                    if (!old.contains(c))
                         state.getLastPressTimes().put(c, currentTime);
                 });
 

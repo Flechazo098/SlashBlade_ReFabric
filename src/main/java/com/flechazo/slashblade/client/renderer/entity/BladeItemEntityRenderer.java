@@ -1,22 +1,21 @@
 package com.flechazo.slashblade.client.renderer.entity;
 
+import com.flechazo.slashblade.capability.persistentdata.PersistentDataHelper;
 import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
-import com.flechazo.slashblade.util.accessor.PersistentDataAccessor;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.flechazo.slashblade.client.renderer.model.BladeModelManager;
 import com.flechazo.slashblade.client.renderer.model.obj.WavefrontObject;
+import com.flechazo.slashblade.client.renderer.util.BladeRenderState;
 import com.flechazo.slashblade.client.renderer.util.MSAutoCloser;
 import com.flechazo.slashblade.entity.BladeItemEntity;
-import com.flechazo.slashblade.client.renderer.util.BladeRenderState;
-import com.flechazo.slashblade.item.ItemSlashBlade;
 import com.flechazo.slashblade.item.SwordType;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemEntityRenderer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Axis;
 
 import java.util.EnumSet;
 
@@ -27,7 +26,7 @@ public class BladeItemEntityRenderer extends ItemEntityRenderer {
 
     @Override
     public void render(ItemEntity itemIn, float entityYaw, float partialTicks, PoseStack matrixStackIn,
-            MultiBufferSource bufferIn, int packedLightIn) {
+                       MultiBufferSource bufferIn, int packedLightIn) {
         this.shadowRadius = 0;
 
         if (!itemIn.getItem().isEmpty()) {
@@ -39,7 +38,7 @@ public class BladeItemEntityRenderer extends ItemEntityRenderer {
     }
 
     private void renderBlade(ItemEntity itemIn, float entityYaw, float partialTicks, PoseStack matrixStackIn,
-            MultiBufferSource bufferIn, int packedLightIn) {
+                             MultiBufferSource bufferIn, int packedLightIn) {
         if (itemIn instanceof BladeItemEntity bladeItem) {
             try (MSAutoCloser msac = MSAutoCloser.pushMatrix(matrixStackIn)) {
                 matrixStackIn.mulPose(Axis.YP.rotationDegrees(entityYaw));
@@ -47,7 +46,7 @@ public class BladeItemEntityRenderer extends ItemEntityRenderer {
                 ItemStack current = itemIn.getItem();
 
                 EnumSet<SwordType> types = SwordType.from(current);
-                ((PersistentDataAccessor) itemIn).slashbladerefabriced$getPersistentData();
+                PersistentDataHelper.getPersistentData(itemIn);
                 ResourceLocation modelLocation = BladeStateHelper.getBladeState(current)
                         .map((state) -> state.getModel().orElseGet(bladeItem::getModel)).orElseGet(bladeItem::getModel);
                 ResourceLocation textureLocation = BladeStateHelper.getBladeState(current)
@@ -139,18 +138,18 @@ public class BladeItemEntityRenderer extends ItemEntityRenderer {
     /*
      * @Override public void doRenderShadowAndFire(Entity entityIn, double x, double
      * y, double z, float yaw, float partialTicks) {
-     * 
+     *
      * matrixStackIn.enableBlend(); matrixStackIn.blendFuncSeparate(
      * matrixStackIn.SourceFactor.SRC_COLOR, matrixStackIn.DestFactor.ONE ,
      * matrixStackIn.SourceFactor.ONE, matrixStackIn.DestFactor.ZERO);
-     * 
+     *
      * matrixStackIn.pushMatrix(); matrixStackIn.translatef((float)x, (float)y,
      * (float)z); matrixStackIn.scaled(1.4,1.8, 1.4);
      * matrixStackIn.translatef((float)-x, (float)-y, (float)-z);
-     * 
+     *
      * //core super.doRenderShadowAndFire(entityIn, x, y, z, yaw, partialTicks);
-     * 
-     * 
+     *
+     *
      * //dark fire matrixStackIn.blendFuncSeparate(
      * matrixStackIn.SourceFactor.SRC_ALPHA, matrixStackIn.DestFactor.ONE ,
      * matrixStackIn.SourceFactor.ONE, matrixStackIn.DestFactor.ZERO);
@@ -159,8 +158,8 @@ public class BladeItemEntityRenderer extends ItemEntityRenderer {
      * (float)-y, (float)-z); super.doRenderShadowAndFire(entityIn, x, y, z, yaw,
      * partialTicks); matrixStackIn.blendEquation(GL14.GL_FUNC_REVERSE_SUBTRACT);
      * super.doRenderShadowAndFire(entityIn, x, y, z, yaw, partialTicks);
-     * 
-     * 
+     *
+     *
      * matrixStackIn.popMatrix(); matrixStackIn.blendEquation(GL14.GL_FUNC_ADD);
      * matrixStackIn.blendFuncSeparate(GL11.GL_SRC_ALPHA,
      * GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);

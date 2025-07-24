@@ -1,20 +1,17 @@
 package com.flechazo.slashblade.entity;
 
 import com.flechazo.slashblade.SlashBladeConfig;
-import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.ability.StunManager;
 import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponent;
 import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankHelper;
 import com.flechazo.slashblade.capability.slashblade.BladeStateComponent;
 import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
-import com.flechazo.slashblade.item.ItemSlashBlade;
 import com.flechazo.slashblade.network.util.PlayMessages;
 import com.flechazo.slashblade.registry.EntityTypeRegister;
 import com.flechazo.slashblade.util.AttackManager;
 import com.flechazo.slashblade.util.EnumSetConverter;
 import com.flechazo.slashblade.util.KnockBacks;
 import com.flechazo.slashblade.util.NBTHelper;
-import com.flechazo.slashblade.util.accessor.PersistentDataAccessor;
 import io.github.fabricators_of_create.porting_lib.entity.PartEntity;
 import io.github.fabricators_of_create.porting_lib.entity.PortingLibEntity;
 import net.fabricmc.api.EnvType;
@@ -30,7 +27,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -38,7 +34,6 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
-import net.minecraft.world.item.alchemy.PotionUtils;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
@@ -50,21 +45,21 @@ import java.util.List;
 
 
 public class EntityDrive extends EntityAbstractSummonedSword {
-    private static final EntityDataAccessor<Integer> COLOR = SynchedEntityData.<Integer>defineId(EntityDrive.class,
+    private static final EntityDataAccessor<Integer> COLOR = SynchedEntityData.defineId(EntityDrive.class,
             EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Integer> FLAGS = SynchedEntityData.<Integer>defineId(EntityDrive.class,
+    private static final EntityDataAccessor<Integer> FLAGS = SynchedEntityData.defineId(EntityDrive.class,
             EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Float> RANK = SynchedEntityData.<Float>defineId(EntityDrive.class,
+    private static final EntityDataAccessor<Float> RANK = SynchedEntityData.defineId(EntityDrive.class,
             EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> ROTATION_OFFSET = SynchedEntityData
-            .<Float>defineId(EntityDrive.class, EntityDataSerializers.FLOAT);
-    private static final EntityDataAccessor<Float> ROTATION_ROLL = SynchedEntityData.<Float>defineId(EntityDrive.class,
+            .defineId(EntityDrive.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> ROTATION_ROLL = SynchedEntityData.defineId(EntityDrive.class,
             EntityDataSerializers.FLOAT);
-    private static final EntityDataAccessor<Float> BASESIZE = SynchedEntityData.<Float>defineId(EntityDrive.class,
+    private static final EntityDataAccessor<Float> BASESIZE = SynchedEntityData.defineId(EntityDrive.class,
             EntityDataSerializers.FLOAT);
-    private static final EntityDataAccessor<Float> SPEED = SynchedEntityData.<Float>defineId(EntityDrive.class,
+    private static final EntityDataAccessor<Float> SPEED = SynchedEntityData.defineId(EntityDrive.class,
             EntityDataSerializers.FLOAT);
-    private static final EntityDataAccessor<Float> LIFETIME = SynchedEntityData.<Float>defineId(EntityDrive.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> LIFETIME = SynchedEntityData.defineId(EntityDrive.class, EntityDataSerializers.FLOAT);
 
     private KnockBacks action = KnockBacks.cancel;
 
@@ -255,13 +250,10 @@ public class EntityDrive extends EntityAbstractSummonedSword {
     }
 
     public List<MobEffectInstance> getPotionEffects() {
-        List<MobEffectInstance> effects = PotionUtils.getAllEffects(((PersistentDataAccessor) this).slashbladerefabriced$getPersistentData());
 
-        if (effects.isEmpty())
-            effects.add(new MobEffectInstance(MobEffects.POISON, 1, 1));
-
-        return effects;
+        return super.getPotionEffects();
     }
+
 
     public void setDamage(double damageIn) {
         this.damage = damageIn;
@@ -303,12 +295,12 @@ public class EntityDrive extends EntityAbstractSummonedSword {
         // todo: attack manager
         targetEntity.invulnerableTime = 0;
         float damageValue = i;
-        if(this.getOwner() instanceof LivingEntity living) {
+        if (this.getOwner() instanceof LivingEntity living) {
             damageValue *= living.getAttributeValue(Attributes.ATTACK_DAMAGE);
             System.out.println(living.getAttributeValue(Attributes.ATTACK_DAMAGE));
             System.out.println("man" + i);
             //评分等级加成
-            if (living instanceof Player player){
+            if (living instanceof Player player) {
                 ConcentrationRankComponent.ConcentrationRanks rankBonus = ConcentrationRankHelper.getConcentrationRank(player)
                         .map(rp -> rp.getRank(player.getCommandSenderWorld().getGameTime()))
                         .orElse(ConcentrationRankComponent.ConcentrationRanks.NONE);
@@ -329,8 +321,7 @@ public class EntityDrive extends EntityAbstractSummonedSword {
                 hits = ((PartEntity<?>) targetEntity).getParent();
             }
 
-            if (hits instanceof LivingEntity) {
-                LivingEntity targetLivingEntity = (LivingEntity) hits;
+            if (hits instanceof LivingEntity targetLivingEntity) {
 
                 StunManager.setStun(targetLivingEntity);
                 if (!this.level().isClientSide() && shooter instanceof LivingEntity) {

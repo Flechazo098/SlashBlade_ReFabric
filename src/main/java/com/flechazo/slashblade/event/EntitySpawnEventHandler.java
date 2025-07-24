@@ -2,8 +2,9 @@ package com.flechazo.slashblade.event;
 
 /**
  * 此类已被弃用
- *<p>
+ * <p>
  * 请参阅 {@link com.flechazo.slashblade.mixin.event.MobSpawnMixin} 类以获得替代实现。
+ *
  * @deprecated 使用 {@link com.flechazo.slashblade.mixin.event.MobSpawnMixin} 替代。
  */
 @Deprecated

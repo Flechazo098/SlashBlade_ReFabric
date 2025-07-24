@@ -10,7 +10,6 @@ import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.UUID;
@@ -24,7 +23,7 @@ public class MotionBroadcastMessage {
         this.combo = combo;
     }
 
-    public MotionBroadcastMessage () {
+    public MotionBroadcastMessage() {
 
     }
 

@@ -1,6 +1,5 @@
 package com.flechazo.slashblade.entity;
 
-import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.init.DefaultResources;
 import com.flechazo.slashblade.network.util.PlayMessages;
 import com.flechazo.slashblade.registry.EntityTypeRegister;
@@ -65,7 +64,7 @@ public class BladeItemEntity extends ItemEntity {
         CompoundTag compoundnbt = this.saveWithoutId(new CompoundTag());
         compoundnbt.remove("Dimension");
         compoundnbt.putShort("Health", (short) 100);
-        if (compoundnbt.getShort("PickupDelay") != (short) 32767){
+        if (compoundnbt.getShort("PickupDelay") != (short) 32767) {
             compoundnbt.putShort("Age", Short.MIN_VALUE);
         }
         this.load(compoundnbt);
@@ -93,10 +92,10 @@ public class BladeItemEntity extends ItemEntity {
         if (this.level().isClientSide()) {
             if (random.nextInt(5) == 0 && getAirSupply() < 0) {
                 Direction direction = Direction.UP;
-                double d0 = (double) this.getX() - (double) (random.nextFloat() * 0.1F);
-                double d1 = (double) this.getY() - (double) (random.nextFloat() * 0.1F);
-                double d2 = (double) this.getZ() - (double) (random.nextFloat() * 0.1F);
-                double d3 = (double) (0.4F - (random.nextFloat() + random.nextFloat()) * 0.4F);
+                double d0 = this.getX() - (double) (random.nextFloat() * 0.1F);
+                double d1 = this.getY() - (double) (random.nextFloat() * 0.1F);
+                double d2 = this.getZ() - (double) (random.nextFloat() * 0.1F);
+                double d3 = 0.4F - (random.nextFloat() + random.nextFloat()) * 0.4F;
                 this.level().addParticle(ParticleTypes.PORTAL, d0 + (double) direction.getStepX() * d3,
                         d1 + 2 + (double) direction.getStepY() * d3, d2 + (double) direction.getStepZ() * d3,
                         random.nextGaussian() * 0.005D, -2, random.nextGaussian() * 0.005D);
@@ -104,10 +103,10 @@ public class BladeItemEntity extends ItemEntity {
 
             if (!this.onGround() && !this.isInWater() && random.nextInt(3) == 0) {
                 Direction direction = Direction.UP;
-                double d0 = (double) this.getX() - (double) (random.nextFloat() * 0.1F);
-                double d1 = (double) this.getY() - (double) (random.nextFloat() * 0.1F);
-                double d2 = (double) this.getZ() - (double) (random.nextFloat() * 0.1F);
-                double d3 = (double) (0.4F - (random.nextFloat() + random.nextFloat()) * 0.4F);
+                double d0 = this.getX() - (double) (random.nextFloat() * 0.1F);
+                double d1 = this.getY() - (double) (random.nextFloat() * 0.1F);
+                double d2 = this.getZ() - (double) (random.nextFloat() * 0.1F);
+                double d3 = 0.4F - (random.nextFloat() + random.nextFloat()) * 0.4F;
                 this.level().addParticle(ParticleTypes.END_ROD, d0 + (double) direction.getStepX() * d3,
                         d1 + (double) direction.getStepY() * d3, d2 + (double) direction.getStepZ() * d3,
                         random.nextGaussian() * 0.005D, random.nextGaussian() * 0.005D, random.nextGaussian() * 0.005D);

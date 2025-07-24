@@ -1,8 +1,8 @@
 package com.flechazo.slashblade.mixin.event;
 
+import com.flechazo.slashblade.capability.persistentdata.PersistentDataHelper;
 import com.flechazo.slashblade.event.KnockBackHandler;
 import com.flechazo.slashblade.util.NBTHelper;
-import com.flechazo.slashblade.util.accessor.PersistentDataAccessor;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -16,39 +16,40 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class KnockBackHandlerMixin {
 
     @Inject(method = "knockback(DDD)V", at = @At("HEAD"), cancellable = true)
-
     private void onKnockBack(double strength, double ratioX, double ratioZ, CallbackInfo ci) {
         LivingEntity self = (LivingEntity) (Object) this;
-        CompoundTag nbt = ((PersistentDataAccessor) self).slashbladerefabriced$getPersistentData();
-        if (!nbt.contains(KnockBackHandler.NBT_KEY)) {
-            return;
-        }
 
-        Vec3 factor = NBTHelper.getVector3d(nbt, KnockBackHandler.NBT_KEY);
-        nbt.remove(KnockBackHandler.NBT_KEY);
+        PersistentDataHelper.getPersistentData(self).ifPresent(persistentData -> {
+            CompoundTag nbt = persistentData.getPersistentData();
 
-        if (self.fallDistance < 0) self.fallDistance = 0;
-        self.fallDistance += factor.z;
+            if (!nbt.contains(KnockBackHandler.NBT_KEY)) {
+                return;
+            }
 
-        double resist = self.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE);
-        if (self.getRandom().nextDouble() < resist) {
-            ci.cancel();
-            return;
-        }
+            Vec3 factor = NBTHelper.getVector3d(nbt, KnockBackHandler.NBT_KEY);
+            nbt.remove(KnockBackHandler.NBT_KEY);
 
-        self.hasImpulse = true;
-        Vec3 motion = self.getDeltaMovement();
+            if (self.fallDistance < 0) {
+                self.fallDistance = 0;
+            }
+            self.fallDistance += factor.z;
 
-        if (factor.y > 0) {
-            self.setDeltaMovement(motion.x, Math.max(motion.y, factor.y), motion.z);
-        } else if (factor.y < 0) {
-            self.setDeltaMovement(
-                    motion.x,
-                    Math.min(motion.y, factor.y),
-                    motion.z
-            );
-        }
+            double resist = self.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE);
+            if (self.getRandom().nextDouble() < resist) {
+                ci.cancel();
+                return;
+            }
 
-        self.knockback(strength, ratioX, ratioZ);
+            self.hasImpulse = true;
+            Vec3 motion = self.getDeltaMovement();
+
+            if (factor.y > 0) {
+                self.setDeltaMovement(motion.x, Math.max(motion.y, factor.y), motion.z);
+            } else if (factor.y < 0) {
+                self.setDeltaMovement(motion.x, Math.min(motion.y, factor.y), motion.z);
+            }
+
+            self.knockback(strength, ratioX, ratioZ);
+        });
     }
 }

@@ -1,6 +1,5 @@
 package com.flechazo.slashblade.ability;
 
-import com.flechazo.slashblade.capability.inputstate.InputStateComponentRegistry;
 import com.flechazo.slashblade.capability.inputstate.InputStateHelper;
 import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.event.InputCommandEvent;
@@ -8,7 +7,6 @@ import com.flechazo.slashblade.item.ItemSlashBlade;
 import com.flechazo.slashblade.util.InputCommand;
 import com.flechazo.slashblade.util.RayTraceHelper;
 import com.flechazo.slashblade.util.TargetSelector;
-import com.flechazo.slashblade.util.accessor.PersistentDataAccessor;
 import io.github.fabricators_of_create.porting_lib.entity.PartEntity;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -16,14 +14,12 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.util.Mth;
 import net.minecraft.world.phys.HitResult;
 
 import java.util.Comparator;
@@ -59,10 +55,10 @@ public class LockOnManager {
             return;
 
         Entity targetEntity;
-        
+
         if (event.getOld().contains(InputCommand.SNEAK) == event.getCurrent().contains(InputCommand.SNEAK))
             return;
-        
+
         if ((event.getOld().contains(InputCommand.SNEAK) && !event.getCurrent().contains(InputCommand.SNEAK))) {
             // remove target
             targetEntity = null;
@@ -115,11 +111,9 @@ public class LockOnManager {
         ItemStack stack = player.getMainHandItem();
         if (stack.isEmpty() || !(stack.getItem() instanceof ItemSlashBlade)) return;
 
-        // 必须蹲下才激活
-        CompoundTag data = ((PersistentDataAccessor)(Object)player).slashbladerefabriced$getPersistentData();
-        if (!InputStateHelper.getInputState(player)
+        if (InputStateHelper.getInputState(player)
                 .filter(st -> st.getCommands().contains(InputCommand.SNEAK))
-                .isPresent()) return;
+                .isEmpty()) return;
 
         // 获取当前目标实体
         BladeStateHelper.getBladeState(stack).ifPresent(state -> {
@@ -128,33 +122,33 @@ public class LockOnManager {
 
             // 部分旋转插值恢复
             float partialTicks = client.getFrameTime();
-            float oldHead   = player.yHeadRot,   oldBody = player.yBodyRot,
-                    oldPitch  = player.getXRot(),  oldYaw  = player.getYRot();
-            float prevHead = player.yHeadRotO,   prevBody = player.yBodyRotO,
-                    prevYaw  = player.yRotO,       prevPitch = player.xRotO;
+            float oldHead = player.yHeadRot, oldBody = player.yBodyRot,
+                    oldPitch = player.getXRot(), oldYaw = player.getYRot();
+            float prevHead = player.yHeadRotO, prevBody = player.yBodyRotO,
+                    prevYaw = player.yRotO, prevPitch = player.xRotO;
 
             // 旋转朝向目标
             player.lookAt(EntityAnchorArgument.Anchor.EYES,
                     target.getEyeY() == 0
-                            ? target.position().add(0, target.getEyeHeight()/2, 0)
+                            ? target.position().add(0, target.getEyeHeight() / 2, 0)
                             : target.position().add(0, target.getEyeHeight(), 0)
             );
 
             // 插值平滑
             float lerpStep = 0.125f * partialTicks;
-            float diff     = Math.abs(Mth.wrapDegrees(oldYaw - player.yHeadRot)) * 0.5f;
+            float diff = Math.abs(Mth.wrapDegrees(oldYaw - player.yHeadRot)) * 0.5f;
             lerpStep *= Math.min(1.0f, diff);
 
-            player.setXRot (Mth.rotLerp(lerpStep, oldPitch, player.getXRot()));
-            player.setYRot (Mth.rotLerp(lerpStep, oldYaw,   player.getYRot()));
+            player.setXRot(Mth.rotLerp(lerpStep, oldPitch, player.getXRot()));
+            player.setYRot(Mth.rotLerp(lerpStep, oldYaw, player.getYRot()));
             player.setYHeadRot(Mth.rotLerp(lerpStep, oldHead, player.getYHeadRot()));
 
             // 恢复身体朝向
             player.yBodyRot = oldBody;
             player.yBodyRotO = prevBody;
             player.yHeadRotO = prevHead;
-            player.yRotO      = prevYaw;
-            player.xRotO      = prevPitch;
+            player.yRotO = prevYaw;
+            player.xRotO = prevPitch;
         });
     }
 }

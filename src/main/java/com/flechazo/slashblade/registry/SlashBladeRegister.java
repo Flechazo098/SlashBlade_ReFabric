@@ -67,29 +67,29 @@ public class SlashBladeRegister {
     public static BladeStandItem BLADESTAND_1W;
     public static BladeStandItem BLADESTAND_2W;
 
-    public static void registerAll () {
-        WOOD = new ItemSlashBladeDetune(new ItemTierSlashBlade(60, 2F), 2, - 2.4F, new FabricItemSettings())
+    public static void registerAll() {
+        WOOD = new ItemSlashBladeDetune(new ItemTierSlashBlade(60, 2F), 2, -2.4F, new FabricItemSettings())
                 .setDestructable().setTexture(new ResourceLocation(SlashBladeRefabriced.MODID, "model/wood.png"));
         Registry.register(BuiltInRegistries.ITEM, WOOD_ID, WOOD);
 
-        BAMBOO = new ItemSlashBladeDetune(new ItemTierSlashBlade(70, 3F), 3, - 2.4F, new FabricItemSettings())
+        BAMBOO = new ItemSlashBladeDetune(new ItemTierSlashBlade(70, 3F), 3, -2.4F, new FabricItemSettings())
                 .setDestructable().setTexture(new ResourceLocation(SlashBladeRefabriced.MODID, "model/bamboo.png"));
         Registry.register(BuiltInRegistries.ITEM, BAMBOO_ID, BAMBOO);
 
-        SILVER = new ItemSlashBladeDetune(new ItemTierSlashBlade(40, 3F), 3, - 2.4F, new FabricItemSettings())
+        SILVER = new ItemSlashBladeDetune(new ItemTierSlashBlade(40, 3F), 3, -2.4F, new FabricItemSettings())
                 .setDestructable().setTexture(new ResourceLocation(SlashBladeRefabriced.MODID, "model/silverbamboo.png"));
         Registry.register(BuiltInRegistries.ITEM, SILVER_ID, SILVER);
 
-        WHITE = new ItemSlashBladeDetune(new ItemTierSlashBlade(70, 4F), 4, - 2.4F, new FabricItemSettings())
+        WHITE = new ItemSlashBladeDetune(new ItemTierSlashBlade(70, 4F), 4, -2.4F, new FabricItemSettings())
                 .setDestructable().setTexture(new ResourceLocation(SlashBladeRefabriced.MODID, "model/white.png"));
         Registry.register(BuiltInRegistries.ITEM, WHITE_ID, WHITE);
 
-        SLASHBLADE = new ItemSlashBlade(new ItemTierSlashBlade(40, 4F), 4, - 2.4F, new FabricItemSettings());
+        SLASHBLADE = new ItemSlashBlade(new ItemTierSlashBlade(40, 4F), 4, -2.4F, new FabricItemSettings());
         Registry.register(BuiltInRegistries.ITEM, SLASHBLADE_ID, SLASHBLADE);
 
         PROUDSOUL = new Item(new FabricItemSettings()) {
             @Override
-            public boolean onEntityItemUpdate (ItemStack stack, ItemEntity entity) {
+            public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
                 if (entity instanceof BladeItemEntity) return false;
                 CompoundTag tag = stack.getOrCreateTag();
                 tag.putInt("Health", 50);
@@ -103,12 +103,12 @@ public class SlashBladeRegister {
             }
 
             @Override
-            public boolean isFoil (ItemStack stack) {
+            public boolean isFoil(ItemStack stack) {
                 return true;
             }
 
             @Override
-            public int getEnchantmentValue () {
+            public int getEnchantmentValue() {
                 return 50;
             }
         };
@@ -116,12 +116,12 @@ public class SlashBladeRegister {
 
         PROUDSOUL_INGOT = new Item(new FabricItemSettings()) {
             @Override
-            public boolean isFoil (ItemStack stack) {
+            public boolean isFoil(ItemStack stack) {
                 return true;
             }
 
             @Override
-            public int getEnchantmentValue () {
+            public int getEnchantmentValue() {
                 return 100;
             }
         };
@@ -129,12 +129,12 @@ public class SlashBladeRegister {
 
         PROUDSOUL_TINY = new Item(new FabricItemSettings()) {
             @Override
-            public boolean isFoil (ItemStack stack) {
+            public boolean isFoil(ItemStack stack) {
                 return true;
             }
 
             @Override
-            public int getEnchantmentValue () {
+            public int getEnchantmentValue() {
                 return 10;
             }
         };
@@ -142,17 +142,17 @@ public class SlashBladeRegister {
 
         PROUDSOUL_SPHERE = new Item(new FabricItemSettings().rarity(Rarity.UNCOMMON)) {
             @Override
-            public boolean isFoil (ItemStack stack) {
+            public boolean isFoil(ItemStack stack) {
                 return true;
             }
 
             @Override
-            public int getEnchantmentValue () {
+            public int getEnchantmentValue() {
                 return 150;
             }
 
             @Override
-            public void appendHoverText (ItemStack stack, @Nullable Level lvl, List<Component> tips, TooltipFlag flag) {
+            public void appendHoverText(ItemStack stack, @Nullable Level lvl, List<Component> tips, TooltipFlag flag) {
                 if (stack.hasTag() && stack.getTag().contains("SpecialAttackType")) {
                     ResourceLocation sa = new ResourceLocation(stack.getTag().getString("SpecialAttackType"));
                     var entry = SlashArtsRegistry.REGISTRY.get(sa);
@@ -168,17 +168,17 @@ public class SlashBladeRegister {
 
         PROUDSOUL_CRYSTAL = new Item(new FabricItemSettings().rarity(Rarity.RARE)) {
             @Override
-            public boolean isFoil (ItemStack stack) {
+            public boolean isFoil(ItemStack stack) {
                 return true;
             }
 
             @Override
-            public int getEnchantmentValue () {
+            public int getEnchantmentValue() {
                 return 200;
             }
 
             @Override
-            public void appendHoverText (ItemStack stack, @Nullable Level lvl, List<Component> tips, TooltipFlag flag) {
+            public void appendHoverText(ItemStack stack, @Nullable Level lvl, List<Component> tips, TooltipFlag flag) {
                 if (stack.hasTag() && stack.getTag().contains("SpecialEffectType")) {
                     ResourceLocation se = new ResourceLocation(stack.getTag().getString("SpecialEffectType"));
                     var effect = SpecialEffectsRegistry.REGISTRY.get(se);
@@ -201,12 +201,12 @@ public class SlashBladeRegister {
 
         PROUDSOUL_TRAP = new Item(new FabricItemSettings().rarity(Rarity.EPIC)) {
             @Override
-            public boolean isFoil (ItemStack stack) {
+            public boolean isFoil(ItemStack stack) {
                 return true;
             }
 
             @Override
-            public int getEnchantmentValue () {
+            public int getEnchantmentValue() {
                 return getTrapezohedronMaxRefine();
             }
         };

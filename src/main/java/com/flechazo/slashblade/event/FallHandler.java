@@ -6,19 +6,19 @@ import com.flechazo.slashblade.registry.combo.ComboState;
 import com.flechazo.slashblade.util.AdvancementHelper;
 import io.github.fabricators_of_create.porting_lib.attributes.PortingLibAttributes;
 import io.github.fabricators_of_create.porting_lib.block.CustomLandingEffectsBlock;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.core.particles.BlockParticleOption;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.server.level.ServerLevel;
 
 /**
  * 摔落事件处理类
@@ -49,7 +49,7 @@ public class FallHandler {
 
             float f = (float) Mth.ceil(fallFactor);
             if (!state.isAir()) {
-                double d0 = Math.min((double) (0.2F + f / 15.0F), 2.5D);
+                double d0 = Math.min(0.2F + f / 15.0F, 2.5D);
                 int i = (int) (150.0D * d0);
                 Block block = state.getBlock();
 
@@ -78,10 +78,10 @@ public class FallHandler {
 
             float f = (float) Mth.ceil(fallFactor);
             if (!state.isAir()) {
-                double d0 = Math.min((double) (0.2F + f / 15.0F), 2.5D);
+                double d0 = Math.min(0.2F + f / 15.0F, 2.5D);
                 int i = (int) (150.0D * d0);
                 ((ServerLevel) user.level()).sendParticles(new BlockParticleOption(ParticleTypes.BLOCK, state),
-                        targetPos.x(), targetPos.y(), targetPos.z(), i, 0.0D, 0.0D, 0.0D, (double) 0.15F);
+                        targetPos.x(), targetPos.y(), targetPos.z(), i, 0.0D, 0.0D, 0.0D, 0.15F);
             }
         }
     }

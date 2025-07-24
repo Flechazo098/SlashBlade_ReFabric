@@ -31,12 +31,9 @@ import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.awt.Color;
-import java.util.AbstractMap;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
 
 public interface BladeStateComponent extends Component {
     // 获取最后一次动作时间
@@ -251,7 +248,7 @@ public interface BladeStateComponent extends Component {
         ResourceLocation currentloc = resolvCurrentComboState(user);
         ComboState current = ComboStateRegistry.COMBO_STATE.get(currentloc);
 
-        if(current == null)
+        if (current == null)
             return ComboStateRegistry.NONE.getId();
 
         ResourceLocation next = current.getNext(user);
@@ -286,7 +283,7 @@ public interface BladeStateComponent extends Component {
         Map.Entry<Integer, ResourceLocation> currentloc = resolvCurrentComboStateTicks(user);
 
         ComboState current = ComboStateRegistry.COMBO_STATE.get(currentloc.getValue());
-        if(current == null)
+        if (current == null)
             return ComboStateRegistry.NONE.getId();
 
         // Uninterrupted
@@ -337,7 +334,7 @@ public interface BladeStateComponent extends Component {
 
     // 解析当前连击状态
     default ResourceLocation resolvCurrentComboState(LivingEntity user) {
-        if(!(user.getMainHandItem().getItem() instanceof ItemSlashBlade))
+        if (!(user.getMainHandItem().getItem() instanceof ItemSlashBlade))
             return ComboStateRegistry.NONE.getId();
         return resolvCurrentComboStateTicks(user).getValue();
     }
@@ -463,7 +460,7 @@ public interface BladeStateComponent extends Component {
                                 .orElse(ComboStateRegistry.STANDBY.getId()).toString()
                 );
 
-        if (this.getSpecialEffects() != null && ! this.getSpecialEffects().isEmpty()) {
+        if (this.getSpecialEffects() != null && !this.getSpecialEffects().isEmpty()) {
             ListTag seList = new ListTag();
             this.getSpecialEffects().forEach(se -> seList.add(StringTag.valueOf(se.toString())));
             tag.put("SpecialEffects", seList);
@@ -515,10 +512,10 @@ public interface BladeStateComponent extends Component {
                 // Combo Root
                 .get("ComboRoot", (String s) -> this.setComboRoot(ResourceLocation.tryParse(s)));
 
-                if (tag.contains("SpecialEffects")) {
-                 ListTag list = tag.getList("SpecialEffects", Tag.TAG_STRING);
-                 this.setSpecialEffects(list);
-               }
+        if (tag.contains("SpecialEffects")) {
+            ListTag list = tag.getList("SpecialEffects", Tag.TAG_STRING);
+            this.setSpecialEffects(list);
+        }
 
         this.setHasChangedActiveState(false);
     }

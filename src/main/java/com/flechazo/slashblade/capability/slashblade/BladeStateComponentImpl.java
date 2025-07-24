@@ -5,7 +5,6 @@ import com.flechazo.slashblade.registry.ComboStateRegistry;
 import com.flechazo.slashblade.registry.SlashArtsRegistry;
 import com.flechazo.slashblade.registry.SpecialEffectsRegistry;
 import com.flechazo.slashblade.util.NBTHelper;
-import dev.onyxstudios.cca.api.v3.component.sync.AutoSyncedComponent;
 import dev.onyxstudios.cca.api.v3.item.ItemComponent;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -21,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public class BladeStateComponentImpl extends ItemComponent implements BladeStateComponent{
+public class BladeStateComponentImpl extends ItemComponent implements BladeStateComponent {
 
     // action state
     protected long lastActionTime; // lastActionTime
@@ -80,8 +79,8 @@ public class BladeStateComponentImpl extends ItemComponent implements BladeState
     public BladeStateComponentImpl(ItemStack blade) {
         super(blade);
         this.blade = blade;
-        if(!blade.isEmpty()) {
-            if(blade.getOrCreateTag().contains("bladeState"))
+        if (!blade.isEmpty()) {
+            if (blade.getOrCreateTag().contains("bladeState"))
                 this.readFromNbt(blade.getOrCreateTag().getCompound("bladeState"));
         }
     }
@@ -299,7 +298,7 @@ public class BladeStateComponentImpl extends ItemComponent implements BladeState
 
     @Override
     public ResourceLocation getComboRoot() {
-        if(this.comboRootName == null || !ComboStateRegistry.COMBO_STATE.containsKey(this.comboRootName))
+        if (this.comboRootName == null || !ComboStateRegistry.COMBO_STATE.containsKey(this.comboRootName))
             return ComboStateRegistry.STANDBY.getId();
         return this.comboRootName;
     }
@@ -370,9 +369,9 @@ public class BladeStateComponentImpl extends ItemComponent implements BladeState
     @Override
     public void setSpecialEffects(ListTag list) {
         List<ResourceLocation> result = new ArrayList<>();
-        list.forEach(tag->{
+        list.forEach(tag -> {
             ResourceLocation se = ResourceLocation.tryParse(tag.getAsString());
-            if(SpecialEffectsRegistry.REGISTRY.containsKey(se))
+            if (SpecialEffectsRegistry.REGISTRY.containsKey(se))
                 result.add(se);
         });
         this.specialEffects = result;
@@ -380,7 +379,7 @@ public class BladeStateComponentImpl extends ItemComponent implements BladeState
 
     @Override
     public boolean addSpecialEffect(ResourceLocation se) {
-        if(SpecialEffectsRegistry.REGISTRY.containsKey(se)) {
+        if (SpecialEffectsRegistry.REGISTRY.containsKey(se)) {
             return this.specialEffects.add(se);
         }
         return false;
@@ -393,7 +392,7 @@ public class BladeStateComponentImpl extends ItemComponent implements BladeState
 
     @Override
     public boolean hasSpecialEffect(ResourceLocation se) {
-        if(SpecialEffectsRegistry.REGISTRY.containsKey(se)) {
+        if (SpecialEffectsRegistry.REGISTRY.containsKey(se)) {
             return this.specialEffects.contains(se);
         }
         this.specialEffects.remove(se);
@@ -467,7 +466,7 @@ public class BladeStateComponentImpl extends ItemComponent implements BladeState
 
         this.setComboRoot(ResourceLocation.tryParse(tag.getString("ComboRoot")));
 
-        if(tag.contains("SpecialEffects")) {
+        if (tag.contains("SpecialEffects")) {
             this.setSpecialEffects(tag.getList("SpecialEffects", 8));
         }
         return tag;
@@ -518,9 +517,9 @@ public class BladeStateComponentImpl extends ItemComponent implements BladeState
         tag.putString("ComboRoot",
                 Optional.ofNullable(this.getComboRoot()).orElse(ComboStateRegistry.STANDBY.getId()).toString());
 
-        if(this.getSpecialEffects()!=null && !this.getSpecialEffects().isEmpty()) {
+        if (this.getSpecialEffects() != null && !this.getSpecialEffects().isEmpty()) {
             ListTag seList = new ListTag();
-            this.getSpecialEffects().forEach(se->seList.add(StringTag.valueOf(se.toString())));
+            this.getSpecialEffects().forEach(se -> seList.add(StringTag.valueOf(se.toString())));
             tag.put("SpecialEffects", seList);
         }
     }

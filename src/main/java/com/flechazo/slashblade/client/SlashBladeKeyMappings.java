@@ -1,10 +1,8 @@
 package com.flechazo.slashblade.client;
 
-import org.lwjgl.glfw.GLFW;
-
 import com.mojang.blaze3d.platform.InputConstants;
-
 import net.minecraft.client.KeyMapping;
+import org.lwjgl.glfw.GLFW;
 
 public class SlashBladeKeyMappings {
     public static final KeyMapping KEY_SPECIAL_MOVE = new KeyMapping(
@@ -20,5 +18,7 @@ public class SlashBladeKeyMappings {
             GLFW.GLFW_MOUSE_BUTTON_MIDDLE,
             "key.category.slashblade"
     );
-    public static void init() {}
+
+    public static void init() {
+    }
 }

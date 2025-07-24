@@ -8,7 +8,7 @@ import net.minecraft.world.entity.LivingEntity;
 
 public class LivingEntityComponentRegister implements EntityComponentInitializer {
     @Override
-    public void registerEntityComponentFactories (EntityComponentFactoryRegistry registry) {
+    public void registerEntityComponentFactories(EntityComponentFactoryRegistry registry) {
         registry.registerFor(LivingEntity.class, ConcentrationRankComponentRegistry.CONCENTRATION_RANK, entity -> new ConcentrationRankComponentImpl());
     }
 }

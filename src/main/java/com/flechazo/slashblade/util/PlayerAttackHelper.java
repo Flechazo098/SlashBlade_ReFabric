@@ -6,7 +6,6 @@ import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankCom
 import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankHelper;
 import com.flechazo.slashblade.capability.slashblade.BladeStateComponent;
 import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
-import com.flechazo.slashblade.item.ItemSlashBlade;
 import io.github.fabricators_of_create.porting_lib.entity.PartEntity;
 import io.github.fabricators_of_create.porting_lib.entity.events.CriticalHitEvent;
 import net.minecraft.core.particles.ParticleTypes;
@@ -33,7 +32,7 @@ public class PlayerAttackHelper {
     // 该方法伤害公式=(面板攻击力 + 横扫之刃附魔加成 + 评分等级加成 + 杀手类附魔加成) * 连招伤害系数 * 拔刀伤害系数 * 拔刀剑伤害调整比例 * 暴击倍率
     public static void attack(Player attacker, Entity target, float comboRatio) {
         // 触发Forge事件，以兼容其他模组
-        if (! FabricHooks.onPlayerAttackTarget(attacker, target)) return;
+        if (!FabricHooks.onPlayerAttackTarget(attacker, target)) return;
         // 判断攻击目标是否可以被攻击
         if (target.isAttackable()) {
             if (!target.skipAttackInteraction(attacker)) {
@@ -58,9 +57,9 @@ public class PlayerAttackHelper {
                 //杀手类附魔加成(杀死类附魔攻击对应的生物加成2.5 * 附魔等级)
                 float enchantmentDamageBonus;
                 if (target instanceof LivingEntity) {
-                    enchantmentDamageBonus  = EnchantmentHelper.getDamageBonus(attacker.getMainHandItem(), ((LivingEntity)target).getMobType());
+                    enchantmentDamageBonus = EnchantmentHelper.getDamageBonus(attacker.getMainHandItem(), ((LivingEntity) target).getMobType());
                 } else {
-                    enchantmentDamageBonus  = EnchantmentHelper.getDamageBonus(attacker.getMainHandItem(), MobType.UNDEFINED);
+                    enchantmentDamageBonus = EnchantmentHelper.getDamageBonus(attacker.getMainHandItem(), MobType.UNDEFINED);
                 }
                 baseDamage += enchantmentDamageBonus;
 

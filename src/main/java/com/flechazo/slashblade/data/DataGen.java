@@ -1,8 +1,5 @@
 package com.flechazo.slashblade.data;
 
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.data.builtin.SlashBladeBuiltInRegistry;
 import com.flechazo.slashblade.data.builtin.SlashBladeEntityDropBuiltInRegistry;
@@ -10,15 +7,11 @@ import com.flechazo.slashblade.data.tag.SlashBladeEntityTypeTagProvider;
 import com.flechazo.slashblade.event.drop.EntityDropEntry;
 import com.flechazo.slashblade.registry.slashblade.SlashBladeDefinition;
 import io.github.fabricators_of_create.porting_lib.data.DatapackBuiltinEntriesProvider;
-import io.github.fabricators_of_create.porting_lib.data.ExistingFileHelper;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.RegistrySetBuilder;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.PackOutput;
+
+import java.util.Set;
 
 public class DataGen implements DataGeneratorEntrypoint {
 
@@ -36,7 +29,7 @@ public class DataGen implements DataGeneratorEntrypoint {
 
         pack.addProvider((dataOutput, registries) -> new DatapackBuiltinEntriesProvider(dataOutput, registries, builder, Set.of(SlashBladeRefabriced.MODID)) {
             @Override
-            public String getName () {
+            public String getName() {
                 return "SlashBlade Combined Registry";
             }
         });

@@ -60,7 +60,7 @@ public abstract class AnvilMenuMixin {
                 s.setProudSoulCount(s.getProudSoulCount() + Math.min(5000, level * 10));
                 if (s.getRefine() < refineLimit) {
                     s.setRefine(s.getRefine() + 1);
-                    if(s.getRefine() < 200)
+                    if (s.getRefine() < 200)
                         s.setMaxDamage(s.getMaxDamage() + 1);
                 }
 

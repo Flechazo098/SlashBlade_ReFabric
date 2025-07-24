@@ -1,10 +1,7 @@
 package com.flechazo.slashblade.item;
 
-import java.util.List;
-
 import com.flechazo.slashblade.capability.slashblade.BladeStateComponent;
 import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
-
 import com.flechazo.slashblade.init.DefaultResources;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -12,6 +9,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+
+import java.util.List;
 
 public class ItemSlashBladeDetune extends ItemSlashBlade {
     private ResourceLocation model;
@@ -45,7 +44,7 @@ public class ItemSlashBladeDetune extends ItemSlashBlade {
         return this;
     }
 
-    public float getBaseAttack () {
+    public float getBaseAttack() {
         return baseAttack;
     }
 
@@ -61,6 +60,7 @@ public class ItemSlashBladeDetune extends ItemSlashBlade {
     public BladeStateComponent createComponent(ItemStack stack) {
         return BladeStateHelper.createSimpleBladeState(stack, model, texture, baseAttack, this.getTier().getUses());
     }
+
     @Override
     public boolean isDestructable(ItemStack stack) {
         return this.isDestructable;

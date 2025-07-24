@@ -1,6 +1,5 @@
 package com.flechazo.slashblade.entity;
 
-import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.network.util.PlayMessages;
 import com.flechazo.slashblade.registry.EntityTypeRegister;
 import com.flechazo.slashblade.util.KnockBacks;
@@ -13,7 +12,10 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.*;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class EntitySpiralSwords extends EntityAbstractSummonedSword {
     private static final EntityDataAccessor<Boolean> IT_FIRED = SynchedEntityData.defineId(EntitySpiralSwords.class,
@@ -70,13 +72,13 @@ public class EntitySpiralSwords extends EntityAbstractSummonedSword {
             if (target != null) {
                 dir = this.position().subtract(target.position()).multiply(1, 0, 1).normalize();
             }
-            ((EntitySpiralSwords) this).shoot(dir.x, dir.y, dir.z, 3.0f, 1.0f);
+            this.shoot(dir.x, dir.y, dir.z, 3.0f, 1.0f);
             return;
         }
 
         // this.startRiding()
         this.setDeltaMovement(Vec3.ZERO);
-            this.baseTick();
+        this.baseTick();
 
         faceEntityStandby();
         // this.getVehicle().positionRider(this);
@@ -101,7 +103,7 @@ public class EntitySpiralSwords extends EntityAbstractSummonedSword {
         }
 
         if (raytraceresult != null && raytraceresult.getType() == HitResult.Type.ENTITY) {
-            Entity entity = ((EntityHitResult) raytraceresult).getEntity();
+            Entity entity = raytraceresult.getEntity();
             Entity entity1 = this.getShooter();
             if (entity instanceof Player && entity1 instanceof Player
                     && !((Player) entity1).canHarmPlayer((Player) entity)) {
@@ -111,7 +113,7 @@ public class EntitySpiralSwords extends EntityAbstractSummonedSword {
         }
 
         if (raytraceresult != null && raytraceresult.getType() == HitResult.Type.ENTITY
-                && ! EntityEventFactory.onProjectileImpact(this, raytraceresult)) {
+                && !EntityEventFactory.onProjectileImpact(this, raytraceresult)) {
             this.onHit(raytraceresult);
             this.resetAlreadyHits();
             this.hasImpulse = true;

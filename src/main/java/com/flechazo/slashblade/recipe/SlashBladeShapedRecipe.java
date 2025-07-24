@@ -63,9 +63,9 @@ public class SlashBladeShapedRecipe extends ShapedRecipe {
     public ItemStack assemble(CraftingContainer container, RegistryAccess access) {
         var result = this.getResultItem(access);
         if (!(result.getItem() instanceof ItemSlashBlade)) {
-        	result = new ItemStack(SlashBladeRegister.SLASHBLADE);
+            result = new ItemStack(SlashBladeRegister.SLASHBLADE);
         }
-        
+
         var resultState = BladeStateHelper.getBladeState(result).orElseThrow(NullPointerException::new);
         for (var stack : container.getItems()) {
             if (!(stack.getItem() instanceof ItemSlashBlade))
@@ -77,7 +77,7 @@ public class SlashBladeShapedRecipe extends ShapedRecipe {
             resultState.setRefine(resultState.getRefine() + ingredientState.getRefine());
             updateEnchantment(result, stack);
         }
-        
+
         return result;
     }
 

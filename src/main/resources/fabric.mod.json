@@ -16,7 +16,7 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-          "com.flechazo.slashblade.SlashBladeRefabriced"
+			"com.flechazo.slashblade.SlashBladeRefabriced"
 		],
 		"client": [
 			"com.flechazo.slashblade.client.ClientHandler"
@@ -28,18 +28,20 @@
 			"com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponentRegistry",
 			"com.flechazo.slashblade.capability.inputstate.InputStateComponentRegistry",
 			"com.flechazo.slashblade.capability.mobeffect.MobEffectComponentRegistry",
-			"com.flechazo.slashblade.capability.LivingEntityComponentRegister"
+			"com.flechazo.slashblade.capability.LivingEntityComponentRegister",
+			"com.flechazo.slashblade.capability.persistentdata.PersistentDataComponentRegistry"
 		],
 		"cardinal-components-item": [
 			"com.flechazo.slashblade.capability.slashblade.BladeStateComponentRegistry"
-			]
+		]
 	},
 	"custom": {
 		"cardinal-components": [
 			"slashblade:concentration_rank",
 			"slashblade:input_state",
 			"slashblade:mob_effect",
-			"slashblade:blade_state"
+			"slashblade:blade_state",
+			"slashblade:persistent_data"
 		]
 	},
 	"mixins": [

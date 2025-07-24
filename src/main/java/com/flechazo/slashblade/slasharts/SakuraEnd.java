@@ -1,6 +1,5 @@
 package com.flechazo.slashblade.slasharts;
 
-import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankHelper;
 import com.flechazo.slashblade.capability.slashblade.BladeStateComponent;
 import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
@@ -13,12 +12,12 @@ import net.minecraft.world.phys.Vec3;
 
 public class SakuraEnd {
     public static EntitySlashEffect doSlash(LivingEntity playerIn, float roll, Vec3 centerOffset, boolean mute,
-            boolean critical, double damage) {
+                                            boolean critical, double damage) {
         return doSlash(playerIn, roll, centerOffset, mute, critical, damage, KnockBacks.cancel);
     }
 
     public static EntitySlashEffect doSlash(LivingEntity playerIn, float roll, Vec3 centerOffset, boolean mute,
-            boolean critical, double damage, KnockBacks knockback) {
+                                            boolean critical, double damage, KnockBacks knockback) {
 
         int colorCode = BladeStateHelper.getBladeState(playerIn.getMainHandItem())
                 .map(BladeStateComponent::getColorCode).orElse(0xFFFFFF);
@@ -27,7 +26,7 @@ public class SakuraEnd {
     }
 
     public static EntitySlashEffect doSlash(LivingEntity playerIn, float roll, int colorCode, Vec3 centerOffset,
-            boolean mute, boolean critical, double damage, KnockBacks knockback) {
+                                            boolean mute, boolean critical, double damage, KnockBacks knockback) {
 
         if (playerIn.level().isClientSide())
             return null;

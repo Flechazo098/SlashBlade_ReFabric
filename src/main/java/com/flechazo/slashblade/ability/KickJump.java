@@ -1,12 +1,12 @@
 package com.flechazo.slashblade.ability;
 
 import com.flechazo.slashblade.SlashBladeRefabriced;
+import com.flechazo.slashblade.capability.persistentdata.PersistentDataHelper;
 import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.event.InputCommandEvent;
 import com.flechazo.slashblade.registry.ComboStateRegistry;
 import com.flechazo.slashblade.util.AdvancementHelper;
 import com.flechazo.slashblade.util.InputCommand;
-import com.flechazo.slashblade.util.accessor.PersistentDataAccessor;
 import io.github.fabricators_of_create.porting_lib.entity.events.PlayerTickEvents;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
@@ -24,6 +24,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+
 import java.util.EnumSet;
 
 public class KickJump {
@@ -66,8 +67,12 @@ public class KickJump {
         if (!current.contains(InputCommand.JUMP))
             return;
 
-        if (0 != ((PersistentDataAccessor) sender).slashbladerefabriced$getPersistentData().getInt(KEY_KICKJUMP))
+        if (PersistentDataHelper.getPersistentData(sender)
+                .map(data -> data.getPersistentData().getInt(KEY_KICKJUMP))
+                .orElse(0) != 0) {
             return;
+        }
+
 
         Iterable<VoxelShape> list = worldIn.getBlockCollisions(sender, sender.getBoundingBox().inflate(0.5, 0, 1));
         if (!list.iterator().hasNext())
@@ -77,7 +82,9 @@ public class KickJump {
         Untouchable.setUntouchable(sender, Untouchable.JUMP_TICKS);
 
         // set cooldown
-        ((PersistentDataAccessor) sender).slashbladerefabriced$getPersistentData().putInt(KEY_KICKJUMP, 2);
+        PersistentDataHelper.getPersistentData(sender).ifPresent(data ->
+                data.getPersistentData().putInt(KEY_KICKJUMP, 2)
+        );
 
         Vec3 delta = sender.getDeltaMovement();
         Vec3 motion = new Vec3(delta.x, +0.8, delta.z);
@@ -96,7 +103,7 @@ public class KickJump {
         if (worldIn instanceof ServerLevel) {
             ((ServerLevel) worldIn).sendParticles(
                     new BlockParticleOption(ParticleTypes.BLOCK, Blocks.GLASS.defaultBlockState()), sender.getX(),
-                    sender.getY(), sender.getZ(), 20, 0.0D, 0.0D, 0.0D, (double) 0.15F);
+                    sender.getY(), sender.getZ(), 20, 0.0D, 0.0D, 0.0D, 0.15F);
         }
 
     }
@@ -105,17 +112,17 @@ public class KickJump {
         // 只在服务端执行
         if (player.level().isClientSide) return;
 
-        CompoundTag tag = ((PersistentDataAccessor) player).slashbladerefabriced$getPersistentData();
-        if (player.onGround() && 0 < tag.getInt(KEY_KICKJUMP)) {
+        PersistentDataHelper.getPersistentData(player).ifPresent(data -> {
+            CompoundTag tag = data.getPersistentData();
+            if (player.onGround() && tag.getInt(KEY_KICKJUMP) > 0) {
+                int count = tag.getInt(KEY_KICKJUMP) - 1;
 
-            int count = tag.getInt(KEY_KICKJUMP);
-            count--;
-
-            if (count <= 0) {
-                tag.remove(KEY_KICKJUMP);
-            } else {
-                tag.putInt(KEY_KICKJUMP, count);
+                if (count <= 0) {
+                    tag.remove(KEY_KICKJUMP);
+                } else {
+                    tag.putInt(KEY_KICKJUMP, count);
+                }
             }
-        }
+        });
     }
 }

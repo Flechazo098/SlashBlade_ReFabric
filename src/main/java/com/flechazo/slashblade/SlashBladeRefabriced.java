@@ -1,27 +1,19 @@
 package com.flechazo.slashblade;
 
 import com.flechazo.slashblade.ability.*;
-import com.flechazo.slashblade.data.builtin.SlashBladeBuiltInRegistry;
-import com.flechazo.slashblade.event.*;
 import com.flechazo.slashblade.client.renderer.model.BladeModelManager;
+import com.flechazo.slashblade.event.*;
 import com.flechazo.slashblade.network.NetworkManager;
 import com.flechazo.slashblade.recipe.RecipeSerializerRegistry;
 import com.flechazo.slashblade.registry.*;
 import com.flechazo.slashblade.registry.combo.ComboCommands;
 import com.flechazo.slashblade.registry.slashblade.SlashBladeDefinition;
 import com.flechazo.slashblade.util.TargetSelector;
-import io.github.fabricators_of_create.porting_lib.registries.RegistryEvents;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.event.registry.FabricRegistryBuilder;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -29,7 +21,7 @@ import org.apache.logging.log4j.Logger;
 public class SlashBladeRefabriced implements ModInitializer {
     public static final String MODID = "slashblade";
 
-    public static ResourceLocation prefix (String path) {
+    public static ResourceLocation prefix(String path) {
         return new ResourceLocation(SlashBladeRefabriced.MODID, path);
     }
 
@@ -40,9 +32,7 @@ public class SlashBladeRefabriced implements ModInitializer {
     @Override
     public void onInitialize() {
         SlashBladeConfig.init();
-
         RegistryHandler.initDatapack();
-
         NetworkManager.registerServerReceivers();
 
         EntityTypeRegister.registerEntityTypes();
@@ -51,7 +41,6 @@ public class SlashBladeRefabriced implements ModInitializer {
         RecipeSerializerRegistry.register();
 
         SlashBladeRegister.registerAll();
-        SlashBladeCreativeGroup.init();
 
         eventHandlerInit();
 
@@ -59,8 +48,7 @@ public class SlashBladeRefabriced implements ModInitializer {
 
         ComboStateRegistry.init();
         SpecialEffectsRegistry.init();
-
-
+        SlashBladeCreativeGroup.init();
     }
 
     private void eventHandlerInit() {
@@ -81,21 +69,21 @@ public class SlashBladeRefabriced implements ModInitializer {
         ComboCommands.initDefaultStandByCommands();
     }
 
-        /**
-         * /scoreboard objectives add stat minecraft.custom:slashblade.sword_summoned
-         * /scoreboard objectives setdisplay sidebar stat
-         */
+    /**
+     * /scoreboard objectives add stat minecraft.custom:slashblade.sword_summoned
+     * /scoreboard objectives setdisplay sidebar stat
+     */
 
-    public static Registry<SlashBladeDefinition> getSlashBladeDefinitionRegistry (Level level) {
+    public static Registry<SlashBladeDefinition> getSlashBladeDefinitionRegistry(Level level) {
         if (level.isClientSide())
             return BladeModelManager.getClientSlashBladeRegistry();
         return level.registryAccess().registryOrThrow(SlashBladeDefinition.NAMED_BLADES_KEY);
     }
 
-    public static HolderLookup.RegistryLookup<SlashBladeDefinition> getSlashBladeDefinitionRegistry (HolderLookup.Provider access) {
+    public static HolderLookup.RegistryLookup<SlashBladeDefinition> getSlashBladeDefinitionRegistry(HolderLookup.Provider access) {
         return access.lookupOrThrow(SlashBladeDefinition.NAMED_BLADES_KEY);
     }
-    }
+}
 
 
 

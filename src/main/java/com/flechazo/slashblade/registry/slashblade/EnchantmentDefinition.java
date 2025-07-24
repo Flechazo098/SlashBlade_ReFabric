@@ -2,7 +2,6 @@ package com.flechazo.slashblade.registry.slashblade;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
 import net.minecraft.resources.ResourceLocation;
 
 public class EnchantmentDefinition {

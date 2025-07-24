@@ -1,35 +1,35 @@
 package com.flechazo.slashblade.ability;
 
-import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.SlashBladeConfig;
+import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponent;
 import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankHelper;
 import com.flechazo.slashblade.capability.inputstate.InputStateHelper;
 import com.flechazo.slashblade.capability.slashblade.BladeStateComponentImpl;
 import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
 import com.flechazo.slashblade.entity.*;
+import com.flechazo.slashblade.event.InputCommandEvent;
+import com.flechazo.slashblade.item.SwordType;
 import com.flechazo.slashblade.registry.EntityTypeRegister;
 import com.flechazo.slashblade.registry.SlashBladeStats;
 import com.flechazo.slashblade.util.*;
-import com.flechazo.slashblade.event.InputCommandEvent;
-import com.flechazo.slashblade.item.SwordType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.timers.TimerCallback;
 import net.minecraft.world.level.timers.TimerQueue;
 import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.level.Level;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -71,18 +71,17 @@ public class SummonedSwordArts {
 
         ItemStack blade = sender.getMainHandItem();
         var bladeState = BladeStateHelper.getBladeState(blade).orElse(new BladeStateComponentImpl(blade));
-        
+
         if (bladeState.isBroken() || bladeState.isSealed()
                 || !SwordType.from(blade).contains(SwordType.BEWITCHED))
             return;
-        
-		int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, blade);
+
+        int powerLevel = EnchantmentHelper.getItemEnchantmentLevel(Enchantments.POWER_ARROWS, blade);
         if (powerLevel <= 0)
             return;
-        
+
         InputCommand targetCommnad = InputCommand.M_DOWN;
-        
-        
+
 
         boolean onDown = !old.contains(targetCommnad) && current.contains(targetCommnad);
 
@@ -91,25 +90,24 @@ public class SummonedSwordArts {
         // basic summoned swords
         if (onDown) {
 
-           InputStateHelper.getInputState(sender).ifPresent(input -> {
+            InputStateHelper.getInputState(sender).ifPresent(input -> {
 
                 // SpiralSwords command
                 input.getScheduler().schedule("SpiralSwords", pressTime + 10, new TimerCallback<LivingEntity>() {
 
                     @Override
                     public void handle(LivingEntity rawEntity, TimerQueue<LivingEntity> queue, long now) {
-                        if (!(rawEntity instanceof ServerPlayer))
+                        if (!(rawEntity instanceof ServerPlayer entity))
                             return;
-                        ServerPlayer entity = (ServerPlayer) rawEntity;
 
                         InputCommand targetCommnad = InputCommand.M_DOWN;
                         boolean inputSucceed = InputStateHelper.getInputState(entity)
                                 .filter(input -> input.getCommands().contains(targetCommnad)
                                         && (!InputCommand.anyMatch(input.getCommands(), InputCommand.move)
-                                                || !input.getCommands().contains(InputCommand.SNEAK))
+                                        || !input.getCommands().contains(InputCommand.SNEAK))
                                         && input.getLastPressTime(targetCommnad) == pressTime)
                                 .isPresent();
-                        
+
                         if (!inputSucceed)
                             return;
 
@@ -150,7 +148,7 @@ public class SummonedSwordArts {
 
                                 for (int i = 0; i < count; i++) {
                                     EntitySpiralSwords ss = new EntitySpiralSwords(
-                                           EntityTypeRegister.SpiralSwords, worldIn);
+                                            EntityTypeRegister.SpiralSwords, worldIn);
                                     ss.setPos(entity.position());
                                     ss.setOwner(entity);
                                     ss.setColor(state.getColorCode());
@@ -176,9 +174,8 @@ public class SummonedSwordArts {
 
                     @Override
                     public void handle(LivingEntity rawEntity, TimerQueue<LivingEntity> queue, long now) {
-                        if (!(rawEntity instanceof ServerPlayer))
+                        if (!(rawEntity instanceof ServerPlayer entity))
                             return;
-                        ServerPlayer entity = (ServerPlayer) rawEntity;
 
                         InputCommand targetCommnad = InputCommand.M_DOWN;
                         boolean inputSucceed = InputStateHelper.getInputState(entity)
@@ -192,7 +189,7 @@ public class SummonedSwordArts {
                             return;
 
                         // summon
-                       BladeStateHelper.getBladeState(entity.getMainHandItem()).ifPresent((state) -> {
+                        BladeStateHelper.getBladeState(entity.getMainHandItem()).ifPresent((state) -> {
 
                             Level worldIn = entity.level();
                             Entity target = state.getTargetEntity(worldIn);
@@ -205,7 +202,7 @@ public class SummonedSwordArts {
                             //烈风环影剑
                             AdvancementHelper.grantCriterion(entity, ADVANCEMENT_STORM_SWORDS);
 
-                            int rank =ConcentrationRankHelper.getConcentrationRank(entity)
+                            int rank = ConcentrationRankHelper.getConcentrationRank(entity)
                                     .map(r -> r.getRank(worldIn.getGameTime()).level).orElse(0);
 
                             int count = 6;
@@ -240,9 +237,8 @@ public class SummonedSwordArts {
 
                     @Override
                     public void handle(LivingEntity rawEntity, TimerQueue<LivingEntity> queue, long now) {
-                        if (!(rawEntity instanceof ServerPlayer))
+                        if (!(rawEntity instanceof ServerPlayer entity))
                             return;
-                        ServerPlayer entity = (ServerPlayer) rawEntity;
 
                         InputCommand targetCommnad = InputCommand.M_DOWN;
                         boolean inputSucceed = InputStateHelper.getInputState(entity)
@@ -304,9 +300,8 @@ public class SummonedSwordArts {
 
                     @Override
                     public void handle(LivingEntity rawEntity, TimerQueue<LivingEntity> queue, long now) {
-                        if (!(rawEntity instanceof ServerPlayer))
+                        if (!(rawEntity instanceof ServerPlayer entity))
                             return;
-                        ServerPlayer entity = (ServerPlayer) rawEntity;
 
                         InputCommand targetCommnad = InputCommand.M_DOWN;
                         boolean inputSucceed = InputStateHelper.getInputState(entity)
@@ -320,7 +315,7 @@ public class SummonedSwordArts {
                             return;
 
                         // summon
-                       BladeStateHelper.getBladeState(entity.getMainHandItem()).ifPresent((state) -> {
+                        BladeStateHelper.getBladeState(entity.getMainHandItem()).ifPresent((state) -> {
 
                             Level worldIn = entity.level();
                             Entity target = state.getTargetEntity(worldIn);
@@ -441,27 +436,27 @@ public class SummonedSwordArts {
         }
     }
 
-	public Optional<Entity> findTarget(ServerPlayer sender, Entity lockedT) {
-		Optional<Entity> foundTarget = Stream.of(Optional.ofNullable(lockedT),
-		        RayTraceHelper
-		                .rayTrace(sender.level(), sender, sender.getEyePosition(1.0f), sender.getLookAngle(),
-		                        12, 12, (e) -> true)
-		                .filter(r -> r.getType() == HitResult.Type.ENTITY).filter(r -> {
-		                    EntityHitResult er = (EntityHitResult) r;
-		                    Entity target = er.getEntity();
+    public Optional<Entity> findTarget(ServerPlayer sender, Entity lockedT) {
+        Optional<Entity> foundTarget = Stream.of(Optional.ofNullable(lockedT),
+                        RayTraceHelper
+                                .rayTrace(sender.level(), sender, sender.getEyePosition(1.0f), sender.getLookAngle(),
+                                        12, 12, (e) -> true)
+                                .filter(r -> r.getType() == HitResult.Type.ENTITY).filter(r -> {
+                                    EntityHitResult er = (EntityHitResult) r;
+                                    Entity target = er.getEntity();
 
-		                    boolean isMatch = true;
-		                    if (target instanceof LivingEntity)
-		                        isMatch = TargetSelector.lockon.test(sender, (LivingEntity) target);
+                                    boolean isMatch = true;
+                                    if (target instanceof LivingEntity)
+                                        isMatch = TargetSelector.lockon.test(sender, (LivingEntity) target);
 
-		                    if (target instanceof IShootable)
-		                        isMatch = ((IShootable) target).getShooter() != sender;
+                                    if (target instanceof IShootable)
+                                        isMatch = ((IShootable) target).getShooter() != sender;
 
-		                    return isMatch;
-		                }).map(r -> ((EntityHitResult) r).getEntity()))
-		        .filter(Optional::isPresent).map(Optional::get).findFirst();
-		return foundTarget;
-	}
+                                    return isMatch;
+                                }).map(r -> ((EntityHitResult) r).getEntity()))
+                .filter(Optional::isPresent).map(Optional::get).findFirst();
+        return foundTarget;
+    }
 
     Vec3 calculateViewVector(float x, float y) {
         float f = x * ((float) Math.PI / 180F);
@@ -470,6 +465,6 @@ public class SummonedSwordArts {
         float f3 = Mth.sin(f1);
         float f4 = Mth.cos(f);
         float f5 = Mth.sin(f);
-        return new Vec3((double) (f3 * f4), (double) (-f5), (double) (f2 * f4));
+        return new Vec3(f3 * f4, -f5, f2 * f4);
     }
 }

@@ -1,11 +1,11 @@
 package com.flechazo.slashblade.client.renderer.model;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.flechazo.slashblade.client.renderer.model.obj.WavefrontObject;
 import com.flechazo.slashblade.init.DefaultResources;
 import com.flechazo.slashblade.registry.slashblade.SlashBladeDefinition;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;

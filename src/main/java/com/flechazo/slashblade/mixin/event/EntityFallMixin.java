@@ -15,7 +15,7 @@ public class EntityFallMixin {
     @Inject(method = "checkFallDamage( DZLnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)V", at = @At("HEAD"))
 
     private void onEntityFall(double heightDifference, boolean onGround, BlockState landedState, BlockPos landedPos, CallbackInfo ci) {
-        Entity entity = (Entity)(Object)this;
+        Entity entity = (Entity) (Object) this;
         if (entity instanceof LivingEntity living) {
             FallHandler.resetState(living);
         }
@@ -25,10 +25,10 @@ public class EntityFallMixin {
 
     private void onEntityLand(double heightDifference, boolean onGround, BlockState landedState, BlockPos landedPos, CallbackInfo ci
     ) {
-        Entity entity = (Entity)(Object)this;
+        Entity entity = (Entity) (Object) this;
         if (entity instanceof LivingEntity living) {
             // 传入 fallFactor = 落差，用于粒子强度
-            float fallFactor = (float)Math.abs(heightDifference);
+            float fallFactor = (float) Math.abs(heightDifference);
             FallHandler.spawnLandingParticle(living, fallFactor);
         }
     }

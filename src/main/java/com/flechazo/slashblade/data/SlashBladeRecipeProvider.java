@@ -1,7 +1,5 @@
 package com.flechazo.slashblade.data;
 
-import java.util.function.Consumer;
-
 import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.flechazo.slashblade.data.builtin.SlashBladeBuiltInRegistry;
 import com.flechazo.slashblade.data.tag.SlashBladeItemTags;
@@ -25,6 +23,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.ItemLike;
+
+import java.util.function.Consumer;
 
 public class SlashBladeRecipeProvider extends RecipeProvider {
 
@@ -53,7 +53,7 @@ public class SlashBladeRecipeProvider extends RecipeProvider {
         SlashBladeShapedRecipeBuilder.shaped(SlashBladeBuiltInRegistry.YAMATO.location()).pattern("PPP").pattern("PBP")
                 .pattern("PPP")
                 .define('B',
-                         SlashBladeIngredient.of(RequestDefinition.Builder.newInstance()
+                        SlashBladeIngredient.of(RequestDefinition.Builder.newInstance()
                                 .name(SlashBladeBuiltInRegistry.YAMATO.location()).addSwordType(SwordType.BROKEN)
                                 .addSwordType(SwordType.SEALED).build()).toVanilla())
                 .define('P', SlashBladeRegister.PROUDSOUL_SPHERE)
@@ -62,7 +62,7 @@ public class SlashBladeRecipeProvider extends RecipeProvider {
 
         SlashBladeShapedRecipeBuilder.shaped(SlashBladeRegister.SLASHBLADE).pattern(" EI").pattern("PBD").pattern("SI ")
                 .define('B',
-                         SlashBladeIngredient.of(SlashBladeRegister.WHITE,
+                        SlashBladeIngredient.of(SlashBladeRegister.WHITE,
                                 RequestDefinition.Builder.newInstance().addSwordType(SwordType.BROKEN).build()).toVanilla())
                 .define('I', Tags.Items.INGOTS_GOLD).define('S', Tags.Items.STRING).define('P', Tags.Items.DYES_BLUE)
                 .define('E', Tags.Items.RODS_BLAZE).define('D', Tags.Items.STORAGE_BLOCKS_COAL)
@@ -71,7 +71,7 @@ public class SlashBladeRecipeProvider extends RecipeProvider {
         SlashBladeShapedRecipeBuilder.shaped(SlashBladeBuiltInRegistry.RUBY.location()).pattern("DPI").pattern("PB ")
                 .pattern("S  ")
                 .define('B',
-                         SlashBladeIngredient.of(SlashBladeRegister.SILVER,
+                        SlashBladeIngredient.of(SlashBladeRegister.SILVER,
                                 RequestDefinition.Builder.newInstance().addSwordType(SwordType.BROKEN).build()).toVanilla())
                 .define('I', SlashBladeRegister.PROUDSOUL).define('S', Tags.Items.STRING).define('P', SlashBladeRegister.PROUDSOUL_INGOT)
                 .define('D', Tags.Items.DYES_RED)
@@ -83,7 +83,7 @@ public class SlashBladeRecipeProvider extends RecipeProvider {
                 .define('Q', Tags.Items.STORAGE_BLOCKS_QUARTZ).define('B', Items.BLAZE_POWDER)
                 .define('S', SlashBladeRegister.PROUDSOUL_CRYSTAL).define('E', Tags.Items.OBSIDIAN)
                 .define('F', Tags.Items.FEATHERS)
-                .define('C',  SlashBladeIngredient.of(RequestDefinition.Builder.newInstance()
+                .define('C', SlashBladeIngredient.of(RequestDefinition.Builder.newInstance()
                         .name(SlashBladeBuiltInRegistry.RUBY.location())
                         .addEnchantment(new EnchantmentDefinition(getEnchantmentID(Enchantments.SMITE), 1)).build()).toVanilla())
 
@@ -96,7 +96,7 @@ public class SlashBladeRecipeProvider extends RecipeProvider {
                 .define('S', SlashBladeRegister.PROUDSOUL_CRYSTAL).define('E', Tags.Items.OBSIDIAN)
                 .define('F', Tags.Items.FEATHERS)
                 .define('C',
-                         SlashBladeIngredient.of(
+                        SlashBladeIngredient.of(
                                 RequestDefinition.Builder.newInstance().name(SlashBladeBuiltInRegistry.RUBY.location())
 
                                         .addEnchantment(new EnchantmentDefinition(
@@ -109,7 +109,7 @@ public class SlashBladeRecipeProvider extends RecipeProvider {
         SlashBladeShapedRecipeBuilder.shaped(SlashBladeBuiltInRegistry.MURAMASA.location()).pattern("SSS")
                 .pattern("SBS").pattern("SSS")
                 .define('B',
-                         SlashBladeIngredient
+                        SlashBladeIngredient
                                 .of(RequestDefinition.Builder.newInstance().proudSoul(10000).refineCount(20).build()).toVanilla())
                 .define('S', Ingredient.of(SlashBladeRegister.PROUDSOUL_SPHERE))
                 .unlockedBy(getHasName(SlashBladeRegister.SLASHBLADE), has(SlashBladeRegister.SLASHBLADE)).save(consumer);
@@ -117,7 +117,7 @@ public class SlashBladeRecipeProvider extends RecipeProvider {
         SlashBladeShapedRecipeBuilder.shaped(SlashBladeBuiltInRegistry.TAGAYASAN.location()).pattern("SES")
                 .pattern("DBD").pattern("SES")
                 .define('B',
-                         SlashBladeIngredient.of(SlashBladeRegister.WOOD, RequestDefinition.Builder.newInstance()
+                        SlashBladeIngredient.of(SlashBladeRegister.WOOD, RequestDefinition.Builder.newInstance()
                                 .addEnchantment(new EnchantmentDefinition(getEnchantmentID(Enchantments.UNBREAKING), 1))
                                 .proudSoul(1000).refineCount(10).build()).toVanilla())
                 .define('S', Ingredient.of(SlashBladeRegister.PROUDSOUL_SPHERE)).define('E', Ingredient.of(Items.ENDER_EYE))
@@ -127,7 +127,7 @@ public class SlashBladeRecipeProvider extends RecipeProvider {
         SlashBladeShapedRecipeBuilder.shaped(SlashBladeBuiltInRegistry.AGITO.location()).pattern(" S ").pattern("SBS")
                 .pattern(" S ")
                 .define('B',
-                         SlashBladeIngredient.of(RequestDefinition.Builder.newInstance()
+                        SlashBladeIngredient.of(RequestDefinition.Builder.newInstance()
                                 .name(SlashBladeBuiltInRegistry.AGITO_RUST.location()).killCount(100).build()).toVanilla())
                 .define('S', Ingredient.of(SlashBladeRegister.PROUDSOUL))
                 .unlockedBy(getHasName(SlashBladeRegister.PROUDSOUL), has(SlashBladeRegister.PROUDSOUL)).save(consumer);
@@ -135,7 +135,7 @@ public class SlashBladeRecipeProvider extends RecipeProvider {
         SlashBladeShapedRecipeBuilder.shaped(SlashBladeBuiltInRegistry.OROTIAGITO_SEALED.location()).pattern(" S ")
                 .pattern("SBS").pattern(" S ")
                 .define('B',
-                         SlashBladeIngredient.of(RequestDefinition.Builder.newInstance()
+                        SlashBladeIngredient.of(RequestDefinition.Builder.newInstance()
                                 .name(SlashBladeBuiltInRegistry.OROTIAGITO_RUST.location()).killCount(100).build()).toVanilla())
                 .define('S', Ingredient.of(SlashBladeRegister.PROUDSOUL))
                 .unlockedBy(getHasName(SlashBladeRegister.PROUDSOUL), has(SlashBladeRegister.PROUDSOUL)).save(consumer);
@@ -143,7 +143,7 @@ public class SlashBladeRecipeProvider extends RecipeProvider {
         SlashBladeShapedRecipeBuilder.shaped(SlashBladeBuiltInRegistry.OROTIAGITO.location()).pattern("PSP")
                 .pattern("SBS").pattern("PSP")
                 .define('B',
-                         SlashBladeIngredient.of(RequestDefinition.Builder.newInstance()
+                        SlashBladeIngredient.of(RequestDefinition.Builder.newInstance()
                                 .name(SlashBladeBuiltInRegistry.OROTIAGITO_SEALED.location()).killCount(1000)
                                 .proudSoul(1000).refineCount(10).build()).toVanilla())
                 .define('P', Ingredient.of(SlashBladeRegister.PROUDSOUL)).define('S', Ingredient.of(SlashBladeRegister.PROUDSOUL_SPHERE))
@@ -152,7 +152,7 @@ public class SlashBladeRecipeProvider extends RecipeProvider {
         SlashBladeShapedRecipeBuilder.shaped(SlashBladeBuiltInRegistry.DOUTANUKI.location()).pattern("  P")
                 .pattern(" B ").pattern("P  ")
                 .define('B',
-                         SlashBladeIngredient.of(RequestDefinition.Builder.newInstance()
+                        SlashBladeIngredient.of(RequestDefinition.Builder.newInstance()
                                 .name(SlashBladeBuiltInRegistry.SABIGATANA.location()).killCount(100).proudSoul(1000)
                                 .refineCount(10).build()).toVanilla())
                 .define('P', Ingredient.of(SlashBladeRegister.PROUDSOUL_SPHERE))
@@ -161,7 +161,7 @@ public class SlashBladeRecipeProvider extends RecipeProvider {
         SlashBladeShapedRecipeBuilder.shaped(SlashBladeBuiltInRegistry.SABIGATANA.location()).pattern("  P")
                 .pattern(" P ").pattern("B  ")
                 .define('B',
-                         SlashBladeIngredient.of(RequestDefinition.Builder.newInstance()
+                        SlashBladeIngredient.of(RequestDefinition.Builder.newInstance()
                                 .name(SlashBladeBuiltInRegistry.SABIGATANA.location()).addSwordType(SwordType.BROKEN)
                                 .addSwordType(SwordType.SEALED).build()).toVanilla())
                 .define('P', Ingredient.of(SlashBladeRegister.PROUDSOUL_INGOT))
@@ -173,7 +173,7 @@ public class SlashBladeRecipeProvider extends RecipeProvider {
                 .define('I', Tags.Items.STORAGE_BLOCKS_IRON).define('R', Tags.Items.STORAGE_BLOCKS_REDSTONE)
                 .define('E', Tags.Items.STORAGE_BLOCKS_EMERALD)
                 .define('B',
-                         SlashBladeIngredient.of(RequestDefinition.Builder.newInstance()
+                        SlashBladeIngredient.of(RequestDefinition.Builder.newInstance()
                                 .addEnchantment(
                                         new EnchantmentDefinition(getEnchantmentID(Enchantments.FIRE_ASPECT), 1))
                                 .build()).toVanilla())
@@ -190,7 +190,7 @@ public class SlashBladeRecipeProvider extends RecipeProvider {
 
     private void rodaiRecipe(ResourceLocation rodai, ItemLike sword, Consumer<FinishedRecipe> consumer) {
         SlashBladeShapedRecipeBuilder.shaped(rodai).pattern("  P").pattern(" B ").pattern("WS ").define('B',
-                         SlashBladeIngredient.of(SlashBladeRegister.SILVER,
+                        SlashBladeIngredient.of(SlashBladeRegister.SILVER,
                                 RequestDefinition.Builder.newInstance().killCount(100).addSwordType(SwordType.BROKEN).build()).toVanilla())
                 .define('W', Ingredient.of(sword)).define('S', Ingredient.of(Tags.Items.STRING))
                 .define('P', Ingredient.of(SlashBladeRegister.PROUDSOUL_CRYSTAL))
@@ -200,7 +200,7 @@ public class SlashBladeRecipeProvider extends RecipeProvider {
 
     private void rodaiAdvRecipe(ResourceLocation rodai, ItemLike sword, Consumer<FinishedRecipe> consumer) {
         SlashBladeShapedRecipeBuilder.shaped(rodai).pattern("  P").pattern(" B ").pattern("WS ").define('B',
-                         SlashBladeIngredient.of(SlashBladeRegister.SILVER,
+                        SlashBladeIngredient.of(SlashBladeRegister.SILVER,
                                 RequestDefinition.Builder.newInstance().killCount(100).addSwordType(SwordType.BROKEN).build()).toVanilla())
                 .define('W', Ingredient.of(sword)).define('S', Ingredient.of(Tags.Items.STRING))
                 .define('P', Ingredient.of(SlashBladeRegister.PROUDSOUL_TRAP))

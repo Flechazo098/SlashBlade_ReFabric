@@ -2,12 +2,9 @@ package com.flechazo.slashblade.event;
 
 import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankHelper;
 import com.flechazo.slashblade.capability.slashblade.BladeStateHelper;
-import com.flechazo.slashblade.item.ItemSlashBlade;
 import io.github.fabricators_of_create.porting_lib.entity.events.living.LivingHurtEvent;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemStack;
 
 public class RankPointHandler {
     private static final class SingletonHolder {
@@ -27,7 +24,7 @@ public class RankPointHandler {
 
     /**
      * Not reached if canceled.
-     * 
+     *
      * @param event
      */
     public void onLivingDeathEvent(LivingHurtEvent event) {
@@ -43,7 +40,7 @@ public class RankPointHandler {
         if (BladeStateHelper.getBladeState(sourceEntity.getMainHandItem()).isEmpty())
             return;
 
-       ConcentrationRankHelper.getConcentrationRank(sourceEntity)
+        ConcentrationRankHelper.getConcentrationRank(sourceEntity)
                 .ifPresent(cr -> cr.addRankPoint(event.getSource()));
     }
 }

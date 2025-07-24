@@ -1,8 +1,8 @@
 package com.flechazo.slashblade.item;
 
+import com.flechazo.slashblade.data.tag.SlashBladeItemTags;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.crafting.Ingredient;
-import com.flechazo.slashblade.data.tag.SlashBladeItemTags;
 
 public class ItemTierSlashBlade implements Tier {
 

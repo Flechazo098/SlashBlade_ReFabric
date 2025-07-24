@@ -1,23 +1,23 @@
 package com.flechazo.slashblade.client.renderer.entity;
 
-import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponent;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.flechazo.slashblade.SlashBladeRefabriced;
+import com.flechazo.slashblade.capability.concentrationrank.ConcentrationRankComponent;
 import com.flechazo.slashblade.client.renderer.model.BladeModelManager;
 import com.flechazo.slashblade.client.renderer.model.obj.Face;
 import com.flechazo.slashblade.client.renderer.model.obj.WavefrontObject;
 import com.flechazo.slashblade.client.renderer.util.BladeRenderState;
 import com.flechazo.slashblade.client.renderer.util.MSAutoCloser;
 import com.flechazo.slashblade.entity.EntitySlashEffect;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import com.mojang.math.Axis;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nullable;
 
@@ -41,7 +41,7 @@ public class SlashEffectRenderer<T extends EntitySlashEffect> extends EntityRend
 
     @Override
     public void render(T entity, float entityYaw, float partialTicks, PoseStack matrixStackIn,
-            MultiBufferSource bufferIn, int packedLightIn) {
+                       MultiBufferSource bufferIn, int packedLightIn) {
 
         try (MSAutoCloser msac = MSAutoCloser.pushMatrix(matrixStackIn)) {
 

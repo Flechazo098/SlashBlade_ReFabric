@@ -3,7 +3,9 @@ package com.flechazo.slashblade.capability.mobeffect;
 import dev.onyxstudios.cca.api.v3.component.Component;
 import net.minecraft.world.effect.MobEffect;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.Set;
 
 public interface MobEffectComponent extends Component {
     default void setManagedStun(long now, long duration) {

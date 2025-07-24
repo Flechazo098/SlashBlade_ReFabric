@@ -1,12 +1,12 @@
 package com.flechazo.slashblade.client.renderer.entity;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import com.flechazo.slashblade.client.renderer.model.BladeModelManager;
 import com.flechazo.slashblade.client.renderer.model.obj.WavefrontObject;
 import com.flechazo.slashblade.client.renderer.util.BladeRenderState;
 import com.flechazo.slashblade.client.renderer.util.MSAutoCloser;
 import com.flechazo.slashblade.entity.EntityAbstractSummonedSword;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -34,7 +34,7 @@ public class SummonedSwordRenderer<T extends EntityAbstractSummonedSword> extend
 
     @Override
     public void render(T entity, float entityYaw, float partialTicks, PoseStack matrixStack, MultiBufferSource bufferIn,
-            int packedLightIn) {
+                       int packedLightIn) {
 
         try (MSAutoCloser msac = MSAutoCloser.pushMatrix(matrixStack)) {
             Entity hits = entity.getHitEntity();

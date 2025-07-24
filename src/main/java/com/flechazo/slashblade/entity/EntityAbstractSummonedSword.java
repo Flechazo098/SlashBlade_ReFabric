@@ -1,20 +1,20 @@
 package com.flechazo.slashblade.entity;
 
 import com.flechazo.slashblade.SlashBladeConfig;
+import com.flechazo.slashblade.ability.StunManager;
+import com.flechazo.slashblade.capability.persistentdata.PersistentDataComponent;
+import com.flechazo.slashblade.capability.persistentdata.PersistentDataHelper;
 import com.flechazo.slashblade.network.util.PlayMessages;
 import com.flechazo.slashblade.registry.EntityTypeRegister;
-import com.flechazo.slashblade.util.accessor.PersistentDataAccessor;
+import com.flechazo.slashblade.util.AttackManager;
+import com.flechazo.slashblade.util.EnumSetConverter;
+import com.flechazo.slashblade.util.NBTHelper;
+import com.flechazo.slashblade.util.TargetSelector;
 import io.github.fabricators_of_create.porting_lib.entity.PartEntity;
 import io.github.fabricators_of_create.porting_lib.entity.PortingLibEntity;
 import io.github.fabricators_of_create.porting_lib.entity.events.EntityEventFactory;
 import io.github.fabricators_of_create.porting_lib.util.LazyOptional;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
-import com.flechazo.slashblade.SlashBladeRefabriced;
-import com.flechazo.slashblade.ability.StunManager;
-import com.flechazo.slashblade.util.AttackManager;
-import com.flechazo.slashblade.util.EnumSetConverter;
-import com.flechazo.slashblade.util.NBTHelper;
-import com.flechazo.slashblade.util.TargetSelector;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
@@ -60,21 +60,21 @@ import java.util.Optional;
 
 public class EntityAbstractSummonedSword extends Projectile implements IShootable {
     private static final EntityDataAccessor<Integer> COLOR = SynchedEntityData
-            .<Integer>defineId(EntityAbstractSummonedSword.class, EntityDataSerializers.INT);
+            .defineId(EntityAbstractSummonedSword.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> FLAGS = SynchedEntityData
-            .<Integer>defineId(EntityAbstractSummonedSword.class, EntityDataSerializers.INT);
+            .defineId(EntityAbstractSummonedSword.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> HIT_ENTITY_ID = SynchedEntityData
-            .<Integer>defineId(EntityAbstractSummonedSword.class, EntityDataSerializers.INT);
+            .defineId(EntityAbstractSummonedSword.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> OFFSET_YAW = SynchedEntityData
-            .<Float>defineId(EntityAbstractSummonedSword.class, EntityDataSerializers.FLOAT);
+            .defineId(EntityAbstractSummonedSword.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> ROLL = SynchedEntityData
-            .<Float>defineId(EntityAbstractSummonedSword.class, EntityDataSerializers.FLOAT);
+            .defineId(EntityAbstractSummonedSword.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Byte> PIERCE = SynchedEntityData.defineId(EntityAbstractSummonedSword.class,
             EntityDataSerializers.BYTE);
     private static final EntityDataAccessor<String> MODEL = SynchedEntityData
             .defineId(EntityAbstractSummonedSword.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Integer> DELAY = SynchedEntityData
-            .<Integer>defineId(EntityAbstractSummonedSword.class, EntityDataSerializers.INT);
+            .defineId(EntityAbstractSummonedSword.class, EntityDataSerializers.INT);
 
     private int ticksInGround;
     private boolean inGround;
@@ -88,9 +88,9 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
 
     static final int ON_GROUND_LIFE_TIME = 20 * 5;
 
-    private SoundEvent hitEntitySound = SoundEvents.TRIDENT_HIT;
-    private SoundEvent hitEntityPlayerSound = SoundEvents.TRIDENT_HIT;
-    private SoundEvent hitGroundSound = SoundEvents.TRIDENT_HIT_GROUND;
+    private final SoundEvent hitEntitySound = SoundEvents.TRIDENT_HIT;
+    private final SoundEvent hitEntityPlayerSound = SoundEvents.TRIDENT_HIT;
+    private final SoundEvent hitGroundSound = SoundEvents.TRIDENT_HIT_GROUND;
 
     protected SoundEvent getHitEntitySound() {
         return this.hitEntitySound;
@@ -164,12 +164,12 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
                 .add(this.random.nextGaussian() * (double) 0.0075F * (double) inaccuracy,
                         this.random.nextGaussian() * (double) 0.0075F * (double) inaccuracy,
                         this.random.nextGaussian() * (double) 0.0075F * (double) inaccuracy)
-                .scale((double) velocity);
+                .scale(velocity);
         this.setDeltaMovement(vec3d);
         float f = Mth.sqrt((float) vec3d.horizontalDistanceSqr());
         this.setPos(this.position());
         this.setYRot((float) (Mth.atan2(vec3d.x, vec3d.z) * (double) (180F / (float) Math.PI)));
-        this.setXRot((float) (Mth.atan2(vec3d.y, (double) f) * (double) (180F / (float) Math.PI)));
+        this.setXRot((float) (Mth.atan2(vec3d.y, f) * (double) (180F / (float) Math.PI)));
         this.yRotO = this.getYRot();
         this.xRotO = this.getXRot();
         this.ticksInGround = 0;
@@ -190,7 +190,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
     @Override
     @Environment(EnvType.CLIENT)
     public void lerpTo(double x, double y, double z, float yaw, float pitch, int posRotationIncrements,
-            boolean teleport) {
+                       boolean teleport) {
         this.setPos(x, y, z);
         this.setRot(yaw, pitch);
     }
@@ -201,7 +201,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
         this.setDeltaMovement(x, y, z);
         if (this.xRotO == 0.0F && this.yRotO == 0.0F) {
             float f = Mth.sqrt((float) (x * x + z * z));
-            this.setXRot((float) (Mth.atan2(y, (double) f) * (double) (180F / (float) Math.PI)));
+            this.setXRot((float) (Mth.atan2(y, f) * (double) (180F / (float) Math.PI)));
             this.setYRot((float) (Mth.atan2(x, z) * (double) (180F / (float) Math.PI)));
             this.xRotO = this.getXRot();
             this.yRotO = this.getYRot();
@@ -331,7 +331,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
             if (this.xRotO == 0.0F && this.yRotO == 0.0F) {
                 float f = Mth.sqrt((float) motionVec.horizontalDistanceSqr());
                 this.setYRot((float) (Mth.atan2(motionVec.x, motionVec.z) * (double) (180F / (float) Math.PI)));
-                this.setXRot((float) (Mth.atan2(motionVec.y, (double) f) * (double) (180F / (float) Math.PI)));
+                this.setXRot((float) (Mth.atan2(motionVec.y, f) * (double) (180F / (float) Math.PI)));
                 this.yRotO = this.getYRot();
                 this.xRotO = this.getXRot();
             }
@@ -357,15 +357,15 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
                     Entity entity = ((EntityHitResult) raytraceresult).getEntity();
                     Entity entity1 = this.getShooter();
                     if (entity instanceof LivingEntity && entity1 instanceof LivingEntity) {
-                    	if(!TargetSelector.test.test( (LivingEntity) entity1, (LivingEntity) entity) ) {
-	                        raytraceresult = null;
-	                        entityraytraceresult = null;
+                        if (!TargetSelector.test.test((LivingEntity) entity1, (LivingEntity) entity)) {
+                            raytraceresult = null;
+                            entityraytraceresult = null;
                         }
                     }
                 }
 
                 if (raytraceresult != null && !(disallowedHitBlock && raytraceresult.getType() == HitResult.Type.BLOCK)
-                        && ! EntityEventFactory.onProjectileImpact(this, raytraceresult)) {
+                        && !EntityEventFactory.onProjectileImpact(this, raytraceresult)) {
                     this.onHit(raytraceresult);
                     this.hasImpulse = true;
                 }
@@ -397,9 +397,8 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
                 this.setYRot((float) (Mth.atan2(mx, mz) * (double) (180F / (float) Math.PI)));
             }
 
-            for (this.setXRot((float) (Mth.atan2(my, (double) f4) * (double) (180F / (float) Math.PI))); this.getXRot()
+            for (this.setXRot((float) (Mth.atan2(my, f4) * (double) (180F / (float) Math.PI))); this.getXRot()
                     - this.xRotO < -180.0F; this.xRotO -= 360.0F) {
-                ;
             }
 
             while (this.getXRot() - this.xRotO >= 180.0F) {
@@ -424,7 +423,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
                 }
             }
 
-            this.setDeltaMovement(motionVec.scale((double) f1));
+            this.setDeltaMovement(motionVec.scale(f1));
             if (!this.isNoGravity() && !disallowedHitBlock) {
                 Vec3 vec3d3 = this.getDeltaMovement();
                 this.setDeltaMovement(vec3d3.x, vec3d3.y - (double) 0.05F, vec3d3.z);
@@ -450,14 +449,14 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
     protected void onHit(HitResult raytraceResultIn) {
         HitResult.Type type = raytraceResultIn.getType();
         switch (type) {
-        case ENTITY:
-            this.onHitEntity((EntityHitResult) raytraceResultIn);
-            break;
-        case BLOCK:
-            this.onHitBlock((BlockHitResult) raytraceResultIn);
-            break;
-        default:
-            break;
+            case ENTITY:
+                this.onHitEntity((EntityHitResult) raytraceResultIn);
+                break;
+            case BLOCK:
+                this.onHitBlock((BlockHitResult) raytraceResultIn);
+                break;
+            default:
+                break;
         }
     }
 
@@ -466,7 +465,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
         this.inBlockState = blockstate;
         Vec3 vec3d = blockraytraceresult.getLocation().subtract(this.getX(), this.getY(), this.getZ());
         this.setDeltaMovement(vec3d);
-        Vec3 vec3d1 = this.position().subtract(vec3d.normalize().scale((double) 0.05F));
+        Vec3 vec3d1 = this.position().subtract(vec3d.normalize().scale(0.05F));
         this.setPos(vec3d1.x, vec3d1.y, vec3d1.z);
         this.playSound(this.getHitGroundSound(), 1.0F, 2.2F / (this.random.nextFloat() * 0.2F + 0.9F));
         this.inGround = true;
@@ -533,8 +532,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
                 hits = ((PartEntity<?>) targetEntity).getParent();
             }
 
-            if (hits instanceof LivingEntity) {
-                LivingEntity targetLivingEntity = (LivingEntity) hits;
+            if (hits instanceof LivingEntity targetLivingEntity) {
 
                 StunManager.setStun(targetLivingEntity);
 
@@ -591,7 +589,7 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
     }
 
     public void setPierce(byte value) {
-        this.getEntityData().set(PIERCE, (byte) value);
+        this.getEntityData().set(PIERCE, value);
     }
 
     public int getDelay() {
@@ -624,13 +622,17 @@ public class EntityAbstractSummonedSword extends Projectile implements IShootabl
     }
 
     public List<MobEffectInstance> getPotionEffects() {
-        List<MobEffectInstance> effects = PotionUtils.getAllEffects(((PersistentDataAccessor) this).slashbladerefabriced$getPersistentData());
+        CompoundTag tag = PersistentDataHelper.getPersistentData(this)
+                .map(PersistentDataComponent::getPersistentData)
+                .orElse(new CompoundTag());
 
-        if (effects.isEmpty())
+        List<MobEffectInstance> effects = PotionUtils.getAllEffects(tag);
+        if (effects.isEmpty()) {
             effects.add(new MobEffectInstance(MobEffects.POISON, 1, 1));
-
+        }
         return effects;
     }
+
 
     public void burst() {
         this.playSound(SoundEvents.GLASS_BREAK, 1.0F, 1.2F / (this.random.nextFloat() * 0.2F + 0.9F));

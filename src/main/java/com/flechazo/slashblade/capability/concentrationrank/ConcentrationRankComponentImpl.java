@@ -2,7 +2,6 @@ package com.flechazo.slashblade.capability.concentrationrank;
 
 import com.flechazo.slashblade.capability.slashblade.BladeStateComponentRegistry;
 import com.flechazo.slashblade.item.ItemSlashBlade;
-import com.flechazo.slashblade.network.NetworkManager;
 import com.flechazo.slashblade.network.RankSyncMessage;
 import com.google.common.collect.Range;
 import net.minecraft.nbt.CompoundTag;
@@ -136,10 +135,9 @@ public class ConcentrationRankComponentImpl implements ConcentrationRankComponen
     }
 
     public void addRankPoint(DamageSource src) {
-        if (!(src.getEntity() instanceof LivingEntity))
+        if (!(src.getEntity() instanceof LivingEntity user))
             return;
 
-        LivingEntity user = (LivingEntity) src.getEntity();
         ItemStack stack = user.getMainHandItem();
 
         Optional<ResourceLocation> combo = Optional.empty();

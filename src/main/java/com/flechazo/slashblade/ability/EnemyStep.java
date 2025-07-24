@@ -21,7 +21,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 
-
 import java.util.EnumSet;
 import java.util.List;
 
@@ -38,7 +37,7 @@ public class EnemyStep {
     }
 
     public void register() {
-       InputCommandEvent.INPUT_COMMAND.register(this::onInputChange);
+        InputCommandEvent.INPUT_COMMAND.register(this::onInputChange);
     }
 
     static final TargetingConditions tc = new TargetingConditions(false).ignoreLineOfSight()
@@ -84,7 +83,7 @@ public class EnemyStep {
         if (worldIn instanceof ServerLevel) {
             ((ServerLevel) worldIn).sendParticles(
                     new BlockParticleOption(ParticleTypes.BLOCK, Blocks.ORANGE_STAINED_GLASS.defaultBlockState()),
-                    sender.getX(), sender.getY(), sender.getZ(), 20, 0.0D, 0.0D, 0.0D, (double) 0.15F);
+                    sender.getX(), sender.getY(), sender.getZ(), 20, 0.0D, 0.0D, 0.0D, 0.15F);
         }
     }
 

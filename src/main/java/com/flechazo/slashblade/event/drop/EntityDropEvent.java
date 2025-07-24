@@ -6,7 +6,6 @@ import com.flechazo.slashblade.item.ItemSlashBlade;
 import com.flechazo.slashblade.registry.EntityTypeRegister;
 import net.fabricmc.fabric.api.entity.event.v1.ServerLivingEntityEvents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
@@ -22,7 +21,7 @@ public class EntityDropEvent {
         // 在服务端实体死亡后触发
         ServerLivingEntityEvents.AFTER_DEATH.register((entity, source) -> {
             // 只对存活实体（非玩家等）进行处理
-            if (! (entity.level() instanceof ServerLevel world)) return;
+            if (!(entity.level() instanceof ServerLevel world)) return;
             handleBladeDrop(world, entity, source);
         });
     }
@@ -60,7 +59,7 @@ public class EntityDropEvent {
 
 
     public static void dropBlade(LivingEntity entity, EntityType<?> type, ItemStack blade, float percent, double x,
-            double y, double z) {
+                                 double y, double z) {
         if (entity.getType().equals(type)) {
             var rand = entity.level().getRandom();
 

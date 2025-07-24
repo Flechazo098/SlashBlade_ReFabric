@@ -8,9 +8,9 @@ import net.minecraft.core.Registry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.entity.LivingEntity;
 
 import java.util.function.Function;
 
@@ -39,7 +39,7 @@ public class SlashArts {
         Fail, Success, Jackpot, Super
     }
 
-    private Function<LivingEntity, ResourceLocation> comboState;
+    private final Function<LivingEntity, ResourceLocation> comboState;
     private Function<LivingEntity, ResourceLocation> comboStateJust;
     private Function<LivingEntity, ResourceLocation> comboStateSuper;
 
@@ -53,11 +53,11 @@ public class SlashArts {
     }
 
     private int costSoul = 20;
-    
+
     public SlashArts(Function<LivingEntity, ResourceLocation> state) {
         this.comboState = state;
         this.comboStateJust = state;
-        this.setComboStateSuper((entity)->ComboStateRegistry.JUDGEMENT_CUT_END.getId());
+        this.setComboStateSuper((entity) -> ComboStateRegistry.JUDGEMENT_CUT_END.getId());
     }
 
     public ResourceLocation getComboState(LivingEntity user) {
@@ -72,25 +72,25 @@ public class SlashArts {
         this.comboStateJust = state;
         return this;
     }
-    
-	public Function<LivingEntity, ResourceLocation> getComboStateSuper() {
-		return comboStateSuper;
-	}
 
-	public SlashArts setComboStateSuper(Function<LivingEntity, ResourceLocation> comboStateSuper) {
-		this.comboStateSuper = comboStateSuper;
+    public Function<LivingEntity, ResourceLocation> getComboStateSuper() {
+        return comboStateSuper;
+    }
+
+    public SlashArts setComboStateSuper(Function<LivingEntity, ResourceLocation> comboStateSuper) {
+        this.comboStateSuper = comboStateSuper;
         return this;
-	}
+    }
 
     public int getProudSoulCost() {
-		return costSoul;
-	}
+        return costSoul;
+    }
 
-	public void setProudSoulCost(int costSoul) {
-		this.costSoul = costSoul;
-	}
+    public void setProudSoulCost(int costSoul) {
+        this.costSoul = costSoul;
+    }
 
-	public Component getDescription() {
+    public Component getDescription() {
         return Component.translatable(this.getDescriptionId());
     }
 

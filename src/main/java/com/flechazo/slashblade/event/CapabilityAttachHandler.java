@@ -2,7 +2,7 @@ package com.flechazo.slashblade.event;
 
 /**
  * 此类已被弃用
- *<p>
+ * <p>
  * {@code INPUT_STATE} 注册请参阅 {@link com.flechazo.slashblade.capability.inputstate.InputStateComponentRegistry}
  * <p>
  * {@code MOB_EFFECT} 注册请参阅 {@link com.flechazo.slashblade.capability.mobeffect.MobEffectComponentRegistry}

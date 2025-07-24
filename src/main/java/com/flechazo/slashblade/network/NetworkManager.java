@@ -12,10 +12,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.Entity;
 
-import java.util.Objects;
 import java.util.function.Supplier;
 
 public class NetworkManager {
@@ -24,7 +22,7 @@ public class NetworkManager {
     public static final ResourceLocation ACTIVE_STATE_SYNC_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "active_state_sync");
     public static final ResourceLocation RANK_SYNC_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "rank_sync");
     public static final ResourceLocation MOTION_BROADCAST_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "motion_broadcast");
-    public static final ResourceLocation SPAWN_ENTITY_ID =  new ResourceLocation(SlashBladeRefabriced.MODID, "spawn_entity");
+    public static final ResourceLocation SPAWN_ENTITY_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "spawn_entity");
 
     public static void registerServerReceivers() {
         ServerPlayNetworking.registerGlobalReceiver(MOVE_COMMAND_ID, MoveCommandMessage::handleServer);
@@ -78,6 +76,7 @@ public class NetworkManager {
             }
         }
     }
+
     /**
      * 向指定世界中以 (x,y,z) 为中心，半径 radius 范围内所有玩家发送包
      */
@@ -89,6 +88,7 @@ public class NetworkManager {
             ServerPlayNetworking.send(player, channelId, buf);
         }
     }
+
     /**
      * 通用的send方法
      * 这个方法处理PacketDistributor.PLAYER.with(() -> player)的调用模式
@@ -104,6 +104,7 @@ public class NetworkManager {
             }
         }
     }
+
     /**
      * PacketDistributor类，用于模拟Forge的网络分发机制
      */

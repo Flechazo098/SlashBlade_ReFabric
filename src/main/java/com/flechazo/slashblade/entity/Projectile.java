@@ -13,7 +13,7 @@ public abstract class Projectile extends net.minecraft.world.entity.projectile.P
             EntityDataSerializers.INT);
 
     protected Projectile(EntityType<? extends net.minecraft.world.entity.projectile.Projectile> p_37248_,
-            Level p_37249_) {
+                         Level p_37249_) {
         super(p_37248_, p_37249_);
     }
 

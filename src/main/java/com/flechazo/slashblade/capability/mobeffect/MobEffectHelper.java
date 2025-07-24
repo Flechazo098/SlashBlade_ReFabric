@@ -8,6 +8,7 @@ public class MobEffectHelper {
 
     /**
      * 获取实体的MobEffect组件
+     *
      * @param entity 实体
      * @return MobEffect组件
      */

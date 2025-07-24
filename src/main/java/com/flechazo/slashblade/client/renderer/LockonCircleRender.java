@@ -20,8 +20,9 @@ public class LockonCircleRender {
 
     /**
      * 此方法已被弃用
-     *<p>
+     * <p>
      * 请参阅 {@link com.flechazo.slashblade.mixin.event.LivingEntityRendererMixin} 类以获得替代实现。
+     *
      * @deprecated 使用 {@link com.flechazo.slashblade.mixin.event.LivingEntityRendererMixin} 替代。
      */
 //    @SubscribeEvent

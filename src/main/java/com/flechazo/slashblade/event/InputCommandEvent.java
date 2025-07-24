@@ -49,7 +49,7 @@ public class InputCommandEvent extends SlashBladeEvent {
     EnumSet<InputCommand> old;
     EnumSet<InputCommand> current;
 
-    public static InputCommandEvent onInputChange (ServerPlayer player, InputStateComponent state, EnumSet<InputCommand> old, EnumSet<InputCommand> current) {
+    public static InputCommandEvent onInputChange(ServerPlayer player, InputStateComponent state, EnumSet<InputCommand> old, EnumSet<InputCommand> current) {
         InputCommandEvent event = new InputCommandEvent(player, state, old, current);
         INPUT_COMMAND.post(event);
         return event;

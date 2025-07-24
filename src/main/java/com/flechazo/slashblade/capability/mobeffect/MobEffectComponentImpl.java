@@ -13,7 +13,7 @@ public class MobEffectComponentImpl implements MobEffectComponent {
     private int stunLimit = 200;
     private Optional<Long> untouchableTimeout = Optional.empty();
     private int untouchableLimit = 200;
-    private Set<MobEffect> effectSet = Sets.newHashSet();
+    private final Set<MobEffect> effectSet = Sets.newHashSet();
     private float storedHealth;
     private boolean hasWorked;
     private Optional<Long> avoidCooldown = Optional.empty();

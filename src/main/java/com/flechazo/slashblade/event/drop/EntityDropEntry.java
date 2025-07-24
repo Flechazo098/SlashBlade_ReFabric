@@ -1,9 +1,8 @@
 package com.flechazo.slashblade.event.drop;
 
+import com.flechazo.slashblade.SlashBladeRefabriced;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-
-import com.flechazo.slashblade.SlashBladeRefabriced;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -40,7 +39,7 @@ public class EntityDropEntry {
     }
 
     public EntityDropEntry(ResourceLocation entityType, ResourceLocation bladeName, float dropRate, boolean request,
-            boolean pointFixed, Vec3 point) {
+                           boolean pointFixed, Vec3 point) {
         this.entityType = entityType;
         this.bladeName = bladeName;
         this.dropRate = dropRate;

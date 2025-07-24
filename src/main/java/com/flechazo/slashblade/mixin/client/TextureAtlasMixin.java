@@ -14,11 +14,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Environment(EnvType.CLIENT)
 @Mixin(TextureAtlas.class)
-public class TextureAtlasMixin  {
+public class TextureAtlasMixin {
 
     @Inject(method = "upload", at = @At("RETURN"))
     private void onResourceReload(SpriteLoader.Preparations preparations, CallbackInfo ci) {
-            BladeModelManager.getInstance().reload();
-            BladeMotionManager.getInstance().reload();
+        BladeModelManager.getInstance().reload();
+        BladeMotionManager.getInstance().reload();
     }
 }
