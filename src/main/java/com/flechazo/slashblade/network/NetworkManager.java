@@ -23,6 +23,7 @@ public class NetworkManager {
     public static final ResourceLocation RANK_SYNC_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "rank_sync");
     public static final ResourceLocation MOTION_BROADCAST_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "motion_broadcast");
     public static final ResourceLocation SPAWN_ENTITY_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "spawn_entity");
+    public static final ResourceLocation SLASHBLADE_DATA_SYNC_ID = new ResourceLocation(SlashBladeRefabriced.MODID, "slashblade_data_sync");
 
     public static void registerServerReceivers() {
         ServerPlayNetworking.registerGlobalReceiver(MOVE_COMMAND_ID, MoveCommandMessage::handleServer);
@@ -33,6 +34,7 @@ public class NetworkManager {
         ClientPlayNetworking.registerGlobalReceiver(RANK_SYNC_ID, RankSyncMessage::handleClient);
         ClientPlayNetworking.registerGlobalReceiver(MOTION_BROADCAST_ID, MotionBroadcastMessage::handleClient);
         ClientPlayNetworking.registerGlobalReceiver(SPAWN_ENTITY_ID, PlayMessages.SpawnEntity::handleClient);
+        ClientPlayNetworking.registerGlobalReceiver(SLASHBLADE_DATA_SYNC_ID, SlashBladeDataSyncMessage::handleClient);
     }
 
     public static void sendToServer(ResourceLocation id, FriendlyByteBuf buf) {

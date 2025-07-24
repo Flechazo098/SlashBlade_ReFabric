@@ -33,6 +33,9 @@
 		],
 		"cardinal-components-item": [
 			"com.flechazo.slashblade.capability.slashblade.BladeStateComponentRegistry"
+		],
+		"jei_mod_plugin": [
+			"com.flechazo.slashblade.compat.jei.JEICompat"
 		]
 	},
 	"custom": {

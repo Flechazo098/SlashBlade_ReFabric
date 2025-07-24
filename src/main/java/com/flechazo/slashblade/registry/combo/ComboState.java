@@ -10,8 +10,6 @@ import com.flechazo.slashblade.slasharts.SlashArts;
 import com.flechazo.slashblade.util.AdvancementHelper;
 import com.flechazo.slashblade.util.TimeValueHelper;
 import com.google.common.collect.Maps;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -25,8 +23,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class ComboState {
-    public static final ResourceKey<Registry<ComboState>> REGISTRY_KEY = ResourceKey
-            .createRegistryKey(new ResourceLocation(SlashBladeRefabriced.MODID, "combo_state"));
 
     private final ResourceLocation motionLoc;
 

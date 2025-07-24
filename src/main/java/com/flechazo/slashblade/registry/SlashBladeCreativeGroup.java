@@ -15,9 +15,37 @@ import net.minecraft.world.item.ItemStack;
 public class SlashBladeCreativeGroup {
 
     private static void fillBlades(CreativeModeTab.ItemDisplayParameters features, CreativeModeTab.Output output) {
-        SlashBladeRefabriced.getSlashBladeDefinitionRegistry(features.holders()).listElements()
-                .sorted(SlashBladeDefinition.COMPARATOR).forEach(entry -> {
-                    ItemStack blade = entry.value().getBlade();
+        // 使用修改后的方法获取Registry而不是RegistryLookup
+        Registry<SlashBladeDefinition> registry = SlashBladeRefabriced.getSlashBladeDefinitionRegistryForCreativeTab();
+        
+        // 直接对SlashBladeDefinition进行排序，而不是Holder.Reference
+        registry.stream()
+                .sorted((left, right) -> {
+                    ResourceLocation leftKey = registry.getKey(left);
+                    ResourceLocation rightKey = registry.getKey(right);
+                    
+                    if (leftKey == null || rightKey == null) {
+                        return leftKey == null ? 1 : -1;
+                    }
+                    
+                    boolean checkSame = leftKey.getNamespace().equalsIgnoreCase(rightKey.getNamespace());
+                    if (!checkSame) {
+                        if (leftKey.getNamespace().equalsIgnoreCase(SlashBladeRefabriced.MODID))
+                            return -1;
+                        if (rightKey.getNamespace().equalsIgnoreCase(SlashBladeRefabriced.MODID))
+                            return 1;
+                    }
+                    
+                    return leftKey.toString().compareToIgnoreCase(rightKey.toString());
+                })
+                .forEach(definition -> {
+                    ItemStack blade = definition.getBlade();
+                    ResourceLocation key = registry.getKey(definition);
+                    
+                    // 添加调试信息
+                    SlashBladeRefabriced.LOGGER.info("Adding blade: {} -> Display Name: {}, NBT: {}",
+                        key, blade.getDisplayName().getString(), blade.getTag());
+                    
                     output.accept(blade);
                 });
     }

@@ -9,9 +9,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
 public class SpecialEffect {
-    public static final ResourceKey<Registry<SpecialEffect>> REGISTRY_KEY = ResourceKey
-            .createRegistryKey(SlashBladeRefabriced.prefix("special_effect"));
-
     private final int requestLevel;
     private final boolean isCopiable;
     private final boolean isRemovable;

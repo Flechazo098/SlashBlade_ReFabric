@@ -10,6 +10,7 @@ import net.minecraft.Util;
 import net.minecraft.core.Holder.Reference;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -114,7 +115,10 @@ public class SlashBladeDefinition {
         if (!this.getName().equals(SlashBladeRefabriced.prefix("none")))
             state.setTranslationKey(this.getTranslationKey());
 
-        result.getOrCreateTag().put("bladeState", state.getActiveState());
+        CompoundTag bladeStateTag = state.getActiveState();
+        bladeStateTag.putString("definitionName", this.getName().toString());
+
+        result.getOrCreateTag().put("bladeState", bladeStateTag);
 
         for (var instance : this.enchantments) {
             var enchantment = BuiltInRegistries.ENCHANTMENT.get(instance.getEnchantmentID());
